@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: html_head('Select Seats')}"></head>
+<body>
+<div th:replace="~{layout :: user_navbar}"></div>
+<main class="container">
+  <!-- Flight Header -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-4">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+          <h3 class="fw-bold mb-1">
+            <span class="badge bg-primary me-2" th:text="${flight.flightNumber}">FL-101</span>
+            <span th:text="${flight.airlineName}">Airline</span>
+          </h3>
+          <div class="text-muted">
+            <i class="bi bi-geo-alt-fill"></i>
+            <strong th:text="${flight.origin}">A</strong>
+            &rarr;
+            <strong th:text="${flight.destination}">B</strong>
+            &nbsp;|&nbsp;
+            <i class="bi bi-calendar3"></i>
+            <span th:text="${#temporals.format(flight.departureDateTime,'dd MMM yyyy HH:mm')}">Date</span>
+          </div>
+        </div>
+        <div class="text-end">
+          <div class="fs-4 fw-bold text-primary">$<span th:text="${#numbers.formatDecimal(flight.fare,1,2)}">0</span> / seat</div>
+          <small class="text-muted"><span th:text="${flight.availableSeats}">0</span> seats available</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" th:text="${error}">
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+
+  <!-- Legend -->
+  <div class="d-flex gap-3 mb-3 flex-wrap">
+    <span><button class="seat-btn seat-available" disabled></button> Available</span>
+    <span><button class="seat-btn seat-booked" disabled></button> Booked</span>
+    <span><button class="seat-btn seat-selected" disabled></button> Selected</span>
+  </div>
+
+  <!-- Seat Map -->
+  <form th:action="@{/user/book/{id}(id=${flight.id})}" method="post" id="seatForm">
+    <div class="card border-0 shadow-sm p-4 mb-4">
+      <div class="text-center text-muted mb-3"><small>✈️ Front of Plane</small></div>
+      <div id="seatMap" class="d-flex flex-column gap-2 align-items-center">
+        <!-- Rendered by JS using Thymeleaf data -->
+      </div>
+      <div class="text-center text-muted mt-3"><small>🛄 Rear of Plane</small></div>
+    </div>
+
+    <div class="card border-0 shadow-sm p-4 mb-4">
+      <h5 class="fw-bold">Booking Summary</h5>
+      <p class="mb-1">Selected seats: <strong id="selectedSeatDisplay">None</strong></p>
+      <p class="mb-3">Total fare: <strong id="totalFareDisplay">$0.00</strong></p>
+      <button type="submit" class="btn btn-success btn-lg" id="confirmBtn" disabled>
+        <i class="bi bi-check-circle"></i> Confirm Booking
+      </button>
+    </div>
+  </form>
+</main>
+
+<!-- Pass data from Thymeleaf → JS -->
+<script th:inline="javascript">
+  const allSeats   = /*[[${allSeats}]]*/ [];
+  const bookedSeats = new Set(/*[[${bookedSeats}]]*/ []);
+  const farePerSeat = /*[[${flight.fare}]]*/ 0;
+</script>
+<script>
+  const seatMap = document.getElementById('seatMap');
+  const selectedSeatDisplay = document.getElementById('selectedSeatDisplay');
+  const totalFareDisplay = document.getElementById('totalFareDisplay');
+  const confirmBtn = document.getElementById('confirmBtn');
+  const seatForm = document.getElementById('seatForm');
+  let selectedSeats = new Set();
+
+  function renderSeats() {
+    seatMap.innerHTML = '';
+    for (let i = 0; i < allSeats.length; i += 6) {
+      const rowDiv = document.createElement('div');
+      rowDiv.className = 'd-flex gap-2 justify-content-center';
+      // Insert aisle spacer after col 3
+      for (let j = 0; j < 6 && (i+j) < allSeats.length; j++) {
+        if (j === 3) {
+          const spacer = document.createElement('div');
+          spacer.style.width = '20px';
+          rowDiv.appendChild(spacer);
+        }
+        const seat = allSeats[i + j];
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = seat;
+        btn.className = 'seat-btn';
+        if (bookedSeats.has(seat)) {
+          btn.classList.add('seat-booked');
+          btn.disabled = true;
+        } else {
+          btn.classList.add('seat-available');
+          btn.addEventListener('click', () => toggleSeat(seat, btn));
+        }
+        rowDiv.appendChild(btn);
+      }
+      seatMap.appendChild(rowDiv);
+    }
+  }
+
+  function toggleSeat(seat, btn) {
+    if (selectedSeats.has(seat)) {
+      selectedSeats.delete(seat);
+      btn.classList.remove('seat-selected');
+      btn.classList.add('seat-available');
+    } else {
+      selectedSeats.add(seat);
+      btn.classList.remove('seat-available');
+      btn.classList.add('seat-selected');
+    }
+    updateSummary();
+  }
+
+  function updateSummary() {
+    // Remove existing hidden inputs
+    seatForm.querySelectorAll('input[name="selectedSeats"]').forEach(el => el.remove());
+    if (selectedSeats.size === 0) {
+      selectedSeatDisplay.textContent = 'None';
+      totalFareDisplay.textContent = '$0.00';
+      confirmBtn.disabled = true;
+    } else {
+      const arr = [...selectedSeats];
+      selectedSeatDisplay.textContent = arr.join(', ');
+      totalFareDisplay.textContent = '$' + (arr.length * farePerSeat).toFixed(2);
+      confirmBtn.disabled = false;
+      arr.forEach(s => {
+        const inp = document.createElement('input');
+        inp.type = 'hidden';
+        inp.name = 'selectedSeats';
+        inp.value = s;
+        seatForm.appendChild(inp);
+      });
+    }
+  }
+
+  renderSeats();
+</script>
+<div th:replace="~{layout :: footer}"></div>
+<div th:replace="~{layout :: html_scripts}"></div>
+</body>
+</html>

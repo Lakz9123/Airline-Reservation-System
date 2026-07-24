@@ -1,51 +1,49 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{layout :: html_head('Admin Login')}"></head>
+<head th:replace="~{layout :: html_head('Login')}"></head>
 <body>
 <div th:replace="~{layout :: navbar}"></div>
 
 <main class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-5">
-            <div class="card shadow-sm border-0 mt-5">
-                <div class="card-body p-4">
-                    <h2 class="text-center mb-4 fw-bold text-primary"><i class="bi bi-shield-lock"></i> Admin Portal Login</h2>
+  <div class="row justify-content-center">
+    <div class="col-md-5">
+      <div class="card shadow border-0 mt-5">
+        <div class="card-body p-4">
+          <h2 class="text-center mb-4 fw-bold text-primary"><i class="bi bi-airplane-fill"></i> SkyFly Login</h2>
 
-                    <!-- Alerts for login outcomes -->
-                    <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-                        Invalid email or password, or account disabled.
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                    <div th:if="${param.logout}" class="alert alert-success alert-dismissible fade show" role="alert">
-                        Logged out successfully.
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
+          <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show">
+            Invalid email or password, or account is disabled.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+          <div th:if="${param.logout}" class="alert alert-success alert-dismissible fade show">
+            Logged out successfully.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+          <div th:if="${success}" class="alert alert-success alert-dismissible fade show" th:text="${success}">
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
 
-                    <form th:action="@{/login}" method="post">
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email Address</label>
-                            <input type="email" class="form-control" id="email" name="email" required placeholder="admin@airline.com">
-                        </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" required placeholder="Enter password">
-                        </div>
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">Sign In</button>
-                        </div>
-                    </form>
-                </div>
+          <form th:action="@{/login}" method="post">
+            <div class="mb-3">
+              <label for="email" class="form-label">Email Address</label>
+              <input type="email" class="form-control" id="email" name="email" required placeholder="you@example.com">
             </div>
-            
-            <div class="text-center text-muted mt-4 p-3 bg-light rounded border">
-                <small>
-                    <strong>Default Admin Credentials:</strong><br>
-                    Email: <code class="bg-white p-1 rounded">admin@airline.com</code><br>
-                    Password: <code class="bg-white p-1 rounded">admin123</code>
-                </small>
+            <div class="mb-3">
+              <label for="password" class="form-label">Password</label>
+              <input type="password" class="form-control" id="password" name="password" required placeholder="Password">
             </div>
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary btn-lg">Sign In</button>
+            </div>
+          </form>
         </div>
+      </div>
+      <div class="text-center mt-3">
+        <span class="text-muted">Don't have an account?</span>
+        <a th:href="@{/register}" class="ms-1 fw-semibold">Register here</a>
+      </div>
     </div>
+  </div>
 </main>
 
 <div th:replace="~{layout :: footer}"></div>

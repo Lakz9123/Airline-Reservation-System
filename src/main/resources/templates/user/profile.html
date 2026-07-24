@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: html_head('My Profile')}"></head>
+<body>
+<div th:replace="~{layout :: user_navbar}"></div>
+<main class="container">
+  <h2 class="fw-bold mb-4"><i class="bi bi-person-circle text-primary"></i> My Profile</h2>
+
+  <div class="row g-4">
+    <!-- Profile Info Card -->
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white border-0 pt-4 px-4">
+          <h5 class="fw-bold mb-0"><i class="bi bi-person-lines-fill text-primary"></i> Account Information</h5>
+        </div>
+        <div class="card-body px-4 pb-4">
+          <div th:if="${nameSuccess}" class="alert alert-success alert-dismissible fade show" th:text="${nameSuccess}">
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+          <div th:if="${nameError}" class="alert alert-danger alert-dismissible fade show" th:text="${nameError}">
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+          <p class="mb-1 text-muted small">Email Address</p>
+          <p class="fw-semibold mb-3" th:text="${currentUser.email}">email@example.com</p>
+          <form th:action="@{/user/profile/update-name}" method="post">
+            <div class="mb-3">
+              <label for="name" class="form-label">Full Name</label>
+              <input type="text" class="form-control" id="name" name="name" th:value="${currentUser.name}" required>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Update Name</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Change Password Card -->
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white border-0 pt-4 px-4">
+          <h5 class="fw-bold mb-0"><i class="bi bi-key-fill text-warning"></i> Change Password</h5>
+        </div>
+        <div class="card-body px-4 pb-4">
+          <div th:if="${passwordSuccess}" class="alert alert-success alert-dismissible fade show" th:text="${passwordSuccess}">
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+          <div th:if="${passwordError}" class="alert alert-danger alert-dismissible fade show" th:text="${passwordError}">
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+          <form th:action="@{/user/profile/change-password}" method="post">
+            <div class="mb-3">
+              <label for="currentPassword" class="form-label">Current Password</label>
+              <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
+            </div>
+            <div class="mb-3">
+              <label for="newPassword" class="form-label">New Password <small class="text-muted">(min 6 chars)</small></label>
+              <input type="password" class="form-control" id="newPassword" name="newPassword" required>
+            </div>
+            <div class="mb-3">
+              <label for="confirmPassword" class="form-label">Confirm New Password</label>
+              <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+            </div>
+            <button type="submit" class="btn btn-warning text-white"><i class="bi bi-lock-fill"></i> Change Password</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+<div th:replace="~{layout :: footer}"></div>
+<div th:replace="~{layout :: html_scripts}"></div>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: html_head('My Dashboard')}"></head>
+<body>
+<div th:replace="~{layout :: user_navbar}"></div>
+<main class="container">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold"><i class="bi bi-speedometer2 text-primary"></i> Welcome, <span th:text="${currentUser.name}">User</span>!</h2>
+  </div>
+
+  <!-- Stats Row -->
+  <div class="row g-4 mb-4">
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm border-start border-4 border-success h-100">
+        <div class="card-body d-flex align-items-center justify-content-between">
+          <div>
+            <h6 class="text-muted mb-1">Confirmed Bookings</h6>
+            <h2 class="fw-bold mb-0" th:text="${confirmedCount}">0</h2>
+          </div>
+          <div class="bg-success text-white rounded-circle p-3"><i class="bi bi-check-circle fs-3"></i></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm border-start border-4 border-danger h-100">
+        <div class="card-body d-flex align-items-center justify-content-between">
+          <div>
+            <h6 class="text-muted mb-1">Cancelled Bookings</h6>
+            <h2 class="fw-bold mb-0" th:text="${cancelledCount}">0</h2>
+          </div>
+          <div class="bg-danger text-white rounded-circle p-3"><i class="bi bi-x-circle fs-3"></i></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm border-start border-4 border-info h-100">
+        <div class="card-body d-flex align-items-center justify-content-between">
+          <div>
+            <h6 class="text-muted mb-1">Total Spent</h6>
+            <h2 class="fw-bold mb-0">$<span th:text="${#numbers.formatDecimal(totalSpent,1,2)}">0.00</span></h2>
+          </div>
+          <div class="bg-info text-white rounded-circle p-3"><i class="bi bi-wallet2 fs-3"></i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="row g-4 mb-4">
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm text-center p-4">
+        <i class="bi bi-search fs-1 text-primary mb-3"></i>
+        <h5 class="fw-bold">Search Flights</h5>
+        <p class="text-muted">Find and book available flights by route and date.</p>
+        <a th:href="@{/user/search}" class="btn btn-primary">Search Now</a>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm text-center p-4">
+        <i class="bi bi-journal-check fs-1 text-success mb-3"></i>
+        <h5 class="fw-bold">My Bookings</h5>
+        <p class="text-muted">View all your past and current flight reservations.</p>
+        <a th:href="@{/user/bookings}" class="btn btn-outline-success">View Bookings</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Bookings -->
+  <h5 class="fw-bold mb-3" th:if="${!#lists.isEmpty(recentBookings)}">Recent Activity</h5>
+  <div class="card border-0 shadow-sm" th:if="${!#lists.isEmpty(recentBookings)}">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0 align-middle">
+        <thead class="table-light">
+          <tr><th>Flight</th><th>Route</th><th>Seats</th><th>Date</th><th>Fare</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr th:each="b : ${recentBookings}">
+            <td><span class="badge bg-secondary" th:text="${b.flight.flightNumber}">FL</span></td>
+            <td><span th:text="${b.flight.origin}">A</span> → <span th:text="${b.flight.destination}">B</span></td>
+            <td><code th:text="${b.seatNumbers}">A1</code></td>
+            <td th:text="${#temporals.format(b.bookingDate,'dd MMM yyyy')}">Date</td>
+            <td>$<span th:text="${#numbers.formatDecimal(b.totalFare,1,2)}">0</span></td>
+            <td>
+              <span class="badge bg-success" th:if="${b.status=='CONFIRMED'}">CONFIRMED</span>
+              <span class="badge bg-danger" th:if="${b.status=='CANCELLED'}">CANCELLED</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+<div th:replace="~{layout :: footer}"></div>
+<div th:replace="~{layout :: html_scripts}"></div>
+</body>
+</html>

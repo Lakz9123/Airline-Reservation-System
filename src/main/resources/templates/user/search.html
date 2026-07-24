@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: html_head('Search Flights')}"></head>
+<body>
+<div th:replace="~{layout :: user_navbar}"></div>
+<main class="container">
+  <h2 class="fw-bold mb-4"><i class="bi bi-search text-primary"></i> Search Flights</h2>
+
+  <!-- Search Form -->
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-body p-4">
+      <form th:action="@{/user/search/results}" method="get" class="row g-3 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">From (Origin)</label>
+          <input type="text" class="form-control" name="origin" th:value="${origin}" required placeholder="e.g. New York">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">To (Destination)</label>
+          <input type="text" class="form-control" name="destination" th:value="${destination}" required placeholder="e.g. London">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">Departure Date</label>
+          <input type="date" class="form-control" name="date" th:value="${date}" required>
+        </div>
+        <div class="col-md-3">
+          <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i> Search</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div th:if="${flights != null}">
+    <div th:if="${#lists.isEmpty(flights)}" class="alert alert-info">
+      No flights found for that route and date. Try different search criteria.
+    </div>
+    <div th:if="${!#lists.isEmpty(flights)}">
+      <h5 class="fw-bold mb-3">Available Flights (<span th:text="${#lists.size(flights)}">0</span> found)</h5>
+      <div class="row g-3">
+        <div class="col-12" th:each="f : ${flights}">
+          <div class="card border-0 shadow-sm">
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col-md-2">
+                  <span class="badge bg-primary fs-6 mb-1" th:text="${f.flightNumber}">FL-101</span><br>
+                  <small class="text-muted" th:text="${f.airlineName}">Airline</small>
+                </div>
+                <div class="col-md-4 text-center">
+                  <div class="d-flex align-items-center justify-content-center gap-2">
+                    <div>
+                      <div class="fs-5 fw-bold" th:text="${#temporals.format(f.departureDateTime,'HH:mm')}">00:00</div>
+                      <div class="text-muted small" th:text="${f.origin}">Origin</div>
+                    </div>
+                    <div class="text-muted px-2">
+                      <i class="bi bi-arrow-right fs-4"></i><br>
+                      <small th:text="${f.durationMinutes + ' min'}">0 min</small>
+                    </div>
+                    <div>
+                      <div class="fs-5 fw-bold" th:text="${#temporals.format(f.arrivalDateTime,'HH:mm')}">00:00</div>
+                      <div class="text-muted small" th:text="${f.destination}">Destination</div>
+                    </div>
+                  </div>
+                  <small class="text-muted" th:text="${#temporals.format(f.departureDateTime,'dd MMM yyyy')}">Date</small>
+                </div>
+                <div class="col-md-2 text-center">
+                  <div class="text-muted small">Available Seats</div>
+                  <div class="fw-bold" th:classappend="${f.availableSeats < 10} ? 'text-danger' : 'text-success'"
+                       th:text="${f.availableSeats}">0</div>
+                </div>
+                <div class="col-md-2 text-center">
+                  <div class="text-muted small">Fare / seat</div>
+                  <div class="fs-5 fw-bold text-primary">$<span th:text="${#numbers.formatDecimal(f.fare,1,2)}">0</span></div>
+                </div>
+                <div class="col-md-2 text-end">
+                  <a th:if="${f.availableSeats > 0}" th:href="@{/user/book/{id}(id=${f.id})}" class="btn btn-success">
+                    <i class="bi bi-cursor-fill"></i> Select Seats
+                  </a>
+                  <span th:if="${f.availableSeats == 0}" class="badge bg-danger p-2">Sold Out</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+<div th:replace="~{layout :: footer}"></div>
+<div th:replace="~{layout :: html_scripts}"></div>
+</body>
+</html>
