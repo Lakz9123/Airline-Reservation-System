@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: html_head('Confirm Booking')}"></head>
+<body>
+<div th:replace="~{layout :: navbar}"></div>
+
+<main class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0 fw-bold"><i class="bi bi-ticket-perforated"></i> Confirm Flight Booking</h4>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Error message -->
+                    <div th:if="${error}" class="alert alert-danger" role="alert">
+                        <span th:text="${error}">Booking error.</span>
+                    </div>
+
+                    <!-- Flight info summary -->
+                    <div class="mb-4 p-3 bg-light rounded border">
+                        <h5 class="fw-bold mb-2 text-primary">Flight Details</h5>
+                        <p class="mb-1"><strong>Flight Number:</strong> <span th:text="${flight.flightNumber}">AA-101</span></p>
+                        <p class="mb-1"><strong>Route:</strong> <span class="text-uppercase" th:text="${flight.origin}">Origin</span> &rarr; <span class="text-uppercase" th:text="${flight.destination}">Destination</span></p>
+                        <p class="mb-1"><strong>Departure:</strong> <span th:text="${#temporals.format(flight.departureDateTime, 'yyyy-MM-dd HH:mm')}">Date</span></p>
+                        <p class="mb-1"><strong>Arrival:</strong> <span th:text="${#temporals.format(flight.arrivalDateTime, 'yyyy-MM-dd HH:mm')}">Date</span></p>
+                        <p class="mb-1"><strong>Price Per Seat:</strong> $<span th:text="${#numbers.formatDecimal(flight.price, 1, 2)}">0.00</span></p>
+                        <p class="mb-0"><strong>Available Seats:</strong> <span th:text="${flight.availableSeats}">0</span></p>
+                    </div>
+
+                    <!-- Booking action form -->
+                    <form th:action="@{/booking/book}" method="post">
+                        <input type="hidden" name="flightId" th:value="${flight.id}">
+                        
+                        <div class="mb-3">
+                            <label for="seats" class="form-label fw-semibold">Number of Seats to Book</label>
+                            <input type="number" class="form-control" id="seats" name="seats" value="1" min="1" th:max="${flight.availableSeats}" required>
+                            <div class="form-text">Choose the quantity of seats to book. Max available is <span th:text="${flight.availableSeats}"></span>.</div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a th:href="@{/}" class="btn btn-outline-secondary"><i class="bi bi-x-circle"></i> Cancel</a>
+                            <button type="submit" class="btn btn-success"><i class="bi bi-check-circle"></i> Confirm Booking</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{layout :: footer}"></div>
+<div th:replace="~{layout :: html_scripts}"></div>
+</body>
+</html>

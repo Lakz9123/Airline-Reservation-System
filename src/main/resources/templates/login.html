@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: html_head('Login')}"></head>
+<body>
+<div th:replace="~{layout :: navbar}"></div>
+
+<main class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow-sm border-0 mt-5">
+                <div class="card-body p-4">
+                    <h2 class="text-center mb-4 fw-bold text-primary"><i class="bi bi-shield-lock"></i> Sign In</h2>
+
+                    <!-- Alerts for login outcomes -->
+                    <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                        Invalid username or password.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <div th:if="${param.logout}" class="alert alert-success alert-dismissible fade show" role="alert">
+                        You have been logged out successfully.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <div th:if="${param.registered}" class="alert alert-success alert-dismissible fade show" role="alert">
+                        Registration successful! Please sign in.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+
+                    <form th:action="@{/login}" method="post">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" required placeholder="Enter username">
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required placeholder="Enter password">
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Login</button>
+                        </div>
+                    </form>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="text-center">
+                        <p class="mb-0">New to SkyFly? <a th:href="@{/register}" class="text-decoration-none fw-semibold">Register here</a></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center text-muted mt-4 p-3 bg-light rounded border">
+                <small>
+                    <strong>Seed Logins for testing:</strong><br>
+                    Admin Account: <code class="bg-white p-1 rounded">admin</code> / <code class="bg-white p-1 rounded">admin123</code><br>
+                    Standard Account: <code class="bg-white p-1 rounded">user</code> / <code class="bg-white p-1 rounded">user123</code>
+                </small>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{layout :: footer}"></div>
+<div th:replace="~{layout :: html_scripts}"></div>
+</body>
+</html>
