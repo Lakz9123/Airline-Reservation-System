@@ -21,14 +21,15 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/register", "/login", "/css/**", "/js/**", "/webjars/**").permitAll()
+                .requestMatchers("/login", "/css/**", "/js/**", "/webjars/**").permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
-                .requestMatchers("/booking/**", "/bookings/**", "/search/**").hasAnyRole("USER", "ADMIN")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
                 .loginPage("/login")
-                .defaultSuccessUrl("/", true)
+                .usernameParameter("email")
+                .passwordParameter("password")
+                .defaultSuccessUrl("/admin/dashboard", true)
                 .failureUrl("/login?error=true")
                 .permitAll()
             )
@@ -39,7 +40,7 @@ public class SecurityConfig {
                 .clearAuthentication(true)
                 .permitAll()
             )
-            .csrf(csrf -> csrf.disable()); // Disable CSRF for simplicity and smooth form submission
+            .csrf(csrf -> csrf.disable());
 
         return http.build();
     }

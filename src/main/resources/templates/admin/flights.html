@@ -28,20 +28,23 @@
                     <thead class="table-dark">
                         <tr>
                             <th>Flight No.</th>
+                            <th>Airline</th>
                             <th>Route</th>
                             <th>Departure</th>
                             <th>Arrival</th>
+                            <th>Duration</th>
+                            <th>Fare</th>
                             <th>Seats (Avail/Total)</th>
-                            <th>Price</th>
                             <th class="text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr th:if="${#lists.isEmpty(flights)}">
-                            <td colspan="7" class="text-center py-4 text-muted">No flights created yet. Click "Add New Flight" to create one.</td>
+                            <td colspan="9" class="text-center py-4 text-muted">No flights created yet. Click "Add New Flight" to create one.</td>
                         </tr>
                         <tr th:each="flight : ${flights}">
                             <td><strong th:text="${flight.flightNumber}">AA-101</strong></td>
+                            <td th:text="${flight.airlineName}">Airline</td>
                             <td>
                                 <span class="fw-semibold text-uppercase" th:text="${flight.origin}">Origin</span> 
                                 <i class="bi bi-arrow-right text-muted mx-1"></i>
@@ -49,11 +52,12 @@
                             </td>
                             <td th:text="${#temporals.format(flight.departureDateTime, 'yyyy-MM-dd HH:mm')}">Departure</td>
                             <td th:text="${#temporals.format(flight.arrivalDateTime, 'yyyy-MM-dd HH:mm')}">Arrival</td>
+                            <td><span th:text="${flight.durationMinutes}">0</span> min</td>
+                            <td>$<span th:text="${#numbers.formatDecimal(flight.fare, 1, 2)}">0.00</span></td>
                             <td>
                                 <span class="fw-bold" th:text="${flight.availableSeats}">0</span> / 
                                 <span th:text="${flight.totalSeats}">0</span>
                             </td>
-                            <td>$<span th:text="${#numbers.formatDecimal(flight.price, 1, 2)}">0.00</span></td>
                             <td class="text-center">
                                 <div class="btn-group" role="group">
                                     <a th:href="@{/admin/flights/edit/{id}(id=${flight.id})}" class="btn btn-sm btn-outline-secondary me-2">

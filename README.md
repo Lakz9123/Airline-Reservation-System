@@ -1,17 +1,22 @@
-# ✈️ SkyFly Airline Reservation System
+# ✈️ SkyFly Airline Reservation System — Phase 1: Admin Module Only
 
-A full-stack **Airline Reservation System** built with **Java Spring Boot**, **Spring Security**, **Spring Data JPA**, **MySQL**, and **Thymeleaf** templates.
+A full-stack **Airline Reservation System (Phase 1: Admin Module)** built with **Java Spring Boot**, **Spring Security**, **Spring Data JPA**, **MySQL**, and **Thymeleaf** templates.
 
 ---
 
-## 🚀 Features
+## 🚀 Phase 1 Scope & Features (Admin Module Only)
 
-- **Authentication** — Form-based login/registration with BCrypt passwords and role-based access (USER / ADMIN)
-- **Flight Search** — Search available flights by origin, destination, and departure date
-- **Booking** — Book one or more seats on a flight, with real-time seat availability tracking
-- **My Bookings** — View all past/active bookings and cancel confirmed bookings (seats are restored)
-- **Admin Panel** — Full CRUD management of flights (Create, Read, Update, Delete)
-- **Auto-seeded Data** — 1 admin user, 1 test user, and 6 sample flights loaded on startup
+- **Authentication & Security** — Spring Security form-based login enforcing `ROLE_ADMIN` access on all `/admin/**` routes.
+- **Admin Dashboard** — Live statistical overview cards displaying:
+  - Total Flights Count
+  - Total Users Count
+  - Total Bookings Count
+  - Total Revenue Calculation
+- **Flight Management (Full CRUD)** — Create, list, edit, and delete flight schedules with details:
+  - Flight Number, Airline Name, Origin, Destination, Departure & Arrival Times, Duration (computed), Fare, Total & Available Seats.
+- **Customer Bookings Viewer (Read-only)** — Tabular view of all customer flight reservations, assigned seats, status (`CONFIRMED`/`CANCELLED`), and total fare.
+- **User Directory Management** — List registered system users, view roles, and toggle account `Enabled`/`Disabled` status.
+- **Data Auto-Seeding** — Seeds default admin (`admin@airline.com` / `admin123`), test users, 5 sample flights, and initial preview bookings on application startup.
 
 ---
 
@@ -28,57 +33,49 @@ A full-stack **Airline Reservation System** built with **Java Spring Boot**, **S
 
 ---
 
-## ⚙️ Setup Instructions
+## ⚙️ Setup & Execution Instructions
 
 ### 1. Prerequisites
 
 - **Java 17** (JDK) — [Download here](https://www.oracle.com/java/technologies/downloads/#java17)
-- **MySQL 8.x** — [Download here](https://dev.mysql.com/downloads/)
-- **Maven 3.9+** — [Download here](https://maven.apache.org/download.cgi) (or use the included `mvnw` wrapper)
+- **MySQL 8.x** — Running on port 3306 with database `airline_db`
+- **Maven 3.9+** or included `./mvnw.cmd` wrapper
 
-### 2. Create the MySQL Database
+### 2. Database Setup
 
-Log into MySQL and run:
+Ensure MySQL server is running and create the `airline_db` database:
 
 ```sql
-CREATE DATABASE airline_db;
+CREATE DATABASE IF NOT EXISTS airline_db;
 ```
 
-### 3. Configure Database Credentials
-
-Open `src/main/resources/application.properties` and update the credentials:
+Update your connection credentials in `src/main/resources/application.properties`:
 
 ```properties
 spring.datasource.url=jdbc:mysql://localhost:3306/airline_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
 spring.datasource.username=root
-spring.datasource.password=YOUR_MYSQL_PASSWORD
+spring.datasource.password=rootpassword
 ```
 
-### 4. Run the Application
+### 3. Run the Application
 
-**Option A — Using Maven Wrapper (recommended, no local Maven needed):**
 ```bash
-./mvnw spring-boot:run        # Linux/Mac
-mvnw.cmd spring-boot:run      # Windows
-```
+# Using Maven Wrapper (Windows)
+mvnw.cmd spring-boot:run
 
-**Option B — Using local Maven:**
-```bash
+# Or using Maven CLI
 mvn spring-boot:run
 ```
 
-The app will start at **http://localhost:8080**
+The application will start at **http://localhost:8080** and automatically redirect to the Admin Portal login.
 
 ---
 
-## 🔑 Default Login Credentials (Seeded on Startup)
+## 🔑 Default Admin Credentials (Seeded on Startup)
 
-| Role  | Username | Password  |
-|-------|----------|-----------|
-| Admin | `admin`  | `admin123` |
-| User  | `user`   | `user123`  |
-
-> These accounts are created automatically via `DataLoader.java` if they don't already exist.
+| Role  | Email              | Password   | Status  |
+|-------|--------------------|------------|---------|
+| Admin | `admin@airline.com` | `admin123` | Enabled |
 
 ---
 
@@ -90,76 +87,53 @@ src/
 │   ├── java/com/airline/reservation/
 │   │   ├── AirlineReservationApplication.java   # Main entry point
 │   │   ├── config/
-│   │   │   └── SecurityConfig.java              # Spring Security config
+│   │   │   └── SecurityConfig.java              # Spring Security config (ROLE_ADMIN guards)
 │   │   ├── controller/
-│   │   │   ├── AdminController.java             # Admin flight CRUD
-│   │   │   ├── AuthController.java              # Login & Registration
-│   │   │   ├── BookingController.java           # Booking & Cancellation
-│   │   │   └── FlightController.java            # Home & Flight Search
+│   │   │   ├── AdminController.java             # Admin dashboard, flight CRUD, bookings, users
+│   │   │   └── AuthController.java              # Login and root routing
 │   │   ├── entity/
-│   │   │   ├── Booking.java                     # Booking entity
-│   │   │   ├── Flight.java                      # Flight entity
-│   │   │   └── User.java                        # User entity
+│   │   │   ├── Booking.java                     # Booking entity (seatNumbers, totalFare)
+│   │   │   ├── Flight.java                      # Flight entity (airlineName, duration, fare)
+│   │   │   └── User.java                        # User entity (name, email, enabled)
 │   │   ├── repository/
 │   │   │   ├── BookingRepository.java
 │   │   │   ├── FlightRepository.java
 │   │   │   └── UserRepository.java
 │   │   ├── service/
-│   │   │   ├── BookingService.java              # Booking business logic
-│   │   │   ├── FlightService.java               # Flight CRUD logic
-│   │   │   ├── UserDetailsServiceImpl.java      # Spring Security user loader
-│   │   │   └── UserService.java                 # User registration
+│   │   │   ├── BookingService.java              # Booking statistics & listing
+│   │   │   ├── FlightService.java               # Flight CRUD & duration logic
+│   │   │   ├── UserDetailsServiceImpl.java      # Email-based Spring Security user loader
+│   │   │   └── UserService.java                 # User directory & enable/disable toggle
 │   │   └── util/
-│   │       └── DataLoader.java                  # Seeds initial data
+│   │       └── DataLoader.java                  # Seeds initial admin, flights, and bookings
 │   └── resources/
 │       ├── templates/
-│       │   ├── layout.html                      # Base Thymeleaf layout
-│       │   ├── login.html
-│       │   ├── register.html
-│       │   ├── index.html                       # Home + Search
-│       │   ├── admin/
-│       │   │   ├── flights.html                 # Admin flight list
-│       │   │   └── flight-form.html             # Create/Edit form
-│       │   └── user/
-│       │       ├── book.html                    # Booking confirmation
-│       │       └── bookings.html                # My bookings
+│       │   ├── layout.html                      # Admin navbar layout
+│       │   ├── login.html                       # Admin email login
+│       │   └── admin/
+│       │       ├── dashboard.html               # Admin metrics overview
+│       │       ├── flights.html                 # Flight management table
+│       │       ├── flight-form.html             # Add/Edit flight form
+│       │       ├── bookings.html                # Read-only bookings viewer
+│       │       └── users.html                   # User directory & toggle status
 │       └── application.properties
 └── test/
     ├── java/.../AirlineReservationApplicationTests.java
-    └── resources/application.properties        # H2 in-memory for tests
+    └── resources/application.properties        # H2 in-memory for testing
 ```
 
 ---
 
-## 🗃️ Database Schema (auto-created by JPA)
+## 🌐 Admin Portal Routes
 
-**`users`** — `id`, `username`, `password`, `role`
-
-**`flights`** — `id`, `flight_number`, `origin`, `destination`, `departure_date_time`, `arrival_date_time`, `total_seats`, `available_seats`, `price`
-
-**`bookings`** — `id`, `user_id`, `flight_id`, `number_of_seats`, `booking_date`, `status`
-
----
-
-## 🌐 Application URLs
-
-| URL                    | Access       | Description                    |
-|------------------------|--------------|--------------------------------|
-| `/`                    | Public       | Home page & flight search      |
-| `/register`            | Public       | User registration              |
-| `/login`               | Public       | Login page                     |
-| `/search`              | Authenticated| Flight search results          |
-| `/booking/book`        | USER/ADMIN   | Book seats on a flight         |
-| `/bookings`            | USER/ADMIN   | View & cancel bookings         |
-| `/admin/flights`       | ADMIN only   | Flight management dashboard    |
-| `/admin/flights/new`   | ADMIN only   | Create new flight              |
-| `/admin/flights/edit/{id}` | ADMIN only | Edit existing flight        |
-
----
-
-## 📝 Notes
-
-- The application uses `spring.jpa.hibernate.ddl-auto=update` — schema is auto-managed by Hibernate
-- Tests run with an H2 in-memory database (no MySQL required for testing)
-- CSRF is disabled for simplicity in development; enable it for production use
-- No payment integration — booking is mocked/confirmed instantly
+| Route                  | Access       | Description                                  |
+|------------------------|--------------|----------------------------------------------|
+| `/`                    | Public       | Redirects to `/admin/dashboard`              |
+| `/login`               | Public       | Email & Password Admin login form            |
+| `/admin/dashboard`     | ADMIN only   | Stat metrics dashboard                       |
+| `/admin/flights`       | ADMIN only   | Flight management list                       |
+| `/admin/flights/new`   | ADMIN only   | Create new flight form                       |
+| `/admin/flights/edit/{id}` | ADMIN only | Edit flight form                         |
+| `/admin/flights/delete/{id}` | ADMIN only | Delete flight                              |
+| `/admin/bookings`      | ADMIN only   | Read-only view of customer bookings         |
+| `/admin/users`         | ADMIN only   | List users & toggle enabled/disabled status  |

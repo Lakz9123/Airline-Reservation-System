@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: html_head('Admin Dashboard')}"></head>
+<body>
+<div th:replace="~{layout :: navbar}"></div>
+
+<main class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark"><i class="bi bi-speedometer2 text-primary"></i> Admin Dashboard</h2>
+        <span class="badge bg-secondary p-2">Phase 1: Admin Module</span>
+    </div>
+
+    <!-- Stat Cards Row -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 border-start border-4 border-primary h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <h6 class="text-muted fw-semibold mb-1">Total Flights</h6>
+                            <h2 class="fw-bold text-dark mb-0" th:text="${totalFlights}">0</h2>
+                        </div>
+                        <div class="bg-primary text-white rounded-circle p-3">
+                            <i class="bi bi-airplane fs-3"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 border-start border-4 border-success h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <h6 class="text-muted fw-semibold mb-1">Total Users</h6>
+                            <h2 class="fw-bold text-dark mb-0" th:text="${totalUsers}">0</h2>
+                        </div>
+                        <div class="bg-success text-white rounded-circle p-3">
+                            <i class="bi bi-people fs-3"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 border-start border-4 border-warning h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <h6 class="text-muted fw-semibold mb-1">Total Bookings</h6>
+                            <h2 class="fw-bold text-dark mb-0" th:text="${totalBookings}">0</h2>
+                        </div>
+                        <div class="bg-warning text-dark rounded-circle p-3">
+                            <i class="bi bi-journal-bookmark fs-3"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 border-start border-4 border-info h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <h6 class="text-muted fw-semibold mb-1">Total Revenue</h6>
+                            <h2 class="fw-bold text-dark mb-0">$<span th:text="${#numbers.formatDecimal(totalRevenue, 1, 2)}">0.00</span></h2>
+                        </div>
+                        <div class="bg-info text-white rounded-circle p-3">
+                            <i class="bi bi-currency-dollar fs-3"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Navigation Cards -->
+    <h4 class="fw-bold text-dark mb-3">Quick Actions</h4>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 text-center p-4">
+                <i class="bi bi-airplane-engines fs-1 text-primary mb-3"></i>
+                <h5 class="fw-bold">Manage Flights</h5>
+                <p class="text-muted">Create, edit, or remove flight schedules, routes, and fares.</p>
+                <a th:href="@{/admin/flights}" class="btn btn-outline-primary">Go to Flights</a>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 text-center p-4">
+                <i class="bi bi-journal-check fs-1 text-warning mb-3"></i>
+                <h5 class="fw-bold">View Bookings</h5>
+                <p class="text-muted">Browse through all customer flight reservations and booking statuses.</p>
+                <a th:href="@{/admin/bookings}" class="btn btn-outline-warning text-dark">Go to Bookings</a>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 text-center p-4">
+                <i class="bi bi-person-gear fs-1 text-success mb-3"></i>
+                <h5 class="fw-bold">User Directory</h5>
+                <p class="text-muted">Inspect user accounts, assign roles, and toggle enable/disable access.</p>
+                <a th:href="@{/admin/users}" class="btn btn-outline-success">Go to Users</a>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{layout :: footer}"></div>
+<div th:replace="~{layout :: html_scripts}"></div>
+</body>
+</html>

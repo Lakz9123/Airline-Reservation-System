@@ -13,6 +13,9 @@ public class Flight {
     @Column(name = "flight_number", nullable = false)
     private String flightNumber;
 
+    @Column(name = "airline_name", nullable = false)
+    private String airlineName;
+
     @Column(nullable = false)
     private String origin;
 
@@ -25,27 +28,32 @@ public class Flight {
     @Column(name = "arrival_date_time", nullable = false)
     private LocalDateTime arrivalDateTime;
 
+    @Column(name = "duration_minutes", nullable = false)
+    private Integer durationMinutes;
+
+    @Column(nullable = false)
+    private Double fare;
+
     @Column(name = "total_seats", nullable = false)
     private Integer totalSeats;
 
     @Column(name = "available_seats", nullable = false)
     private Integer availableSeats;
 
-    @Column(nullable = false)
-    private Double price;
-
     // Constructors
     public Flight() {}
 
-    public Flight(String flightNumber, String origin, String destination, LocalDateTime departureDateTime, LocalDateTime arrivalDateTime, Integer totalSeats, Integer availableSeats, Double price) {
+    public Flight(String flightNumber, String airlineName, String origin, String destination, LocalDateTime departureDateTime, LocalDateTime arrivalDateTime, Integer durationMinutes, Double fare, Integer totalSeats, Integer availableSeats) {
         this.flightNumber = flightNumber;
+        this.airlineName = airlineName;
         this.origin = origin;
         this.destination = destination;
         this.departureDateTime = departureDateTime;
         this.arrivalDateTime = arrivalDateTime;
+        this.durationMinutes = durationMinutes;
+        this.fare = fare;
         this.totalSeats = totalSeats;
         this.availableSeats = availableSeats;
-        this.price = price;
     }
 
     // Getters and Setters
@@ -63,6 +71,14 @@ public class Flight {
 
     public void setFlightNumber(String flightNumber) {
         this.flightNumber = flightNumber;
+    }
+
+    public String getAirlineName() {
+        return airlineName;
+    }
+
+    public void setAirlineName(String airlineName) {
+        this.airlineName = airlineName;
     }
 
     public String getOrigin() {
@@ -97,6 +113,22 @@ public class Flight {
         this.arrivalDateTime = arrivalDateTime;
     }
 
+    public Integer getDurationMinutes() {
+        return durationMinutes;
+    }
+
+    public void setDurationMinutes(Integer durationMinutes) {
+        this.durationMinutes = durationMinutes;
+    }
+
+    public Double getFare() {
+        return fare;
+    }
+
+    public void setFare(Double fare) {
+        this.fare = fare;
+    }
+
     public Integer getTotalSeats() {
         return totalSeats;
     }
@@ -111,13 +143,5 @@ public class Flight {
 
     public void setAvailableSeats(Integer availableSeats) {
         this.availableSeats = availableSeats;
-    }
-
-    public Double getPrice() {
-        return price;
-    }
-
-    public void setPrice(Double price) {
-        this.price = price;
     }
 }

@@ -18,8 +18,8 @@ public class Booking {
     @JoinColumn(name = "flight_id", nullable = false)
     private Flight flight;
 
-    @Column(name = "number_of_seats", nullable = false)
-    private Integer numberOfSeats;
+    @Column(name = "seat_numbers", nullable = false)
+    private String seatNumbers; // Comma-separated (e.g. "12A, 12B")
 
     @Column(name = "booking_date", nullable = false)
     private LocalDateTime bookingDate;
@@ -27,15 +27,19 @@ public class Booking {
     @Column(nullable = false)
     private String status; // "CONFIRMED" or "CANCELLED"
 
+    @Column(name = "total_fare", nullable = false)
+    private Double totalFare;
+
     // Constructors
     public Booking() {}
 
-    public Booking(User user, Flight flight, Integer numberOfSeats, LocalDateTime bookingDate, String status) {
+    public Booking(User user, Flight flight, String seatNumbers, LocalDateTime bookingDate, String status, Double totalFare) {
         this.user = user;
         this.flight = flight;
-        this.numberOfSeats = numberOfSeats;
+        this.seatNumbers = seatNumbers;
         this.bookingDate = bookingDate;
         this.status = status;
+        this.totalFare = totalFare;
     }
 
     // Getters and Setters
@@ -63,12 +67,12 @@ public class Booking {
         this.flight = flight;
     }
 
-    public Integer getNumberOfSeats() {
-        return numberOfSeats;
+    public String getSeatNumbers() {
+        return seatNumbers;
     }
 
-    public void setNumberOfSeats(Integer numberOfSeats) {
-        this.numberOfSeats = numberOfSeats;
+    public void setSeatNumbers(String seatNumbers) {
+        this.seatNumbers = seatNumbers;
     }
 
     public LocalDateTime getBookingDate() {
@@ -85,5 +89,13 @@ public class Booking {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Double getTotalFare() {
+        return totalFare;
+    }
+
+    public void setTotalFare(Double totalFare) {
+        this.totalFare = totalFare;
     }
 }
