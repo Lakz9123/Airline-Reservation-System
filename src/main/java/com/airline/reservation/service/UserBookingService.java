@@ -73,7 +73,7 @@ public class UserBookingService {
      * Returns the saved Booking.
      */
     @Transactional
-    public Booking bookSeats(User user, Long flightId, List<String> requestedSeats) {
+    public Booking bookSeats(User user, Long flightId, List<String> requestedSeats, String cabinClass) {
         if (requestedSeats == null || requestedSeats.isEmpty()) {
             throw new IllegalArgumentException("Please select at least one seat.");
         }
@@ -99,11 +99,18 @@ public class UserBookingService {
         flight.setAvailableSeats(flight.getAvailableSeats() - requestedSeats.size());
         flightRepository.save(flight);
 
+        // Determine multiplier based on cabin class
+        double multiplier = 1.0;
+        if ("Premium Economy".equalsIgnoreCase(cabinClass)) multiplier = 1.5;
+        else if ("Business Class".equalsIgnoreCase(cabinClass)) multiplier = 2.5;
+        else if ("First Class".equalsIgnoreCase(cabinClass)) multiplier = 4.0;
+        else cabinClass = "Economy"; // default
+
         // Compute total fare
-        double totalFare = flight.getFare() * requestedSeats.size();
+        double totalFare = flight.getFare() * multiplier * requestedSeats.size();
         String seatNumbersStr = String.join(", ", requestedSeats);
 
-        Booking booking = new Booking(user, flight, seatNumbersStr, LocalDateTime.now(), "CONFIRMED", totalFare);
+        Booking booking = new Booking(user, flight, seatNumbersStr, LocalDateTime.now(), "CONFIRMED", totalFare, cabinClass);
         return bookingRepository.save(booking);
     }
 

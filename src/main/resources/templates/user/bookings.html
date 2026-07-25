@@ -41,8 +41,9 @@
           <div class="text-muted small" th:text="${#temporals.format(b.flight.departureDateTime,'dd MMM yyyy HH:mm')}">Date</div>
         </div>
         <div class="col-6 col-md-2">
-          <div class="text-muted small">Seats</div>
-          <code th:text="${b.seatNumbers}">A1, A2</code>
+          <div class="text-muted small">Seats / Cabin</div>
+          <code th:text="${b.seatNumbers}">A1, A2</code><br>
+          <small class="badge bg-secondary mt-1" th:text="${b.cabinClass}">Economy</small>
         </div>
         <div class="col-6 col-md-2">
           <div class="text-muted small">Total Fare</div>

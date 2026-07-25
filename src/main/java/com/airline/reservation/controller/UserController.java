@@ -133,19 +133,22 @@ public class UserController {
     @PostMapping("/book/{flightId}")
     public String proceedToPayment(@PathVariable Long flightId,
                                    @RequestParam(value = "selectedSeats", required = false) List<String> selectedSeats,
+                                   @RequestParam(value = "cabinClass", defaultValue = "Economy") String cabinClass,
                                    RedirectAttributes redirectAttributes) {
         if (selectedSeats == null || selectedSeats.isEmpty()) {
             redirectAttributes.addFlashAttribute("error", "Please select at least one seat.");
             return "redirect:/user/book/" + flightId;
         }
         redirectAttributes.addFlashAttribute("selectedSeats", selectedSeats);
+        redirectAttributes.addFlashAttribute("cabinClass", cabinClass);
         return "redirect:/user/payment/" + flightId;
     }
 
     @GetMapping("/payment/{flightId}")
     public String showPaymentPage(@PathVariable Long flightId,
                                   Model model,
-                                  @ModelAttribute("selectedSeats") List<String> selectedSeats) {
+                                  @ModelAttribute("selectedSeats") List<String> selectedSeats,
+                                  @ModelAttribute("cabinClass") String cabinClass) {
         if (selectedSeats == null || selectedSeats.isEmpty()) {
             return "redirect:/user/book/" + flightId;
         }
@@ -153,19 +156,27 @@ public class UserController {
                 .orElseThrow(() -> new IllegalArgumentException("Flight not found"));
         model.addAttribute("flight", flight);
         model.addAttribute("selectedSeats", selectedSeats);
-        model.addAttribute("totalFare", flight.getFare() * selectedSeats.size());
+        model.addAttribute("cabinClass", cabinClass == null || cabinClass.isEmpty() ? "Economy" : cabinClass);
+        
+        double multiplier = 1.0;
+        if ("Premium Economy".equalsIgnoreCase(cabinClass)) multiplier = 1.5;
+        else if ("Business Class".equalsIgnoreCase(cabinClass)) multiplier = 2.5;
+        else if ("First Class".equalsIgnoreCase(cabinClass)) multiplier = 4.0;
+        
+        model.addAttribute("totalFare", flight.getFare() * multiplier * selectedSeats.size());
         return "user/payment";
     }
 
     @PostMapping("/payment/{flightId}")
     public String processPayment(@PathVariable Long flightId,
                                  @RequestParam("selectedSeats") List<String> selectedSeats,
+                                 @RequestParam("cabinClass") String cabinClass,
                                  @AuthenticationPrincipal UserDetails principal,
                                  RedirectAttributes redirectAttributes) {
         User user = getCurrentUser(principal);
         try {
             // Mock payment processing happens here
-            Booking booking = userBookingService.bookSeats(user, flightId, selectedSeats);
+            Booking booking = userBookingService.bookSeats(user, flightId, selectedSeats, cabinClass);
             emailService.sendBookingConfirmation(booking);
             redirectAttributes.addFlashAttribute("bookingSuccess", true);
             return "redirect:/user/bookings";

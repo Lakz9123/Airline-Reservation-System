@@ -82,9 +82,9 @@ public class DataLoader implements CommandLineRunner {
             flightRepository.saveAll(Arrays.asList(f1, f2, f3, f4, f5));
 
             // 4. Seed Sample Bookings for Admin preview
-            Booking b1 = new Booking(user1, f1, "12A, 12B", now.minusDays(1), "CONFIRMED", 900.00);
-            Booking b2 = new Booking(user1, f2, "14C", now.minusHours(5), "CONFIRMED", 250.00);
-            Booking b3 = new Booking(user2, f1, "15A", now.minusDays(2), "CANCELLED", 450.00);
+            Booking b1 = new Booking(user1, f1, "12A, 12B", now.minusDays(1), "CONFIRMED", 900.00, "Economy");
+            Booking b2 = new Booking(user1, f2, "14C", now.minusHours(5), "CONFIRMED", 250.00, "Economy");
+            Booking b3 = new Booking(user2, f1, "15A", now.minusDays(2), "CANCELLED", 450.00, "Economy");
 
             bookingRepository.saveAll(Arrays.asList(b1, b2, b3));
         }

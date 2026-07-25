@@ -30,16 +30,20 @@ public class Booking {
     @Column(name = "total_fare", nullable = false)
     private Double totalFare;
 
+    @Column(name = "cabin_class", nullable = false)
+    private String cabinClass;
+
     // Constructors
     public Booking() {}
 
-    public Booking(User user, Flight flight, String seatNumbers, LocalDateTime bookingDate, String status, Double totalFare) {
+    public Booking(User user, Flight flight, String seatNumbers, LocalDateTime bookingDate, String status, Double totalFare, String cabinClass) {
         this.user = user;
         this.flight = flight;
         this.seatNumbers = seatNumbers;
         this.bookingDate = bookingDate;
         this.status = status;
         this.totalFare = totalFare;
+        this.cabinClass = cabinClass;
     }
 
     // Getters and Setters
@@ -97,5 +101,13 @@ public class Booking {
 
     public void setTotalFare(Double totalFare) {
         this.totalFare = totalFare;
+    }
+
+    public String getCabinClass() {
+        return cabinClass;
+    }
+
+    public void setCabinClass(String cabinClass) {
+        this.cabinClass = cabinClass;
     }
 }

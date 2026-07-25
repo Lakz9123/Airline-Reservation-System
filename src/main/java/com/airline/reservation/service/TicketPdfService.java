@@ -216,7 +216,7 @@ public class TicketPdfService {
 
         float detailTop2 = detailTop - 50;
         drawDetailBlock(canvas, bf, bfBold, col1, detailTop2, "SEAT(S)",     booking.getSeatNumbers());
-        drawDetailBlock(canvas, bf, bfBold, col2, detailTop2, "CLASS",       "ECONOMY");
+        drawDetailBlock(canvas, bf, bfBold, col2, detailTop2, "CLASS",       booking.getCabinClass() != null ? booking.getCabinClass().toUpperCase() : "ECONOMY");
         drawDetailBlock(canvas, bf, bfBold, col3, detailTop2, "STATUS",      booking.getStatus());
         drawDetailBlock(canvas, bf, bfBold, col4, detailTop2, "TOTAL FARE",
                 String.format("$%.2f", booking.getTotalFare()));
