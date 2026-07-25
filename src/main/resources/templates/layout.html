@@ -63,21 +63,22 @@
                 <li class="nav-item"><a class="nav-link" th:href="@{/admin/bookings}"><i class="bi bi-journal-bookmark"></i> Bookings</a></li>
                 <li class="nav-item"><a class="nav-link" th:href="@{/admin/users}"><i class="bi bi-people"></i> Users</a></li>
             </ul>
-            <ul class="navbar-nav ms-auto align-items-center">
-                <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
-                    <a class="nav-link dropdown-toggle btn btn-outline-light btn-sm text-dark px-3 py-1 bg-white" href="#" id="adminDrop" role="button" data-bs-toggle="dropdown">
-                        <i class="bi bi-person-circle"></i> <span sec:authentication="name" class="fw-semibold">Admin</span>
+            <ul class="navbar-nav ms-auto align-items-center gap-2">
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <span class="navbar-text text-white me-1">
+                        <i class="bi bi-person-circle"></i>
+                        <span sec:authentication="name" class="fw-semibold"></span>
                         <span class="badge bg-danger ms-1">ADMIN</span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                            <form th:action="@{/logout}" method="post" class="m-0">
-                                <button type="submit" class="dropdown-item text-danger"><i class="bi bi-box-arrow-right"></i> Logout</button>
-                            </form>
-                        </li>
-                    </ul>
+                    </span>
                 </li>
-                <li class="nav-item ms-2 align-self-center">
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <form th:action="@{/logout}" method="post" class="m-0">
+                        <button type="submit" class="btn btn-danger btn-sm px-3">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </button>
+                    </form>
+                </li>
+                <li class="nav-item align-self-center">
                     <button class="btn btn-outline-light btn-sm darkModeToggle"><i class="bi bi-moon"></i></button>
                 </li>
             </ul>
@@ -102,22 +103,26 @@
                 <li class="nav-item"><a class="nav-link" th:href="@{/user/bookings}"><i class="bi bi-journal-check"></i> My Bookings</a></li>
                 <li class="nav-item"><a class="nav-link" th:href="@{/user/profile}"><i class="bi bi-person-circle"></i> Profile</a></li>
             </ul>
-            <ul class="navbar-nav ms-auto align-items-center">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle btn btn-outline-light btn-sm text-dark px-3 py-1 bg-white" href="#" id="userDrop" role="button" data-bs-toggle="dropdown">
-                        <i class="bi bi-person-circle"></i> <span sec:authentication="name" class="fw-semibold">User</span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" th:href="@{/user/profile}"><i class="bi bi-person-gear"></i> Profile</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <form th:action="@{/logout}" method="post" class="m-0">
-                                <button type="submit" class="dropdown-item text-danger"><i class="bi bi-box-arrow-right"></i> Logout</button>
-                            </form>
-                        </li>
-                    </ul>
+            <ul class="navbar-nav ms-auto align-items-center gap-2">
+                <li class="nav-item">
+                    <span class="navbar-text text-white me-1">
+                        <i class="bi bi-person-circle"></i>
+                        <span sec:authentication="name" class="fw-semibold"></span>
+                    </span>
                 </li>
-                <li class="nav-item ms-2 align-self-center">
+                <li class="nav-item">
+                    <a class="btn btn-outline-light btn-sm px-3" th:href="@{/user/profile}">
+                        <i class="bi bi-person-gear"></i> Profile
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <form th:action="@{/logout}" method="post" class="m-0">
+                        <button type="submit" class="btn btn-danger btn-sm px-3">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </button>
+                    </form>
+                </li>
+                <li class="nav-item align-self-center">
                     <button class="btn btn-outline-light btn-sm darkModeToggle"><i class="bi bi-moon"></i></button>
                 </li>
             </ul>
@@ -141,24 +146,25 @@
                 <li class="nav-item"><a class="nav-link" th:href="@{/admin/bookings}"><i class="bi bi-journal-bookmark"></i> Bookings</a></li>
                 <li class="nav-item"><a class="nav-link" th:href="@{/admin/users}"><i class="bi bi-people"></i> Users</a></li>
             </ul>
-            <ul class="navbar-nav ms-auto align-items-center">
-                <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
-                    <a class="nav-link dropdown-toggle btn btn-outline-light btn-sm text-dark px-3 py-1 bg-white" href="#" id="navUserDrop" role="button" data-bs-toggle="dropdown">
-                        <i class="bi bi-person-circle"></i> <span sec:authentication="name" class="fw-semibold">Admin</span>
+            <ul class="navbar-nav ms-auto align-items-center gap-2">
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <span class="navbar-text text-white me-1">
+                        <i class="bi bi-person-circle"></i>
+                        <span sec:authentication="name" class="fw-semibold"></span>
                         <span class="badge bg-danger ms-1">ADMIN</span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                            <form th:action="@{/logout}" method="post" class="m-0">
-                                <button type="submit" class="dropdown-item text-danger"><i class="bi bi-box-arrow-right"></i> Logout</button>
-                            </form>
-                        </li>
-                    </ul>
+                    </span>
+                </li>
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <form th:action="@{/logout}" method="post" class="m-0">
+                        <button type="submit" class="btn btn-danger btn-sm px-3">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </button>
+                    </form>
                 </li>
                 <li class="nav-item" sec:authorize="!isAuthenticated()">
                     <a class="btn btn-outline-light btn-sm px-3" th:href="@{/login}">Login</a>
                 </li>
-                <li class="nav-item ms-2 align-self-center">
+                <li class="nav-item align-self-center">
                     <button class="btn btn-outline-light btn-sm darkModeToggle"><i class="bi bi-moon"></i></button>
                 </li>
             </ul>
