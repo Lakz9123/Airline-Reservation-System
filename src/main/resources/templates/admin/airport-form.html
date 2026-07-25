@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: html_head(${airport.id == null ? 'Add Airport' : 'Edit Airport'})}"></head>
+<body>
+<div th:replace="~{layout :: navbar}"></div>
+
+<main class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0 fw-bold">
+                        <i class="bi" th:classappend="${airport.id == null ? 'bi-plus-circle' : 'bi-pencil-square'}"></i>
+                        <span th:text="${airport.id == null ? 'Add New Airport' : 'Edit Airport'}">Airport Form</span>
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <form th:action="@{/admin/airports}" th:object="${airport}" method="post">
+                        <!-- Hidden ID for updates -->
+                        <input type="hidden" th:field="*{id}">
+                        
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="airportCode" class="form-label fw-semibold">Airport Code (IATA)</label>
+                                <input type="text" th:field="*{airportCode}" class="form-control" id="airportCode" required maxlength="3" placeholder="e.g. MAA" style="text-transform:uppercase;">
+                            </div>
+                            <div class="col-md-8">
+                                <label for="airportName" class="form-label fw-semibold">Airport Name</label>
+                                <input type="text" th:field="*{airportName}" class="form-control" id="airportName" required placeholder="e.g. Chennai International Airport">
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="city" class="form-label fw-semibold">City</label>
+                                <input type="text" th:field="*{city}" class="form-control" id="city" required placeholder="e.g. Chennai">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="country" class="form-label fw-semibold">Country</label>
+                                <input type="text" th:field="*{country}" class="form-control" id="country" required placeholder="e.g. India">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="terminalCount" class="form-label fw-semibold">Terminal Count</label>
+                                <input type="number" th:field="*{terminalCount}" class="form-control" id="terminalCount" min="1" placeholder="e.g. 4">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="timezone" class="form-label fw-semibold">Timezone</label>
+                                <input type="text" th:field="*{timezone}" class="form-control" id="timezone" placeholder="e.g. GMT+5:30">
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a th:href="@{/admin/airports}" class="btn btn-outline-secondary"><i class="bi bi-x-circle"></i> Cancel</a>
+                            <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> Save Airport</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{layout :: footer}"></div>
+<div th:replace="~{layout :: html_scripts}"></div>
+</body>
+</html>

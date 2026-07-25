@@ -115,8 +115,10 @@ public class TicketPdfService {
         // ── Route section ────────────────────────────────────────────────────
         float bodyTop = cardY + cardH - headerH - 30;
 
-        String origin = booking.getFlight().getOrigin().toUpperCase();
-        String dest   = booking.getFlight().getDestination().toUpperCase();
+        String originCode = booking.getFlight().getOriginAirport().getAirportCode();
+        String originName = booking.getFlight().getOriginAirport().getAirportName() + ", " + booking.getFlight().getOriginAirport().getCity();
+        String destCode   = booking.getFlight().getDestinationAirport().getAirportCode();
+        String destName   = booking.getFlight().getDestinationAirport().getAirportName() + ", " + booking.getFlight().getDestinationAirport().getCity();
 
         float originX = cardX + 30;
         float arrowX  = cardX + cardW / 2f - 30;
@@ -127,7 +129,6 @@ public class TicketPdfService {
         canvas.setFontAndSize(bfBold, 42);
         canvas.setColorFill(DARK_BG);
         canvas.setTextMatrix(originX, bodyTop - 15);
-        String originCode = origin.length() >= 3 ? origin.substring(0, 3) : origin;
         canvas.showText(originCode);
         canvas.endText();
 
@@ -135,7 +136,7 @@ public class TicketPdfService {
         canvas.setFontAndSize(bf, 10);
         canvas.setColorFill(TEXT_MUTED);
         canvas.setTextMatrix(originX, bodyTop - 32);
-        canvas.showText(origin);
+        canvas.showText(originName);
         canvas.endText();
 
         canvas.beginText();
@@ -165,7 +166,6 @@ public class TicketPdfService {
         canvas.setFontAndSize(bfBold, 42);
         canvas.setColorFill(DARK_BG);
         canvas.setTextMatrix(destX, bodyTop - 15);
-        String destCode = dest.length() >= 3 ? dest.substring(0, 3) : dest;
         canvas.showText(destCode);
         canvas.endText();
 
@@ -173,7 +173,7 @@ public class TicketPdfService {
         canvas.setFontAndSize(bf, 10);
         canvas.setColorFill(TEXT_MUTED);
         canvas.setTextMatrix(destX, bodyTop - 32);
-        canvas.showText(dest);
+        canvas.showText(destName);
         canvas.endText();
 
         canvas.beginText();

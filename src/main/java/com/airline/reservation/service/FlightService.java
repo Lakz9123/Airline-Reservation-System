@@ -26,6 +26,12 @@ public class FlightService {
     }
 
     public Flight saveFlight(Flight flight) {
+        if (flight.getOriginAirport() != null && flight.getDestinationAirport() != null) {
+            if (flight.getOriginAirport().getId().equals(flight.getDestinationAirport().getId())) {
+                throw new IllegalArgumentException("Origin and Destination airports cannot be the same.");
+            }
+        }
+
         // Automatically compute duration in minutes if departure & arrival times are set
         if (flight.getDepartureDateTime() != null && flight.getArrivalDateTime() != null) {
             long minutes = Duration.between(flight.getDepartureDateTime(), flight.getArrivalDateTime()).toMinutes();

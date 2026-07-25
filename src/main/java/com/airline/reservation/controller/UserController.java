@@ -10,6 +10,7 @@ import com.airline.reservation.service.QrCodeService;
 import com.airline.reservation.service.TicketPdfService;
 import com.airline.reservation.service.UserBookingService;
 import com.airline.reservation.service.UserService;
+import com.airline.reservation.service.AirportService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -36,6 +37,7 @@ public class UserController {
     private final BookingRepository bookingRepository;
     private final EmailService emailService;
     private final QrCodeService qrCodeService;
+    private final AirportService airportService;
 
     public UserController(UserService userService,
                           FlightRepository flightRepository,
@@ -44,7 +46,8 @@ public class UserController {
                           TicketPdfService ticketPdfService,
                           BookingRepository bookingRepository,
                           EmailService emailService,
-                          QrCodeService qrCodeService) {
+                          QrCodeService qrCodeService,
+                          AirportService airportService) {
         this.userService = userService;
         this.flightRepository = flightRepository;
         this.userBookingService = userBookingService;
@@ -53,6 +56,7 @@ public class UserController {
         this.bookingRepository = bookingRepository;
         this.emailService = emailService;
         this.qrCodeService = qrCodeService;
+        this.airportService = airportService;
     }
 
     // ----- Helper: resolve current User entity -----
@@ -87,23 +91,25 @@ public class UserController {
     @GetMapping("/search")
     public String searchForm(Model model) {
         model.addAttribute("flights", Collections.emptyList());
+        model.addAttribute("airports", airportService.getAllAirports());
         return "user/search";
     }
 
     @GetMapping("/search/results")
     public String searchResults(
-            @RequestParam String origin,
-            @RequestParam String destination,
+            @RequestParam Long originId,
+            @RequestParam Long destinationId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             @RequestParam(required = false) Double maxFare,
             @RequestParam(required = false) String airline,
             Model model) {
         LocalDateTime startOfDay = date.atStartOfDay();
         LocalDateTime endOfDay = date.atTime(23, 59, 59);
-        List<Flight> flights = flightRepository.searchFlights(origin.trim(), destination.trim(), startOfDay, endOfDay, maxFare, airline);
+        List<Flight> flights = flightRepository.searchFlights(originId, destinationId, startOfDay, endOfDay, maxFare, airline);
         model.addAttribute("flights", flights);
-        model.addAttribute("origin", origin);
-        model.addAttribute("destination", destination);
+        model.addAttribute("originId", originId);
+        model.addAttribute("destinationId", destinationId);
+        model.addAttribute("airports", airportService.getAllAirports());
         model.addAttribute("date", date);
         model.addAttribute("maxFare", maxFare);
         model.addAttribute("airline", airline);
@@ -228,13 +234,16 @@ public class UserController {
 
         // Pre-compute display values so Thymeleaf doesn't need complex SpEL
         String ref = String.format("SKY-%05d", booking.getId());
-        String orig = booking.getFlight().getOrigin().toUpperCase();
-        String dest = booking.getFlight().getDestination().toUpperCase();
+        String originCode = booking.getFlight().getOriginAirport().getAirportCode();
+        String destCode = booking.getFlight().getDestinationAirport().getAirportCode();
+        String originFull = booking.getFlight().getOriginAirport().getAirportName() + ", " + booking.getFlight().getOriginAirport().getCity();
+        String destFull = booking.getFlight().getDestinationAirport().getAirportName() + ", " + booking.getFlight().getDestinationAirport().getCity();
+        
         model.addAttribute("bookingRef",  ref);
-        model.addAttribute("originCode",  orig.length() >= 3 ? orig.substring(0, 3) : orig);
-        model.addAttribute("destCode",    dest.length() >= 3 ? dest.substring(0, 3) : dest);
-        model.addAttribute("originFull",  orig);
-        model.addAttribute("destFull",    dest);
+        model.addAttribute("originCode",  originCode);
+        model.addAttribute("destCode",    destCode);
+        model.addAttribute("originFull",  originFull);
+        model.addAttribute("destFull",    destFull);
 
         // Generate QR Code
         String qrText = "Booking: " + ref + "\nFlight: " + booking.getFlight().getFlightNumber() + "\nSeats: " + booking.getSeatNumbers();

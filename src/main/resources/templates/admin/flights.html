@@ -46,9 +46,9 @@
                             <td><strong th:text="${flight.flightNumber}">AA-101</strong></td>
                             <td th:text="${flight.airlineName}">Airline</td>
                             <td>
-                                <span class="fw-semibold text-uppercase" th:text="${flight.origin}">Origin</span> 
+                                <span class="fw-semibold text-uppercase" th:text="${flight.originAirport.airportCode} + ' (' + ${flight.originAirport.city} + ')'">Origin</span> 
                                 <i class="bi bi-arrow-right text-muted mx-1"></i>
-                                <span class="fw-semibold text-uppercase" th:text="${flight.destination}">Destination</span>
+                                <span class="fw-semibold text-uppercase" th:text="${flight.destinationAirport.airportCode} + ' (' + ${flight.destinationAirport.city} + ')'">Destination</span>
                             </td>
                             <td th:text="${#temporals.format(flight.departureDateTime, 'yyyy-MM-dd HH:mm')}">Departure</td>
                             <td th:text="${#temporals.format(flight.arrivalDateTime, 'yyyy-MM-dd HH:mm')}">Arrival</td>

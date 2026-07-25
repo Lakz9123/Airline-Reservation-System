@@ -16,11 +16,13 @@ public class Flight {
     @Column(name = "airline_name", nullable = false)
     private String airlineName;
 
-    @Column(nullable = false)
-    private String origin;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "origin_airport_id", nullable = false)
+    private Airport originAirport;
 
-    @Column(nullable = false)
-    private String destination;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "destination_airport_id", nullable = false)
+    private Airport destinationAirport;
 
     @Column(name = "departure_date_time", nullable = false)
     private LocalDateTime departureDateTime;
@@ -43,11 +45,11 @@ public class Flight {
     // Constructors
     public Flight() {}
 
-    public Flight(String flightNumber, String airlineName, String origin, String destination, LocalDateTime departureDateTime, LocalDateTime arrivalDateTime, Integer durationMinutes, Double fare, Integer totalSeats, Integer availableSeats) {
+    public Flight(String flightNumber, String airlineName, Airport originAirport, Airport destinationAirport, LocalDateTime departureDateTime, LocalDateTime arrivalDateTime, Integer durationMinutes, Double fare, Integer totalSeats, Integer availableSeats) {
         this.flightNumber = flightNumber;
         this.airlineName = airlineName;
-        this.origin = origin;
-        this.destination = destination;
+        this.originAirport = originAirport;
+        this.destinationAirport = destinationAirport;
         this.departureDateTime = departureDateTime;
         this.arrivalDateTime = arrivalDateTime;
         this.durationMinutes = durationMinutes;
@@ -81,20 +83,20 @@ public class Flight {
         this.airlineName = airlineName;
     }
 
-    public String getOrigin() {
-        return origin;
+    public Airport getOriginAirport() {
+        return originAirport;
     }
 
-    public void setOrigin(String origin) {
-        this.origin = origin;
+    public void setOriginAirport(Airport originAirport) {
+        this.originAirport = originAirport;
     }
 
-    public String getDestination() {
-        return destination;
+    public Airport getDestinationAirport() {
+        return destinationAirport;
     }
 
-    public void setDestination(String destination) {
-        this.destination = destination;
+    public void setDestinationAirport(Airport destinationAirport) {
+        this.destinationAirport = destinationAirport;
     }
 
     public LocalDateTime getDepartureDateTime() {

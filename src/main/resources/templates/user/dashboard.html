@@ -76,7 +76,7 @@
         <tbody>
           <tr th:each="b : ${recentBookings}">
             <td><span class="badge bg-secondary" th:text="${b.flight.flightNumber}">FL</span></td>
-            <td><span th:text="${b.flight.origin}">A</span> → <span th:text="${b.flight.destination}">B</span></td>
+            <td><span th:text="${b.flight.originAirport.airportCode}">A</span> → <span th:text="${b.flight.destinationAirport.airportCode}">B</span></td>
             <td><code th:text="${b.seatNumbers}">A1</code></td>
             <td th:text="${#temporals.format(b.bookingDate,'dd MMM yyyy')}">Date</td>
             <td>$<span th:text="${#numbers.formatDecimal(b.totalFare,1,2)}">0</span></td>

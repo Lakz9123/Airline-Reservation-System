@@ -39,9 +39,9 @@
                             </td>
                             <td><span class="badge bg-secondary" th:text="${booking.flight.flightNumber}">AA-101</span></td>
                             <td>
-                                <span class="fw-semibold text-uppercase" th:text="${booking.flight.origin}">Origin</span> 
+                                <span class="fw-semibold text-uppercase" th:text="${booking.flight.originAirport.airportCode}">Origin</span> 
                                 <i class="bi bi-arrow-right text-muted mx-1"></i>
-                                <span class="fw-semibold text-uppercase" th:text="${booking.flight.destination}">Destination</span>
+                                <span class="fw-semibold text-uppercase" th:text="${booking.flight.destinationAirport.airportCode}">Destination</span>
                             </td>
                             <td><code class="bg-light text-dark p-1 rounded" th:text="${booking.seatNumbers}">12A, 12B</code></td>
                             <td th:text="${#temporals.format(booking.bookingDate, 'yyyy-MM-dd HH:mm')}">Date</td>

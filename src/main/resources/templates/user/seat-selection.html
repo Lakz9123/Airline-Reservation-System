@@ -15,9 +15,9 @@
           </h3>
           <div class="text-muted">
             <i class="bi bi-geo-alt-fill"></i>
-            <strong th:text="${flight.origin}">A</strong>
+            <strong th:text="${flight.originAirport.airportCode} + ' (' + ${flight.originAirport.city} + ')'">A</strong>
             &rarr;
-            <strong th:text="${flight.destination}">B</strong>
+            <strong th:text="${flight.destinationAirport.airportCode} + ' (' + ${flight.destinationAirport.city} + ')'">B</strong>
             &nbsp;|&nbsp;
             <i class="bi bi-calendar3"></i>
             <span th:text="${#temporals.format(flight.departureDateTime,'dd MMM yyyy HH:mm')}">Date</span>

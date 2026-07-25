@@ -35,7 +35,7 @@ public class EmailService {
                     + "<ul>"
                     + "<li><strong>Booking Reference:</strong> SKY-" + String.format("%05d", booking.getId()) + "</li>"
                     + "<li><strong>Flight:</strong> " + booking.getFlight().getFlightNumber() + " (" + booking.getFlight().getAirlineName() + ")</li>"
-                    + "<li><strong>Route:</strong> " + booking.getFlight().getOrigin() + " to " + booking.getFlight().getDestination() + "</li>"
+                    + "<li><strong>Route:</strong> " + booking.getFlight().getOriginAirport().getAirportCode() + " (" + booking.getFlight().getOriginAirport().getCity() + ") to " + booking.getFlight().getDestinationAirport().getAirportCode() + " (" + booking.getFlight().getDestinationAirport().getCity() + ")</li>"
                     + "<li><strong>Seats:</strong> " + booking.getSeatNumbers() + "</li>"
                     + "<li><strong>Total Fare:</strong> $" + String.format("%.2f", booking.getTotalFare()) + "</li>"
                     + "</ul>"

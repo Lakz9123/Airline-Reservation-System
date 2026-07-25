@@ -3,9 +3,11 @@ package com.airline.reservation.util;
 import com.airline.reservation.entity.Booking;
 import com.airline.reservation.entity.Flight;
 import com.airline.reservation.entity.User;
+import com.airline.reservation.entity.Airport;
 import com.airline.reservation.repository.BookingRepository;
 import com.airline.reservation.repository.FlightRepository;
 import com.airline.reservation.repository.UserRepository;
+import com.airline.reservation.repository.AirportRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -19,12 +21,14 @@ public class DataLoader implements CommandLineRunner {
     private final UserRepository userRepository;
     private final FlightRepository flightRepository;
     private final BookingRepository bookingRepository;
+    private final AirportRepository airportRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public DataLoader(UserRepository userRepository, FlightRepository flightRepository, BookingRepository bookingRepository, PasswordEncoder passwordEncoder) {
+    public DataLoader(UserRepository userRepository, FlightRepository flightRepository, BookingRepository bookingRepository, AirportRepository airportRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.flightRepository = flightRepository;
         this.bookingRepository = bookingRepository;
+        this.airportRepository = airportRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -50,31 +54,51 @@ public class DataLoader implements CommandLineRunner {
             userRepository.save(user2);
         }
 
+        // Seed 6 Indian Airports if none exist
+        Airport maa = null, blr = null, del = null, bom = null, hyd = null, ccu = null;
+        if (airportRepository.count() == 0) {
+            // Note: existing flight data will need reseeding since ddl-auto=update can't migrate strings to FKs.
+            maa = new Airport("MAA", "Chennai International Airport", "Chennai", "India", 4, "GMT+5:30");
+            blr = new Airport("BLR", "Kempegowda International Airport", "Bengaluru", "India", 2, "GMT+5:30");
+            del = new Airport("DEL", "Indira Gandhi International Airport", "New Delhi", "India", 3, "GMT+5:30");
+            bom = new Airport("BOM", "Chhatrapati Shivaji Maharaj International Airport", "Mumbai", "India", 2, "GMT+5:30");
+            hyd = new Airport("HYD", "Rajiv Gandhi International Airport", "Hyderabad", "India", 1, "GMT+5:30");
+            ccu = new Airport("CCU", "Netaji Subhash Chandra Bose International Airport", "Kolkata", "India", 1, "GMT+5:30");
+            airportRepository.saveAll(Arrays.asList(maa, blr, del, bom, hyd, ccu));
+        } else {
+            maa = airportRepository.findByAirportCodeIgnoreCase("MAA").orElse(null);
+            blr = airportRepository.findByAirportCodeIgnoreCase("BLR").orElse(null);
+            del = airportRepository.findByAirportCodeIgnoreCase("DEL").orElse(null);
+            bom = airportRepository.findByAirportCodeIgnoreCase("BOM").orElse(null);
+            hyd = airportRepository.findByAirportCodeIgnoreCase("HYD").orElse(null);
+            ccu = airportRepository.findByAirportCodeIgnoreCase("CCU").orElse(null);
+        }
+
         // 3. Seed 5 Sample Flights
         if (flightRepository.count() == 0) {
             LocalDateTime now = LocalDateTime.now();
 
-            Flight f1 = new Flight("AA-101", "American Airlines", "New York", "London", 
+            Flight f1 = new Flight("AA-101", "American Airlines", del, bom, 
                     now.plusDays(2).withHour(10).withMinute(0).withSecond(0).withNano(0), 
                     now.plusDays(2).withHour(22).withMinute(30).withSecond(0).withNano(0), 
                     750, 450.00, 150, 148);
 
-            Flight f2 = new Flight("UA-202", "United Airlines", "Chicago", "San Francisco", 
+            Flight f2 = new Flight("UA-202", "United Airlines", bom, blr, 
                     now.plusDays(3).withHour(8).withMinute(15).withSecond(0).withNano(0), 
                     now.plusDays(3).withHour(11).withMinute(45).withSecond(0).withNano(0), 
                     210, 250.00, 120, 119);
 
-            Flight f3 = new Flight("DL-303", "Delta Air Lines", "Atlanta", "Miami", 
+            Flight f3 = new Flight("DL-303", "Delta Air Lines", maa, hyd, 
                     now.plusDays(1).withHour(14).withMinute(30).withSecond(0).withNano(0), 
                     now.plusDays(1).withHour(16).withMinute(45).withSecond(0).withNano(0), 
                     135, 150.00, 100, 100);
 
-            Flight f4 = new Flight("LH-404", "Lufthansa", "Frankfurt", "Tokyo", 
+            Flight f4 = new Flight("LH-404", "Lufthansa", del, ccu, 
                     now.plusDays(5).withHour(13).withMinute(0).withSecond(0).withNano(0), 
                     now.plusDays(6).withHour(7).withMinute(15).withSecond(0).withNano(0), 
                     675, 850.00, 250, 250);
 
-            Flight f5 = new Flight("EK-505", "Emirates", "Dubai", "Paris", 
+            Flight f5 = new Flight("EK-505", "Emirates", blr, maa, 
                     now.plusDays(4).withHour(6).withMinute(30).withSecond(0).withNano(0), 
                     now.plusDays(4).withHour(11).withMinute(0).withSecond(0).withNano(0), 
                     450, 550.00, 200, 200);

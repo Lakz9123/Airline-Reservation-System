@@ -12,11 +12,17 @@
       <form th:action="@{/user/search/results}" method="get" class="row g-3 align-items-end">
         <div class="col-md-2">
           <label class="form-label fw-semibold">From (Origin)</label>
-          <input type="text" class="form-control" name="origin" th:value="${origin}" required placeholder="e.g. New York">
+          <select class="form-select" name="originId" required>
+            <option value="" disabled th:selected="${originId == null}">Select Origin</option>
+            <option th:each="ap : ${airports}" th:value="${ap.id}" th:text="${ap.airportCode} + ' - ' + ${ap.city}" th:selected="${ap.id == originId}"></option>
+          </select>
         </div>
         <div class="col-md-2">
           <label class="form-label fw-semibold">To (Destination)</label>
-          <input type="text" class="form-control" name="destination" th:value="${destination}" required placeholder="e.g. London">
+          <select class="form-select" name="destinationId" required>
+            <option value="" disabled th:selected="${destinationId == null}">Select Destination</option>
+            <option th:each="ap : ${airports}" th:value="${ap.id}" th:text="${ap.airportCode} + ' - ' + ${ap.city}" th:selected="${ap.id == destinationId}"></option>
+          </select>
         </div>
         <div class="col-md-2">
           <label class="form-label fw-semibold">Departure Date</label>
@@ -57,7 +63,7 @@
                   <div class="d-flex align-items-center justify-content-center gap-2">
                     <div>
                       <div class="fs-5 fw-bold" th:text="${#temporals.format(f.departureDateTime,'HH:mm')}">00:00</div>
-                      <div class="text-muted small" th:text="${f.origin}">Origin</div>
+                      <div class="text-muted small" th:text="${f.originAirport.airportCode} + ' (' + ${f.originAirport.city} + ')'">Origin</div>
                     </div>
                     <div class="text-muted px-2">
                       <i class="bi bi-arrow-right fs-4"></i><br>
@@ -65,7 +71,7 @@
                     </div>
                     <div>
                       <div class="fs-5 fw-bold" th:text="${#temporals.format(f.arrivalDateTime,'HH:mm')}">00:00</div>
-                      <div class="text-muted small" th:text="${f.destination}">Destination</div>
+                      <div class="text-muted small" th:text="${f.destinationAirport.airportCode} + ' (' + ${f.destinationAirport.city} + ')'">Destination</div>
                     </div>
                   </div>
                   <small class="text-muted" th:text="${#temporals.format(f.departureDateTime,'dd MMM yyyy')}">Date</small>

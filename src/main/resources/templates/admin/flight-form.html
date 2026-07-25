@@ -30,12 +30,18 @@
                             </div>
                             
                             <div class="col-md-6">
-                                <label for="origin" class="form-label fw-semibold">Origin</label>
-                                <input type="text" th:field="*{origin}" class="form-control" id="origin" required placeholder="e.g. New York">
+                                <label for="originAirport" class="form-label fw-semibold">Origin Airport</label>
+                                <select th:field="*{originAirport.id}" class="form-select" id="originAirport" required>
+                                    <option value="" disabled selected>Select Origin</option>
+                                    <option th:each="ap : ${airports}" th:value="${ap.id}" th:text="${ap.airportCode} + ' - ' + ${ap.airportName} + ', ' + ${ap.city}"></option>
+                                </select>
                             </div>
                             <div class="col-md-6">
-                                <label for="destination" class="form-label fw-semibold">Destination</label>
-                                <input type="text" th:field="*{destination}" class="form-control" id="destination" required placeholder="e.g. London">
+                                <label for="destinationAirport" class="form-label fw-semibold">Destination Airport</label>
+                                <select th:field="*{destinationAirport.id}" class="form-select" id="destinationAirport" required>
+                                    <option value="" disabled selected>Select Destination</option>
+                                    <option th:each="ap : ${airports}" th:value="${ap.id}" th:text="${ap.airportCode} + ' - ' + ${ap.airportName} + ', ' + ${ap.city}"></option>
+                                </select>
                             </div>
 
                             <div class="col-md-6">

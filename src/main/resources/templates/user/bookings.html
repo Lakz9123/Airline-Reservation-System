@@ -37,7 +37,7 @@
           <div class="text-muted small" th:text="${b.flight.airlineName}">Airline</div>
         </div>
         <div class="col-6 col-md-3">
-          <strong th:text="${b.flight.origin}">Origin</strong> → <strong th:text="${b.flight.destination}">Dest</strong>
+          <strong th:text="${b.flight.originAirport.airportCode} + ' (' + ${b.flight.originAirport.city} + ')'">Origin</strong> → <strong th:text="${b.flight.destinationAirport.airportCode} + ' (' + ${b.flight.destinationAirport.city} + ')'">Dest</strong>
           <div class="text-muted small" th:text="${#temporals.format(b.flight.departureDateTime,'dd MMM yyyy HH:mm')}">Date</div>
         </div>
         <div class="col-6 col-md-2">

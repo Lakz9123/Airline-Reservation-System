@@ -16,7 +16,7 @@
                     <div class="bg-light p-3 rounded mb-4">
                         <div class="d-flex justify-content-between mb-2">
                             <span class="text-muted">Flight:</span>
-                            <span class="fw-bold" th:text="${flight.flightNumber} + ' (' + ${flight.origin} + ' to ' + ${flight.destination} + ')'">FL-101 (NYC to LHR)</span>
+                            <span class="fw-bold" th:text="${flight.flightNumber} + ' (' + ${flight.originAirport.airportCode} + ' to ' + ${flight.destinationAirport.airportCode} + ')'">FL-101 (MAA to DEL)</span>
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <span class="text-muted">Seats:</span>
