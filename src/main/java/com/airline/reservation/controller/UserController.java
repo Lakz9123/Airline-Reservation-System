@@ -5,6 +5,8 @@ import com.airline.reservation.entity.Flight;
 import com.airline.reservation.entity.User;
 import com.airline.reservation.repository.BookingRepository;
 import com.airline.reservation.repository.FlightRepository;
+import com.airline.reservation.service.EmailService;
+import com.airline.reservation.service.QrCodeService;
 import com.airline.reservation.service.TicketPdfService;
 import com.airline.reservation.service.UserBookingService;
 import com.airline.reservation.service.UserService;
@@ -32,19 +34,25 @@ public class UserController {
     private final PasswordEncoder passwordEncoder;
     private final TicketPdfService ticketPdfService;
     private final BookingRepository bookingRepository;
+    private final EmailService emailService;
+    private final QrCodeService qrCodeService;
 
     public UserController(UserService userService,
                           FlightRepository flightRepository,
                           UserBookingService userBookingService,
                           PasswordEncoder passwordEncoder,
                           TicketPdfService ticketPdfService,
-                          BookingRepository bookingRepository) {
+                          BookingRepository bookingRepository,
+                          EmailService emailService,
+                          QrCodeService qrCodeService) {
         this.userService = userService;
         this.flightRepository = flightRepository;
         this.userBookingService = userBookingService;
         this.passwordEncoder = passwordEncoder;
         this.ticketPdfService = ticketPdfService;
         this.bookingRepository = bookingRepository;
+        this.emailService = emailService;
+        this.qrCodeService = qrCodeService;
     }
 
     // ----- Helper: resolve current User entity -----
@@ -87,14 +95,18 @@ public class UserController {
             @RequestParam String origin,
             @RequestParam String destination,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(required = false) Double maxFare,
+            @RequestParam(required = false) String airline,
             Model model) {
         LocalDateTime startOfDay = date.atStartOfDay();
         LocalDateTime endOfDay = date.atTime(23, 59, 59);
-        List<Flight> flights = flightRepository.searchFlights(origin.trim(), destination.trim(), startOfDay, endOfDay);
+        List<Flight> flights = flightRepository.searchFlights(origin.trim(), destination.trim(), startOfDay, endOfDay, maxFare, airline);
         model.addAttribute("flights", flights);
         model.addAttribute("origin", origin);
         model.addAttribute("destination", destination);
         model.addAttribute("date", date);
+        model.addAttribute("maxFare", maxFare);
+        model.addAttribute("airline", airline);
         return "user/search";
     }
 
@@ -116,18 +128,46 @@ public class UserController {
     }
 
     // ============================
-    // 4. Booking Confirmation (POST)
+    // 4. Payment Mock
     // ============================
     @PostMapping("/book/{flightId}")
-    public String confirmBooking(@PathVariable Long flightId,
-                                 @RequestParam(value = "selectedSeats", required = false) List<String> selectedSeats,
+    public String proceedToPayment(@PathVariable Long flightId,
+                                   @RequestParam(value = "selectedSeats", required = false) List<String> selectedSeats,
+                                   RedirectAttributes redirectAttributes) {
+        if (selectedSeats == null || selectedSeats.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "Please select at least one seat.");
+            return "redirect:/user/book/" + flightId;
+        }
+        redirectAttributes.addFlashAttribute("selectedSeats", selectedSeats);
+        return "redirect:/user/payment/" + flightId;
+    }
+
+    @GetMapping("/payment/{flightId}")
+    public String showPaymentPage(@PathVariable Long flightId,
+                                  Model model,
+                                  @ModelAttribute("selectedSeats") List<String> selectedSeats) {
+        if (selectedSeats == null || selectedSeats.isEmpty()) {
+            return "redirect:/user/book/" + flightId;
+        }
+        Flight flight = flightRepository.findById(flightId)
+                .orElseThrow(() -> new IllegalArgumentException("Flight not found"));
+        model.addAttribute("flight", flight);
+        model.addAttribute("selectedSeats", selectedSeats);
+        model.addAttribute("totalFare", flight.getFare() * selectedSeats.size());
+        return "user/payment";
+    }
+
+    @PostMapping("/payment/{flightId}")
+    public String processPayment(@PathVariable Long flightId,
+                                 @RequestParam("selectedSeats") List<String> selectedSeats,
                                  @AuthenticationPrincipal UserDetails principal,
                                  RedirectAttributes redirectAttributes) {
         User user = getCurrentUser(principal);
         try {
+            // Mock payment processing happens here
             Booking booking = userBookingService.bookSeats(user, flightId, selectedSeats);
+            emailService.sendBookingConfirmation(booking);
             redirectAttributes.addFlashAttribute("bookingSuccess", true);
-            redirectAttributes.addFlashAttribute("booking", booking);
             return "redirect:/user/bookings";
         } catch (IllegalArgumentException | IllegalStateException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
@@ -184,6 +224,12 @@ public class UserController {
         model.addAttribute("destCode",    dest.length() >= 3 ? dest.substring(0, 3) : dest);
         model.addAttribute("originFull",  orig);
         model.addAttribute("destFull",    dest);
+
+        // Generate QR Code
+        String qrText = "Booking: " + ref + "\nFlight: " + booking.getFlight().getFlightNumber() + "\nSeats: " + booking.getSeatNumbers();
+        String qrBase64 = qrCodeService.generateQrCodeBase64(qrText, 150, 150);
+        model.addAttribute("qrBase64", qrBase64);
+
         return "user/ticket";
     }
 

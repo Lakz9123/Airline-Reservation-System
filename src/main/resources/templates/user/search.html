@@ -10,19 +10,27 @@
   <div class="card shadow-sm border-0 mb-4">
     <div class="card-body p-4">
       <form th:action="@{/user/search/results}" method="get" class="row g-3 align-items-end">
-        <div class="col-md-3">
+        <div class="col-md-2">
           <label class="form-label fw-semibold">From (Origin)</label>
           <input type="text" class="form-control" name="origin" th:value="${origin}" required placeholder="e.g. New York">
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
           <label class="form-label fw-semibold">To (Destination)</label>
           <input type="text" class="form-control" name="destination" th:value="${destination}" required placeholder="e.g. London">
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
           <label class="form-label fw-semibold">Departure Date</label>
           <input type="date" class="form-control" name="date" th:value="${date}" required>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
+          <label class="form-label fw-semibold">Max Fare ($)</label>
+          <input type="number" step="0.01" class="form-control" name="maxFare" th:value="${maxFare}" placeholder="Opt limit">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label fw-semibold">Airline</label>
+          <input type="text" class="form-control" name="airline" th:value="${airline}" placeholder="Opt airline">
+        </div>
+        <div class="col-md-2 mt-4">
           <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i> Search</button>
         </div>
       </form>

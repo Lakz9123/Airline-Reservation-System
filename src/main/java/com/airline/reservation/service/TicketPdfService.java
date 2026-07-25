@@ -12,6 +12,12 @@ import java.time.format.DateTimeFormatter;
 @Service
 public class TicketPdfService {
 
+    private final QrCodeService qrCodeService;
+
+    public TicketPdfService(QrCodeService qrCodeService) {
+        this.qrCodeService = qrCodeService;
+    }
+
     private static final DateTimeFormatter DATE_FMT  = DateTimeFormatter.ofPattern("dd MMM yyyy");
     private static final DateTimeFormatter TIME_FMT  = DateTimeFormatter.ofPattern("HH:mm");
     private static final DateTimeFormatter FULL_FMT  = DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm");
@@ -215,26 +221,17 @@ public class TicketPdfService {
         drawDetailBlock(canvas, bf, bfBold, col4, detailTop2, "TOTAL FARE",
                 String.format("$%.2f", booking.getTotalFare()));
 
-        // ── Barcode-style decoration (purely decorative) ──────────────────────
-        float barX = cardX + cardW - 95;
+        // ── QR Code ────────────────────────────────────────────────────────
+        float barX = cardX + cardW - 100;
         float barY = cardY + 20;
-        canvas.setColorFill(DARK_BG);
-        int[] widths = {3,1,2,1,3,2,1,2,3,1,2,3,1,2,1,3,2,1,3,1,2,1,3,2,1};
-        float bx = barX;
-        for (int i = 0; i < widths.length; i++) {
-            if (i % 2 == 0) {
-                canvas.rectangle(bx, barY, widths[i], 60);
-                canvas.fill();
-            }
-            bx += widths[i] + 1;
+        
+        String qrText = "Booking: SKY-" + String.format("%05d", booking.getId()) + "\nFlight: " + booking.getFlight().getFlightNumber() + "\nSeats: " + booking.getSeatNumbers();
+        byte[] qrBytes = qrCodeService.generateQrCodeBytes(qrText, 80, 80);
+        if (qrBytes != null) {
+            Image qrImage = Image.getInstance(qrBytes);
+            qrImage.setAbsolutePosition(barX, barY);
+            canvas.addImage(qrImage);
         }
-
-        canvas.beginText();
-        canvas.setFontAndSize(bf, 7);
-        canvas.setColorFill(TEXT_MUTED);
-        canvas.setTextMatrix(barX, barY - 10);
-        canvas.showText(String.format("*SKY%05d*", booking.getId()));
-        canvas.endText();
 
         // ── Footer ───────────────────────────────────────────────────────────
         canvas.beginText();

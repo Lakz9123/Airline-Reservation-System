@@ -81,8 +81,8 @@
             <td th:text="${#temporals.format(b.bookingDate,'dd MMM yyyy')}">Date</td>
             <td>$<span th:text="${#numbers.formatDecimal(b.totalFare,1,2)}">0</span></td>
             <td>
-              <span class="badge bg-success" th:if="${b.status=='CONFIRMED'}">CONFIRMED</span>
-              <span class="badge bg-danger" th:if="${b.status=='CANCELLED'}">CANCELLED</span>
+              <span class="badge rounded-pill bg-success px-3 py-1" th:if="${b.status=='CONFIRMED'}">CONFIRMED</span>
+              <span class="badge rounded-pill bg-danger px-3 py-1" th:if="${b.status=='CANCELLED'}">CANCELLED</span>
             </td>
           </tr>
         </tbody>

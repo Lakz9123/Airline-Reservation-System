@@ -27,45 +27,41 @@
   <!-- Bookings list -->
   <div th:each="b : ${bookings}" class="card border-0 shadow-sm mb-3">
     <div class="card-body">
-      <div class="row align-items-center">
-        <div class="col-md-1 text-center">
-          <span class="badge bg-success fs-6 mb-1" th:if="${b.status=='CONFIRMED'}">✓</span>
-          <span class="badge bg-danger fs-6 mb-1" th:if="${b.status=='CANCELLED'}">✗</span>
+      <div class="row align-items-center gy-2">
+        <div class="col-12 col-md-1 text-center">
+          <span class="badge rounded-pill bg-success fs-6 px-3" th:if="${b.status=='CONFIRMED'}">✓</span>
+          <span class="badge rounded-pill bg-danger fs-6 px-3" th:if="${b.status=='CANCELLED'}">✗</span>
         </div>
-        <div class="col-md-2">
+        <div class="col-6 col-md-2">
           <div class="fw-bold" th:text="${b.flight.flightNumber}">FL-101</div>
           <div class="text-muted small" th:text="${b.flight.airlineName}">Airline</div>
         </div>
-        <div class="col-md-3">
+        <div class="col-6 col-md-3">
           <strong th:text="${b.flight.origin}">Origin</strong> → <strong th:text="${b.flight.destination}">Dest</strong>
           <div class="text-muted small" th:text="${#temporals.format(b.flight.departureDateTime,'dd MMM yyyy HH:mm')}">Date</div>
         </div>
-        <div class="col-md-2">
+        <div class="col-6 col-md-2">
           <div class="text-muted small">Seats</div>
           <code th:text="${b.seatNumbers}">A1, A2</code>
         </div>
-        <div class="col-md-1">
-          <div class="text-muted small">Booked On</div>
-          <div class="small" th:text="${#temporals.format(b.bookingDate,'dd MMM')}">Date</div>
-        </div>
-        <div class="col-md-2">
+        <div class="col-6 col-md-2">
           <div class="text-muted small">Total Fare</div>
           <div class="fw-bold text-primary">$<span th:text="${#numbers.formatDecimal(b.totalFare,1,2)}">0</span></div>
         </div>
-        <div class="col-md-1 text-end">
-          <span class="badge bg-success p-2" th:if="${b.status=='CONFIRMED'}">CONFIRMED</span>
-          <span class="badge bg-danger p-2" th:if="${b.status=='CANCELLED'}">CANCELLED</span>
+        <div class="col-6 col-md-1">
+          <span class="badge rounded-pill bg-success px-3 py-2" th:if="${b.status=='CONFIRMED'}">CONFIRMED</span>
+          <span class="badge rounded-pill bg-danger px-3 py-2" th:if="${b.status=='CANCELLED'}">CANCELLED</span>
         </div>
-        <div class="col-md-2 text-end d-flex flex-column gap-1">
+        <div class="col-12 col-md-1 text-md-end d-flex d-md-block gap-1 flex-wrap">
           <a th:if="${b.status=='CONFIRMED'}"
              th:href="@{/user/ticket/{id}(id=${b.id})}"
-             class="btn btn-outline-primary btn-sm">
+             class="btn btn-outline-primary btn-sm mb-1">
             <i class="bi bi-ticket-perforated"></i> Ticket
           </a>
           <a th:if="${b.status=='CONFIRMED'}"
              th:href="@{/user/ticket/{id}/download(id=${b.id})}"
-             class="btn btn-success btn-sm">
-            <i class="bi bi-file-earmark-pdf-fill"></i> Download
+             class="btn btn-success btn-sm mb-1">
+            <i class="bi bi-file-earmark-pdf-fill"></i> PDF
           </a>
           <form th:if="${b.status=='CONFIRMED'}" th:action="@{/user/bookings/cancel/{id}(id=${b.id})}" method="post"
                 onsubmit="return confirm('Cancel this booking? Your seats will be released.')">
@@ -76,6 +72,7 @@
     </div>
   </div>
 </main>
+
 <div th:replace="~{layout :: footer}"></div>
 <div th:replace="~{layout :: html_scripts}"></div>
 </body>
