@@ -43,7 +43,7 @@ public class AircraftService {
         Aircraft aircraft = aircraftRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Aircraft not found"));
                 
-        if (flightRepository.existsByAircraft(aircraft)) {
+        if (flightRepository.existsByScheduleAircraft(aircraft)) {
             throw new IllegalStateException("Cannot delete aircraft because it is assigned to one or more flights.");
         }
         

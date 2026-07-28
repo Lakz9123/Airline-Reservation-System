@@ -13,6 +13,8 @@ import com.airline.reservation.repository.UserRepository;
 import com.airline.reservation.repository.AirportRepository;
 import com.airline.reservation.repository.AirlineRepository;
 import com.airline.reservation.repository.AircraftRepository;
+import com.airline.reservation.repository.RouteRepository;
+import com.airline.reservation.repository.ScheduleRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -37,8 +39,10 @@ public class DataLoader implements CommandLineRunner {
     private final AirlineRepository airlineRepository;
     private final AircraftRepository aircraftRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RouteRepository routeRepository;
+    private final ScheduleRepository scheduleRepository;
 
-    public DataLoader(UserRepository userRepository, FlightRepository flightRepository, BookingRepository bookingRepository, AirportRepository airportRepository, AirlineRepository airlineRepository, AircraftRepository aircraftRepository, PasswordEncoder passwordEncoder) {
+    public DataLoader(UserRepository userRepository, FlightRepository flightRepository, BookingRepository bookingRepository, AirportRepository airportRepository, AirlineRepository airlineRepository, AircraftRepository aircraftRepository, PasswordEncoder passwordEncoder, RouteRepository routeRepository, ScheduleRepository scheduleRepository) {
         this.userRepository = userRepository;
         this.flightRepository = flightRepository;
         this.bookingRepository = bookingRepository;
@@ -46,6 +50,8 @@ public class DataLoader implements CommandLineRunner {
         this.airlineRepository = airlineRepository;
         this.aircraftRepository = aircraftRepository;
         this.passwordEncoder = passwordEncoder;
+        this.routeRepository = routeRepository;
+        this.scheduleRepository = scheduleRepository;
     }
 
     @Override
@@ -132,48 +138,73 @@ public class DataLoader implements CommandLineRunner {
             ac4 = aircraftRepository.findByAircraftNumberIgnoreCase("VT-PQR").orElse(null);
         }
 
-        // 4. Generate Realistic Flights dynamically
+        // 4. Generate Routes, Schedules, and Flights
         List<Airport> allAirports = airportRepository.findAll();
         List<Airline> allAirlines = airlineRepository.findAll();
         List<Aircraft> allAircrafts = aircraftRepository.findAll();
 
-        if (flightRepository.count() < 10 && allAirports.size() > 1 && !allAirlines.isEmpty() && !allAircrafts.isEmpty()) {
+        if (routeRepository.count() == 0 && allAirports.size() > 1 && !allAirlines.isEmpty() && !allAircrafts.isEmpty()) {
             Random rand = new Random();
-            List<Flight> flightsToSave = new ArrayList<>();
-            for (int i = 0; i < 300; i++) { // Generate 300 flights
+            List<com.airline.reservation.entity.Route> routesToSave = new ArrayList<>();
+            // Generate 30 Routes
+            for (int i = 0; i < 30; i++) {
                 Airport origin = allAirports.get(rand.nextInt(allAirports.size()));
                 Airport dest = allAirports.get(rand.nextInt(allAirports.size()));
                 while (origin.getId().equals(dest.getId())) {
                     dest = allAirports.get(rand.nextInt(allAirports.size()));
                 }
                 Airline airline = allAirlines.get(rand.nextInt(allAirlines.size()));
-                Aircraft aircraft = allAircrafts.get(rand.nextInt(allAircrafts.size()));
+                int distance = 300 + rand.nextInt(1500); // 300 to 1800 miles
+                int durationMinutes = (distance / 5) + 30; // Approx logic
+                double baseFare = 2000 + (distance * 2); // Base fare math
                 
-                int daysAhead = 1 + rand.nextInt(30);
-                int hour = rand.nextInt(24);
-                int durationMinutes = 60 + rand.nextInt(180); // 1 to 4 hours
-                
-                LocalDateTime dep = LocalDateTime.now().plusDays(daysAhead).withHour(hour).withMinute(0).withSecond(0).withNano(0);
-                LocalDateTime arr = dep.plusMinutes(durationMinutes);
-                
-                String flightNum = airline.getAirlineName().substring(0, 2).toUpperCase() + "-" + (100 + rand.nextInt(900));
-                double fare = 2500 + rand.nextDouble() * 6000; // Between 2500 and 8500 INR
-                
-                Flight f = new Flight(flightNum, airline, origin, dest, dep, arr, durationMinutes, fare, aircraft, aircraft.getCapacity());
-                f.setEconomyFare(Math.round(fare * 100.0) / 100.0);
-                f.setPremiumEconomyFare(Math.round(fare * 1.5 * 100.0) / 100.0);
-                f.setBusinessFare(Math.round(fare * 2.5 * 100.0) / 100.0);
-                f.setFirstClassFare(Math.round(fare * 4.0 * 100.0) / 100.0);
-                flightsToSave.add(f);
+                com.airline.reservation.entity.Route r = new com.airline.reservation.entity.Route(airline, origin, dest, distance, baseFare, durationMinutes);
+                routesToSave.add(r);
+            }
+            routeRepository.saveAll(routesToSave);
+
+            // Generate Schedules for each Route (e.g. 2 schedules per route)
+            List<com.airline.reservation.entity.Schedule> schedulesToSave = new ArrayList<>();
+            for (com.airline.reservation.entity.Route route : routesToSave) {
+                for (int j = 0; j < 2; j++) {
+                    Aircraft aircraft = allAircrafts.get(rand.nextInt(allAircrafts.size()));
+                    java.time.DayOfWeek day = java.time.DayOfWeek.values()[rand.nextInt(7)];
+                    java.time.LocalTime time = java.time.LocalTime.of(rand.nextInt(24), rand.nextBoolean() ? 0 : 30);
+                    com.airline.reservation.entity.Schedule s = new com.airline.reservation.entity.Schedule(route, aircraft, day, time);
+                    schedulesToSave.add(s);
+                }
+            }
+            scheduleRepository.saveAll(schedulesToSave);
+
+            // Generate Flights based on Schedules for the next 30 days
+            List<Flight> flightsToSave = new ArrayList<>();
+            java.time.LocalDate startDate = java.time.LocalDate.now();
+            for (int dayOffset = 0; dayOffset < 30; dayOffset++) {
+                java.time.LocalDate currentDate = startDate.plusDays(dayOffset);
+                for (com.airline.reservation.entity.Schedule schedule : schedulesToSave) {
+                    // Just spawn it anyway for data density, ignoring actual DayOfWeek logic for simplicity in demo
+                    if (rand.nextDouble() > 0.3) { // 70% chance to fly on this day
+                        LocalDateTime dep = LocalDateTime.of(currentDate, schedule.getDepartureTime());
+                        LocalDateTime arr = dep.plusMinutes(schedule.getRoute().getStandardDurationMinutes());
+                        
+                        Flight f = new Flight(schedule, dep, arr, schedule.getAircraft().getCapacity());
+                        double fare = schedule.getRoute().getBaseFare() * (0.9 + rand.nextDouble() * 0.4); // Random variance
+                        f.setEconomyFare(Math.round(fare * 100.0) / 100.0);
+                        f.setPremiumEconomyFare(Math.round(fare * 1.5 * 100.0) / 100.0);
+                        f.setBusinessFare(Math.round(fare * 2.5 * 100.0) / 100.0);
+                        f.setFirstClassFare(Math.round(fare * 4.0 * 100.0) / 100.0);
+                        flightsToSave.add(f);
+                    }
+                }
             }
             flightRepository.saveAll(flightsToSave);
             
             // Seed a few Bookings for Admin preview
             if (!flightsToSave.isEmpty()) {
                 Flight sf = flightsToSave.get(0);
-                Booking b1 = new Booking(user1, sf, "12A, 12B", LocalDateTime.now().minusDays(1), "CONFIRMED", sf.getFare() * 2, "Economy");
-                Booking b2 = new Booking(user1, sf, "14C", LocalDateTime.now().minusHours(5), "CONFIRMED", sf.getFare(), "Economy");
-                Booking b3 = new Booking(user2, sf, "15A", LocalDateTime.now().minusDays(2), "CANCELLED", sf.getFare(), "Economy");
+                Booking b1 = new Booking(user1, sf, "12A, 12B", LocalDateTime.now().minusDays(1), "CONFIRMED", sf.getEconomyFare() * 2, "Economy");
+                Booking b2 = new Booking(user1, sf, "14C", LocalDateTime.now().minusHours(5), "CONFIRMED", sf.getEconomyFare(), "Economy");
+                Booking b3 = new Booking(user2, sf, "15A", LocalDateTime.now().minusDays(2), "CANCELLED", sf.getEconomyFare(), "Economy");
                 bookingRepository.saveAll(Arrays.asList(b1, b2, b3));
             }
         }
