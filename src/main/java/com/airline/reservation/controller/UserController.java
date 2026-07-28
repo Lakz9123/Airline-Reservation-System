@@ -290,7 +290,79 @@ public class UserController {
     }
 
     // ============================
-    // 8. Boarding Pass (separate from ticket)
+    // 8. Online Check-in
+    // ============================
+    @GetMapping("/checkin/{bookingId}")
+    public String startCheckIn(@PathVariable Long bookingId,
+                               @AuthenticationPrincipal UserDetails principal,
+                               Model model,
+                               RedirectAttributes redirectAttributes) {
+        User user = getCurrentUser(principal);
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new IllegalArgumentException("Booking not found"));
+        if (!booking.getUser().getId().equals(user.getId())) {
+            throw new SecurityException("Access denied");
+        }
+
+        if (!userBookingService.isEligibleForCheckIn(booking)) {
+            redirectAttributes.addFlashAttribute("error", "Booking is not eligible for check-in at this time. Check-in opens 48 hours before departure.");
+            return "redirect:/user/bookings";
+        }
+
+        Flight flight = booking.getFlight();
+        model.addAttribute("flight", flight);
+        model.addAttribute("booking", booking);
+        
+        List<String> allSeats = userBookingService.generateSeatLabels(flight);
+        Set<String> bookedSeats = userBookingService.getBookedSeats(flight);
+        
+        // Exclude the user's current seats from bookedSeats so they appear available to select
+        List<String> currentSeats = Arrays.asList(booking.getSeatNumbers().split(",\\s*"));
+        currentSeats.forEach(bookedSeats::remove);
+
+        model.addAttribute("allSeats", allSeats);
+        model.addAttribute("bookedSeats", bookedSeats);
+        model.addAttribute("currentSeats", currentSeats);
+
+        return "user/checkin-seat";
+    }
+
+    @PostMapping("/checkin/{bookingId}/confirm")
+    public String confirmCheckIn(@PathVariable Long bookingId,
+                                 @RequestParam(required = false) List<String> selectedSeats,
+                                 @AuthenticationPrincipal UserDetails principal,
+                                 RedirectAttributes redirectAttributes) {
+        User user = getCurrentUser(principal);
+        try {
+            userBookingService.processCheckIn(bookingId, user.getId(), selectedSeats);
+            return "redirect:/user/checkin/" + bookingId + "/ready";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/user/checkin/" + bookingId;
+        }
+    }
+
+    @GetMapping("/checkin/{bookingId}/ready")
+    public String readyToFly(@PathVariable Long bookingId,
+                             @AuthenticationPrincipal UserDetails principal,
+                             Model model) {
+        User user = getCurrentUser(principal);
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new IllegalArgumentException("Booking not found"));
+        if (!booking.getUser().getId().equals(user.getId())) {
+            throw new SecurityException("Access denied");
+        }
+        
+        if (!"CHECKED_IN".equals(booking.getCheckInStatus())) {
+            return "redirect:/user/bookings";
+        }
+
+        model.addAttribute("booking", booking);
+        return "user/ready-to-fly";
+    }
+
+    // ============================
+    // 9. Boarding Pass (separate from ticket)
     // ============================
     @GetMapping("/boarding-pass/{bookingId}")
     public String viewBoardingPass(@PathVariable Long bookingId,
@@ -304,6 +376,9 @@ public class UserController {
         }
         if (!"CONFIRMED".equals(booking.getStatus())) {
             return "redirect:/user/bookings";
+        }
+        if (!"CHECKED_IN".equals(booking.getCheckInStatus())) {
+            return "redirect:/user/checkin/" + bookingId;
         }
         model.addAttribute("booking", booking);
 
@@ -340,6 +415,10 @@ public class UserController {
         }
         if (!"CONFIRMED".equals(booking.getStatus())) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+        if (!"CHECKED_IN".equals(booking.getCheckInStatus())) {
+            response.sendRedirect("/user/checkin/" + bookingId);
             return;
         }
         String filename = String.format("BoardingPass-SKY%05d.pdf", booking.getId());

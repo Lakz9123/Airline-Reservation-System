@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check-in Reminder</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f4f6f8; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color:#333333;">
+<table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#f4f6f8; padding: 20px 0;">
+    <tr>
+        <td align="center">
+            <table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.05);">
+                <!-- Header -->
+                <tr>
+                    <td align="center" style="background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%); padding: 30px 20px; color:#ffffff;">
+                        <h1 style="margin:0; font-size:26px; font-weight:700; letter-spacing:1px;">✈ SkyFly Airlines</h1>
+                        <p style="margin:5px 0 0 0; font-size:15px; font-weight:600;">Online Check-In is Now Open!</p>
+                    </td>
+                </tr>
+                <!-- Body -->
+                <tr>
+                    <td style="padding: 30px 30px 20px 30px;">
+                        <h2 style="margin:0 0 15px 0; font-size:20px; color:#fd7e14;">Hi, <span th:text="${userName}">Passenger</span>!</h2>
+                        <p style="margin:0 0 20px 0; font-size:15px; line-height:1.5; color:#555555;">
+                            Your upcoming flight with SkyFly Airlines is departing soon! Online check-in is now open. Check in now to confirm your seat and generate your digital boarding pass.
+                        </p>
+                        
+                        <!-- Details Card -->
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#fff8f0; border:1px solid #ffe8cc; border-radius:6px; padding:20px; margin-bottom:25px;">
+                            <tr>
+                                <td style="padding-bottom:10px; font-size:14px; color:#6c757d;">Booking Reference:</td>
+                                <td style="padding-bottom:10px; font-size:16px; font-weight:bold; color:#fd7e14;" align="right" th:text="${bookingRef}">SKY-00001</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-bottom:10px; font-size:14px; color:#6c757d;">Flight Number:</td>
+                                <td style="padding-bottom:10px; font-size:14px; font-weight:600;" align="right" th:text="${flightNumber} + ' (' + ${airlineName} + ')'">FL-101 (IndiGo)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-bottom:10px; font-size:14px; color:#6c757d;">Route:</td>
+                                <td style="padding-bottom:10px; font-size:14px; font-weight:600;" align="right" th:text="${origin} + ' → ' + ${destination}">DEL → BOM</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-bottom:10px; font-size:14px; color:#6c757d;">Departure Time:</td>
+                                <td style="padding-bottom:10px; font-size:14px; font-weight:600; color:#d63384;" align="right" th:text="${departureTime}">01 Jan 2026 10:00</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-bottom:10px; font-size:14px; color:#6c757d;">Current Seat(s):</td>
+                                <td style="padding-bottom:10px; font-size:14px; font-weight:600;" align="right" th:text="${seatNumbers}">12A</td>
+                            </tr>
+                        </table>
+
+                        <!-- CTA Button -->
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tr>
+                                <td align="center" style="padding: 10px 0 20px 0;">
+                                    <a th:href="${checkInUrl}" target="_blank" style="background-color:#fd7e14; color:#ffffff; text-decoration:none; padding:14px 35px; font-size:16px; font-weight:bold; border-radius:5px; display:inline-block; box-shadow:0 3px 6px rgba(253,126,20,0.3);">Check In Now</a>
+                                </td>
+                            </tr>
+                        </table>
+                        
+                        <p style="margin:0; font-size:13px; color:#888888; text-align:center;">
+                            Check-in closes 1 hour before departure. Avoid airport queues by checking in online!
+                        </p>
+                    </td>
+                </tr>
+                <!-- Footer -->
+                <tr>
+                    <td align="center" style="background-color:#f8f9fa; padding:20px; font-size:12px; color:#6c757d; border-top:1px solid #e9ecef;">
+                        &copy; 2026 SkyFly Airlines. All rights reserved.<br>
+                        This is an automated reminder. Please do not reply to this email.
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

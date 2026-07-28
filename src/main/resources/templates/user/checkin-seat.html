@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: html_head('Online Check-in - Confirm Seats')}"></head>
+<body>
+<div th:replace="~{layout :: user_navbar}"></div>
+<main class="container">
+  <!-- Flight Header -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-4">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+          <h3 class="fw-bold mb-1">
+            <span class="badge bg-primary me-2" th:text="${flight.flightNumber}">FL-101</span>
+            <span th:text="${flight.airline.airlineName}">Airline</span>
+          </h3>
+          <div class="text-muted">
+            <i class="bi bi-geo-alt-fill"></i>
+            <strong th:text="${flight.originAirport.airportCode} + ' (' + ${flight.originAirport.city} + ')'">A</strong>
+            &rarr;
+            <strong th:text="${flight.destinationAirport.airportCode} + ' (' + ${flight.destinationAirport.city} + ')'">B</strong>
+            &nbsp;|&nbsp;
+            <i class="bi bi-calendar3"></i>
+            <span th:text="${#temporals.format(flight.departureDateTime,'dd MMM yyyy HH:mm')}">Date</span>
+          </div>
+        </div>
+        <div class="text-end">
+          <div class="fs-5 fw-bold text-success">Check-In Open</div>
+          <small class="text-muted"><span th:text="${flight.availableSeats}">0</span> seats available to switch</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" th:text="${error}">
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+
+  <div class="d-flex gap-3 mb-3 flex-wrap justify-content-center">
+    <span><button class="seat-btn seat-available" disabled style="background-color:#e0e0e0;"></button> Economy</span>
+    <span><button class="seat-btn seat-available" disabled style="background-color:#ffd700; border-color:#d4af37"></button> Business</span>
+    <span><button class="seat-btn seat-booked" disabled></button> Booked</span>
+    <span><button class="seat-btn seat-selected" disabled></button> Selected</span>
+  </div>
+
+  <!-- Seat Map -->
+  <form th:action="@{/user/checkin/{id}/confirm(id=${booking.id})}" method="post" id="seatForm">
+    <div class="card border-0 shadow-sm p-4 mb-4">
+      <div class="text-center text-muted mb-3"><small>✈️ Front of Plane</small></div>
+      <div id="seatMap" class="d-flex flex-column gap-2 align-items-center">
+        <!-- Rendered by JS using Thymeleaf data -->
+      </div>
+      <div class="text-center text-muted mt-3"><small>🛄 Rear of Plane</small></div>
+    </div>
+
+    <div class="card border-0 shadow-sm p-3 p-md-4 mb-4 text-center">
+      <h5 class="fw-bold mb-3">Confirm Your Seats</h5>
+      <p class="mb-3 text-muted">You are currently assigned: <strong class="text-dark" th:text="${booking.seatNumbers}"></strong>. You can keep these or select different available seats.</p>
+      
+      <p class="mb-3">Selected seats: <strong id="selectedSeatDisplay" class="fs-5 text-primary">None</strong></p>
+      <button type="submit" class="btn btn-success btn-lg px-5" id="confirmBtn" disabled>
+        <i class="bi bi-check2-circle"></i> Confirm Check-In
+      </button>
+    </div>
+  </form>
+</main>
+
+<!-- Pass data from Thymeleaf → JS -->
+<script th:inline="javascript">
+  const allSeats   = /*[[${allSeats}]]*/ [];
+  const bookedSeats = new Set(/*[[${bookedSeats}]]*/ []);
+  const currentSeatsArr = /*[[${currentSeats}]]*/ [];
+  const businessSeatsCount = /*[[${flight.aircraft != null ? flight.aircraft.businessSeats : 0}]]*/ 0;
+  const economySeatsCount = /*[[${flight.aircraft != null ? flight.aircraft.economySeats : flight.totalSeats}]]*/ 0;
+  const targetSeatCount = currentSeatsArr.length;
+</script>
+<script>
+  const seatMap = document.getElementById('seatMap');
+  const selectedSeatDisplay = document.getElementById('selectedSeatDisplay');
+  const confirmBtn = document.getElementById('confirmBtn');
+  const seatForm = document.getElementById('seatForm');
+  let selectedSeats = new Set(currentSeatsArr);
+
+  function renderSeats() {
+    seatMap.innerHTML = '';
+    
+    let currentIndex = 0;
+    
+    // Render Business Class
+    if (businessSeatsCount > 0) {
+      const busDiv = document.createElement('div');
+      busDiv.className = 'w-100 text-center text-primary fw-bold my-2';
+      busDiv.textContent = '--- Business Class ---';
+      seatMap.appendChild(busDiv);
+      
+      while (currentIndex < businessSeatsCount && currentIndex < allSeats.length) {
+        const rowDiv = document.createElement('div');
+        rowDiv.className = 'd-flex gap-2 justify-content-center';
+        
+        for (let j = 0; j < 4 && currentIndex < businessSeatsCount && currentIndex < allSeats.length; j++, currentIndex++) {
+          if (j === 2) {
+            const spacer = document.createElement('div');
+            spacer.style.width = '30px';
+            rowDiv.appendChild(spacer);
+          }
+          createSeatBtn(allSeats[currentIndex], rowDiv, true);
+        }
+        seatMap.appendChild(rowDiv);
+      }
+    }
+    
+    // Render Economy Class
+    if (economySeatsCount > 0) {
+      const ecoDiv = document.createElement('div');
+      ecoDiv.className = 'w-100 text-center text-secondary fw-bold my-2';
+      ecoDiv.textContent = '--- Economy Class ---';
+      seatMap.appendChild(ecoDiv);
+      
+      let ecoIndex = 0;
+      while (ecoIndex < economySeatsCount && currentIndex < allSeats.length) {
+        const rowDiv = document.createElement('div');
+        rowDiv.className = 'd-flex gap-2 justify-content-center';
+        
+        for (let j = 0; j < 6 && ecoIndex < economySeatsCount && currentIndex < allSeats.length; j++, currentIndex++, ecoIndex++) {
+          if (j === 3) {
+            const spacer = document.createElement('div');
+            spacer.style.width = '20px';
+            rowDiv.appendChild(spacer);
+          }
+          createSeatBtn(allSeats[currentIndex], rowDiv, false);
+        }
+        seatMap.appendChild(rowDiv);
+      }
+    }
+  }
+
+  function createSeatBtn(seat, rowDiv, isBusiness) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = seat;
+    btn.className = 'seat-btn';
+    
+    if (isBusiness) {
+      btn.style.backgroundColor = '#ffd700'; // Gold for business
+      btn.style.borderColor = '#d4af37';
+    }
+    
+    if (bookedSeats.has(seat)) {
+      btn.classList.add('seat-booked');
+      btn.disabled = true;
+      if (isBusiness) {
+        btn.style.opacity = '0.5';
+        btn.style.backgroundColor = '#8c8c8c';
+      }
+    } else {
+      btn.classList.add('seat-available');
+      btn.addEventListener('click', () => toggleSeat(seat, btn, isBusiness));
+    }
+    rowDiv.appendChild(btn);
+  }
+
+  function toggleSeat(seat, btn, isBusiness) {
+    if (selectedSeats.has(seat)) {
+      selectedSeats.delete(seat);
+      btn.classList.remove('seat-selected');
+      btn.classList.add('seat-available');
+      if(isBusiness) {
+        btn.style.backgroundColor = '#ffd700';
+      }
+    } else {
+      selectedSeats.add(seat);
+      btn.classList.remove('seat-available');
+      btn.classList.add('seat-selected');
+      if(isBusiness) {
+        btn.style.backgroundColor = '#28a745'; // override selected color slightly if needed, or rely on seat-selected class
+      }
+    }
+    updateSummary();
+  }
+
+  function updateSummary() {
+    // Remove existing hidden inputs
+    seatForm.querySelectorAll('input[name="selectedSeats"]').forEach(el => el.remove());
+    if (selectedSeats.size === 0) {
+      selectedSeatDisplay.textContent = 'None';
+      confirmBtn.disabled = true;
+    } else {
+      const arr = [...selectedSeats];
+      selectedSeatDisplay.textContent = arr.join(', ');
+      
+      // Only allow confirming if they have selected exactly the number of seats they originally had
+      confirmBtn.disabled = (arr.length !== targetSeatCount);
+      
+      arr.forEach(s => {
+        const inp = document.createElement('input');
+        inp.type = 'hidden';
+        inp.name = 'selectedSeats';
+        inp.value = s;
+        seatForm.appendChild(inp);
+      });
+    }
+  }
+
+  renderSeats();
+  updateSummary(); // Call once on load to populate the hidden fields for existing seats
+</script>
+<div th:replace="~{layout :: footer}"></div>
+<div th:replace="~{layout :: html_scripts}"></div>
+</body>
+</html>

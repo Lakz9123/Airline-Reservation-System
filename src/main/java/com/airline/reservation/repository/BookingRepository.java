@@ -17,4 +17,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     // Get all CONFIRMED seat numbers for a given flight (for seat map)
     @Query("SELECT b.seatNumbers FROM Booking b WHERE b.flight = :flight AND b.status = 'CONFIRMED'")
     List<String> findConfirmedSeatNumbersByFlight(@Param("flight") Flight flight);
+
+    List<Booking> findByStatusAndCheckInStatusAndReminderSentFalseAndFlight_DepartureDateTimeBetween(
+            String status, String checkInStatus, java.time.LocalDateTime start, java.time.LocalDateTime end);
 }

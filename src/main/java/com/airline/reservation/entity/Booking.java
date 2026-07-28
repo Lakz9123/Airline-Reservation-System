@@ -33,6 +33,12 @@ public class Booking {
     @Column(name = "cabin_class", nullable = false)
     private String cabinClass;
 
+    @Column(nullable = false)
+    private String checkInStatus = "NOT_CHECKED_IN"; // NOT_CHECKED_IN, CHECKED_IN
+
+    @Column(nullable = false)
+    private boolean reminderSent = false;
+
     // Constructors
     public Booking() {}
 
@@ -44,6 +50,7 @@ public class Booking {
         this.status = status;
         this.totalFare = totalFare;
         this.cabinClass = cabinClass;
+        this.checkInStatus = "NOT_CHECKED_IN";
     }
 
     // Getters and Setters
@@ -109,5 +116,21 @@ public class Booking {
 
     public void setCabinClass(String cabinClass) {
         this.cabinClass = cabinClass;
+    }
+
+    public String getCheckInStatus() {
+        return checkInStatus;
+    }
+
+    public void setCheckInStatus(String checkInStatus) {
+        this.checkInStatus = checkInStatus;
+    }
+
+    public boolean isReminderSent() {
+        return reminderSent;
+    }
+
+    public void setReminderSent(boolean reminderSent) {
+        this.reminderSent = reminderSent;
     }
 }

@@ -160,4 +160,70 @@ public class UserBookingService {
         booking.setStatus("CANCELLED");
         bookingRepository.save(booking);
     }
+
+    /**
+     * Checks if a booking is eligible for online check-in.
+     * Must be CONFIRMED, NOT_CHECKED_IN, and within 48h to 1h of departure.
+     */
+    public boolean isEligibleForCheckIn(Booking booking) {
+        if (!"CONFIRMED".equals(booking.getStatus())) return false;
+        if (!"NOT_CHECKED_IN".equals(booking.getCheckInStatus())) return false;
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime departure = booking.getFlight().getDepartureDateTime();
+        
+        LocalDateTime checkInStart = departure.minusHours(48);
+        LocalDateTime checkInEnd = departure.minusHours(1);
+
+        return now.isAfter(checkInStart) && now.isBefore(checkInEnd);
+    }
+
+    /**
+     * Processes the check-in. Updates seats if changed, sets checkInStatus to CHECKED_IN.
+     */
+    @Transactional
+    public void processCheckIn(Long bookingId, Long requestingUserId, List<String> requestedSeats) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new IllegalArgumentException("Booking not found."));
+
+        if (!booking.getUser().getId().equals(requestingUserId)) {
+            throw new SecurityException("Access denied: you do not own this booking.");
+        }
+
+        if (!isEligibleForCheckIn(booking)) {
+            throw new IllegalStateException("Booking is not eligible for check-in at this time.");
+        }
+
+        if (requestedSeats == null || requestedSeats.isEmpty()) {
+            throw new IllegalArgumentException("Please select your seat(s).");
+        }
+
+        // Check if seats changed
+        List<String> currentSeats = Arrays.asList(booking.getSeatNumbers().split(",\\s*"));
+        if (currentSeats.size() != requestedSeats.size()) {
+            throw new IllegalArgumentException("You must select exactly " + currentSeats.size() + " seat(s).");
+        }
+
+        // If they chose different seats, we need to validate them
+        boolean seatsChanged = !new HashSet<>(currentSeats).equals(new HashSet<>(requestedSeats));
+        if (seatsChanged) {
+            Flight flight = booking.getFlight();
+            Set<String> alreadyBooked = getBookedSeats(flight);
+            
+            // Remove current user's old seats from "alreadyBooked" so they can theoretically swap
+            currentSeats.forEach(alreadyBooked::remove);
+
+            List<String> conflicts = requestedSeats.stream()
+                    .filter(alreadyBooked::contains)
+                    .collect(Collectors.toList());
+            if (!conflicts.isEmpty()) {
+                throw new IllegalStateException("Seat(s) " + String.join(", ", conflicts) + " are already booked. Please re-select.");
+            }
+
+            booking.setSeatNumbers(String.join(", ", requestedSeats));
+        }
+
+        booking.setCheckInStatus("CHECKED_IN");
+        bookingRepository.save(booking);
+    }
 }

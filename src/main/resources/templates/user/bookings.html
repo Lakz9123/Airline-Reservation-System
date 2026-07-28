@@ -49,18 +49,35 @@
           <div class="text-muted small">Total Fare</div>
           <div class="fw-bold text-primary">₹<span th:text="${#numbers.formatDecimal(b.totalFare,1,2)}">0</span></div>
         </div>
-        <div class="col-6 col-md-1">
+        <div class="col-6 col-md-1 d-flex flex-column gap-1">
           <span class="badge rounded-pill bg-success px-3 py-2" th:if="${b.status=='CONFIRMED'}">CONFIRMED</span>
           <span class="badge rounded-pill bg-danger px-3 py-2" th:if="${b.status=='CANCELLED'}">CANCELLED</span>
+          
+          <span class="badge rounded-pill bg-info text-dark px-3 py-2" th:if="${b.status=='CONFIRMED' and b.checkInStatus=='CHECKED_IN'}">CHECKED IN</span>
+          <span class="badge rounded-pill bg-secondary px-3 py-2" th:if="${b.status=='CONFIRMED' and b.checkInStatus=='NOT_CHECKED_IN'}">NOT CHECKED IN</span>
         </div>
-        <div class="col-12 col-md-1 text-md-end d-flex d-md-block gap-1 flex-wrap">
+        <div class="col-12 col-md-1 text-md-end d-flex d-md-block gap-1 flex-wrap"
+             th:with="now=${#temporals.createNow()}, dep=${b.flight.departureDateTime}, isCheckInWindow=${now.isAfter(dep.minusHours(48)) and now.isBefore(dep.minusHours(1))}">
           <a th:if="${b.status=='CONFIRMED'}"
              th:href="@{/user/ticket/{id}(id=${b.id})}"
              class="btn btn-outline-primary btn-sm mb-1">
             <i class="bi bi-ticket-perforated"></i> Ticket
           </a>
-          <a th:if="${b.status=='CONFIRMED'}"
-             th:href="@{/user/boarding-pass/{id}(id=${b.id})}"
+          <a th:if="${b.status=='CONFIRMED' and b.checkInStatus=='NOT_CHECKED_IN' and isCheckInWindow}"
+             th:href="@{/user/checkin/{id}(id=${b.id})}"
+             class="btn btn-warning btn-sm mb-1">
+            <i class="bi bi-check2-circle"></i> Check In
+          </a>
+          <button th:if="${b.status=='CONFIRMED' and b.checkInStatus=='NOT_CHECKED_IN' and !isCheckInWindow}"
+                  class="btn btn-secondary btn-sm mb-1"
+                  disabled
+                  data-bs-toggle="tooltip"
+                  data-bs-placement="top"
+                  title="Check-in opens 48 hours before departure">
+            <i class="bi bi-check2-circle"></i> Check In
+          </button>
+          <a th:if="${b.status=='CONFIRMED' and b.checkInStatus=='CHECKED_IN'}"
+             th:href="@{/user/checkin/{id}/ready(id=${b.id})}"
              class="btn btn-outline-success btn-sm mb-1">
             <i class="bi bi-door-open"></i> Boarding Pass
           </a>
