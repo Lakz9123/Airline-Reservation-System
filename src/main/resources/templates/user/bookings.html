@@ -60,6 +60,11 @@
             <i class="bi bi-ticket-perforated"></i> Ticket
           </a>
           <a th:if="${b.status=='CONFIRMED'}"
+             th:href="@{/user/boarding-pass/{id}(id=${b.id})}"
+             class="btn btn-outline-success btn-sm mb-1">
+            <i class="bi bi-door-open"></i> Boarding Pass
+          </a>
+          <a th:if="${b.status=='CONFIRMED'}"
              th:href="@{/user/ticket/{id}/download(id=${b.id})}"
              class="btn btn-success btn-sm mb-1">
             <i class="bi bi-file-earmark-pdf-fill"></i> PDF

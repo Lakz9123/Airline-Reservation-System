@@ -122,6 +122,23 @@ public class AdminController {
         return "redirect:/admin/flights/details/" + id;
     }
 
+    @PostMapping("/flights/details/{id}/boarding")
+    public String updateBoardingInfo(@PathVariable("id") Long id,
+                                     @RequestParam(value = "gateNumber", required = false) String gateNumber,
+                                     @RequestParam(value = "terminal", required = false) String terminal,
+                                     @RequestParam(value = "boardingZone", required = false) String boardingZone,
+                                     RedirectAttributes redirectAttributes) {
+        Flight flight = flightService.getFlightById(id).orElse(null);
+        if (flight != null) {
+            flight.setGateNumber(gateNumber);
+            flight.setTerminal(terminal);
+            flight.setBoardingZone(boardingZone);
+            flightService.saveFlight(flight);
+            redirectAttributes.addFlashAttribute("success", "Boarding information updated successfully.");
+        }
+        return "redirect:/admin/flights/details/" + id;
+    }
+
     // 3. View Bookings (Read-only)
     @GetMapping("/bookings")
     public String listBookings(Model model) {

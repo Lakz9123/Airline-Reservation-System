@@ -1,0 +1,39 @@
+package com.airline.reservation.service;
+
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.oned.Code128Writer;
+import org.springframework.stereotype.Service;
+
+import java.io.ByteArrayOutputStream;
+import java.util.Base64;
+
+@Service
+public class BarcodeService {
+
+    /**
+     * Generate a Code128 barcode as PNG bytes.
+     */
+    public byte[] generateBarcodeBytes(String text, int width, int height) {
+        try {
+            Code128Writer writer = new Code128Writer();
+            BitMatrix bitMatrix = writer.encode(text, BarcodeFormat.CODE_128, width, height);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            MatrixToImageWriter.writeToStream(bitMatrix, "PNG", baos);
+            return baos.toByteArray();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Generate a Code128 barcode as a Base64-encoded data URI for embedding in HTML.
+     */
+    public String generateBarcodeBase64(String text, int width, int height) {
+        byte[] bytes = generateBarcodeBytes(text, width, height);
+        if (bytes == null) return null;
+        return "data:image/png;base64," + Base64.getEncoder().encodeToString(bytes);
+    }
+}

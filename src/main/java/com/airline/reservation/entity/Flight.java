@@ -56,6 +56,16 @@ public class Flight {
     @Column(name = "first_class_fare")
     private Double firstClassFare;
 
+    // Boarding-related fields
+    @Column(name = "gate_number")
+    private String gateNumber;
+
+    @Column(name = "terminal")
+    private String terminal;
+
+    @Column(name = "boarding_zone")
+    private String boardingZone;
+
     // Constructors
     public Flight() {}
 
@@ -195,5 +205,34 @@ public class Flight {
 
     public void setFirstClassFare(Double firstClassFare) {
         this.firstClassFare = firstClassFare;
+    }
+
+    public String getGateNumber() {
+        return gateNumber;
+    }
+
+    public void setGateNumber(String gateNumber) {
+        this.gateNumber = gateNumber;
+    }
+
+    public String getTerminal() {
+        return terminal;
+    }
+
+    public void setTerminal(String terminal) {
+        this.terminal = terminal;
+    }
+
+    public String getBoardingZone() {
+        return boardingZone;
+    }
+
+    public void setBoardingZone(String boardingZone) {
+        this.boardingZone = boardingZone;
+    }
+
+    /** Boarding time = departure minus 45 minutes */
+    public LocalDateTime getBoardingTime() {
+        return departureDateTime != null ? departureDateTime.minusMinutes(45) : null;
     }
 }

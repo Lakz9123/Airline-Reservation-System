@@ -8,6 +8,8 @@ import com.airline.reservation.repository.FlightRepository;
 import com.airline.reservation.service.EmailService;
 import com.airline.reservation.service.QrCodeService;
 import com.airline.reservation.service.TicketPdfService;
+import com.airline.reservation.service.BarcodeService;
+import com.airline.reservation.service.BoardingPassPdfService;
 import com.airline.reservation.service.UserBookingService;
 import com.airline.reservation.service.UserService;
 import com.airline.reservation.service.AirportService;
@@ -40,6 +42,8 @@ public class UserController {
     private final QrCodeService qrCodeService;
     private final AirportService airportService;
     private final AirlineService airlineService;
+    private final BarcodeService barcodeService;
+    private final BoardingPassPdfService boardingPassPdfService;
 
     public UserController(UserService userService,
                           FlightRepository flightRepository,
@@ -50,7 +54,9 @@ public class UserController {
                           EmailService emailService,
                           QrCodeService qrCodeService,
                           AirportService airportService,
-                          AirlineService airlineService) {
+                          AirlineService airlineService,
+                          BarcodeService barcodeService,
+                          BoardingPassPdfService boardingPassPdfService) {
         this.userService = userService;
         this.flightRepository = flightRepository;
         this.userBookingService = userBookingService;
@@ -61,6 +67,8 @@ public class UserController {
         this.qrCodeService = qrCodeService;
         this.airportService = airportService;
         this.airlineService = airlineService;
+        this.barcodeService = barcodeService;
+        this.boardingPassPdfService = boardingPassPdfService;
     }
 
     // ----- Helper: resolve current User entity -----
@@ -282,7 +290,67 @@ public class UserController {
     }
 
     // ============================
-    // 8. Profile
+    // 8. Boarding Pass (separate from ticket)
+    // ============================
+    @GetMapping("/boarding-pass/{bookingId}")
+    public String viewBoardingPass(@PathVariable Long bookingId,
+                                   @AuthenticationPrincipal UserDetails principal,
+                                   Model model) {
+        User user = getCurrentUser(principal);
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new IllegalArgumentException("Booking not found"));
+        if (!booking.getUser().getId().equals(user.getId())) {
+            throw new SecurityException("Access denied");
+        }
+        if (!"CONFIRMED".equals(booking.getStatus())) {
+            return "redirect:/user/bookings";
+        }
+        model.addAttribute("booking", booking);
+
+        String ref = String.format("SKY-%05d", booking.getId());
+        String originCode = booking.getFlight().getOriginAirport().getAirportCode();
+        String destCode = booking.getFlight().getDestinationAirport().getAirportCode();
+        String originFull = booking.getFlight().getOriginAirport().getAirportName() + ", " + booking.getFlight().getOriginAirport().getCity();
+        String destFull = booking.getFlight().getDestinationAirport().getAirportName() + ", " + booking.getFlight().getDestinationAirport().getCity();
+
+        model.addAttribute("bookingRef", ref);
+        model.addAttribute("originCode", originCode);
+        model.addAttribute("destCode", destCode);
+        model.addAttribute("originFull", originFull);
+        model.addAttribute("destFull", destFull);
+
+        // Generate Code128 barcode
+        String barcodeText = String.format("SKY%05d", booking.getId());
+        String barcodeBase64 = barcodeService.generateBarcodeBase64(barcodeText, 300, 50);
+        model.addAttribute("barcodeBase64", barcodeBase64);
+
+        return "user/boarding-pass";
+    }
+
+    @GetMapping("/boarding-pass/{bookingId}/download")
+    public void downloadBoardingPass(@PathVariable Long bookingId,
+                                     @AuthenticationPrincipal UserDetails principal,
+                                     HttpServletResponse response) throws Exception {
+        User user = getCurrentUser(principal);
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new IllegalArgumentException("Booking not found"));
+        if (!booking.getUser().getId().equals(user.getId())) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+        if (!"CONFIRMED".equals(booking.getStatus())) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+        String filename = String.format("BoardingPass-SKY%05d.pdf", booking.getId());
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"");
+        boardingPassPdfService.generate(booking, response.getOutputStream());
+        response.flushBuffer();
+    }
+
+    // ============================
+    // 9. Profile
     // ============================
     @GetMapping("/profile")
     public String viewProfile(@AuthenticationPrincipal UserDetails principal, Model model) {

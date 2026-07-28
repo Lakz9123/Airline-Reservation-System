@@ -148,6 +148,41 @@
                 </div>
             </div>
         </div>
+
+        <!-- Boarding Info Card -->
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-info text-white fw-bold">
+                    <i class="bi bi-door-open"></i> Boarding Information
+                </div>
+                <div class="card-body">
+                    <form th:action="@{/admin/flights/details/{id}/boarding(id=${flight.id})}" method="post">
+                        <div class="row g-4">
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">Gate Number</label>
+                                <input type="text" class="form-control" name="gateNumber" th:value="${flight.gateNumber}" placeholder="e.g. G12">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">Terminal</label>
+                                <input type="text" class="form-control" name="terminal" th:value="${flight.terminal}" placeholder="e.g. T2">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">Boarding Zone</label>
+                                <input type="text" class="form-control" name="boardingZone" th:value="${flight.boardingZone}" placeholder="e.g. Zone A">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">Boarding Time (auto)</label>
+                                <input type="text" class="form-control" th:value="${flight.boardingTime != null ? #temporals.format(flight.boardingTime, 'dd MMM yyyy, HH:mm') : 'N/A'}" disabled>
+                                <small class="text-muted">Departure − 45 min</small>
+                            </div>
+                        </div>
+                        <div class="mt-4 text-end">
+                            <button type="submit" class="btn btn-info text-white px-4 fw-bold"><i class="bi bi-save"></i> Save Boarding Info</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 </main>
 
