@@ -4,6 +4,7 @@ import com.airline.reservation.entity.Flight;
 import com.airline.reservation.repository.FlightRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,6 +26,18 @@ public class FlightService {
     }
 
     public Flight saveFlight(Flight flight) {
+        if (flight.getOriginAirport() != null && flight.getDestinationAirport() != null) {
+            if (flight.getOriginAirport().getId().equals(flight.getDestinationAirport().getId())) {
+                throw new IllegalArgumentException("Origin and Destination airports cannot be the same.");
+            }
+        }
+
+        // Automatically compute duration in minutes if departure & arrival times are set
+        if (flight.getDepartureDateTime() != null && flight.getArrivalDateTime() != null) {
+            long minutes = Duration.between(flight.getDepartureDateTime(), flight.getArrivalDateTime()).toMinutes();
+            flight.setDurationMinutes((int) Math.max(0, minutes));
+        }
+
         if (flight.getId() == null) {
             flight.setAvailableSeats(flight.getTotalSeats());
         } else {

@@ -116,22 +116,15 @@ public class UserBookingService {
         flight.setAvailableSeats(flight.getAvailableSeats() - requestedSeats.size());
         flightRepository.save(flight);
 
-        // Determine fare based on cabin class
-        double farePerSeat;
-        if ("Premium Economy".equalsIgnoreCase(cabinClass)) {
-            farePerSeat = flight.getPremiumEconomyFare() != null ? flight.getPremiumEconomyFare() : flight.getEconomyFare();
-        } else if ("Business Class".equalsIgnoreCase(cabinClass) || "Business".equalsIgnoreCase(cabinClass)) {
-            farePerSeat = flight.getBusinessFare() != null ? flight.getBusinessFare() : flight.getEconomyFare();
-            cabinClass = "Business Class";
-        } else if ("First Class".equalsIgnoreCase(cabinClass)) {
-            farePerSeat = flight.getFirstClassFare() != null ? flight.getFirstClassFare() : flight.getEconomyFare();
-        } else {
-            farePerSeat = flight.getEconomyFare() != null ? flight.getEconomyFare() : 0.0;
-            cabinClass = "Economy";
-        }
+        // Determine multiplier based on cabin class
+        double multiplier = 1.0;
+        if ("Premium Economy".equalsIgnoreCase(cabinClass)) multiplier = 1.5;
+        else if ("Business Class".equalsIgnoreCase(cabinClass)) multiplier = 2.5;
+        else if ("First Class".equalsIgnoreCase(cabinClass)) multiplier = 4.0;
+        else cabinClass = "Economy"; // default
 
         // Compute total fare
-        double totalFare = farePerSeat * requestedSeats.size();
+        double totalFare = flight.getFare() * multiplier * requestedSeats.size();
         String seatNumbersStr = String.join(", ", requestedSeats);
 
         Booking booking = new Booking(user, flight, seatNumbersStr, LocalDateTime.now(), "CONFIRMED", totalFare, cabinClass);

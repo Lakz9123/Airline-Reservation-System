@@ -105,17 +105,19 @@ public class UserController {
             @RequestParam Long originId,
             @RequestParam Long destinationId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(required = false) Double maxFare,
             @RequestParam(required = false) String airline,
             Model model) {
         LocalDateTime startOfDay = date.atStartOfDay();
         LocalDateTime endOfDay = date.atTime(23, 59, 59);
-        List<Flight> flights = flightRepository.searchFlights(originId, destinationId, startOfDay, endOfDay, airline);
+        List<Flight> flights = flightRepository.searchFlights(originId, destinationId, startOfDay, endOfDay, maxFare, airline);
         model.addAttribute("flights", flights);
         model.addAttribute("originId", originId);
         model.addAttribute("destinationId", destinationId);
         model.addAttribute("airports", airportService.getAllAirports());
         model.addAttribute("airlines", airlineService.getAllAirlines());
         model.addAttribute("date", date);
+        model.addAttribute("maxFare", maxFare);
         model.addAttribute("airline", airline);
         return "user/search";
     }
@@ -168,18 +170,12 @@ public class UserController {
         model.addAttribute("selectedSeats", selectedSeats);
         model.addAttribute("cabinClass", cabinClass == null || cabinClass.isEmpty() ? "Economy" : cabinClass);
         
-        double farePerSeat;
-        if ("Premium Economy".equalsIgnoreCase(cabinClass)) {
-            farePerSeat = flight.getPremiumEconomyFare() != null ? flight.getPremiumEconomyFare() : flight.getEconomyFare();
-        } else if ("Business Class".equalsIgnoreCase(cabinClass) || "Business".equalsIgnoreCase(cabinClass)) {
-            farePerSeat = flight.getBusinessFare() != null ? flight.getBusinessFare() : flight.getEconomyFare();
-        } else if ("First Class".equalsIgnoreCase(cabinClass)) {
-            farePerSeat = flight.getFirstClassFare() != null ? flight.getFirstClassFare() : flight.getEconomyFare();
-        } else {
-            farePerSeat = flight.getEconomyFare() != null ? flight.getEconomyFare() : 0.0;
-        }
+        double multiplier = 1.0;
+        if ("Premium Economy".equalsIgnoreCase(cabinClass)) multiplier = 1.5;
+        else if ("Business Class".equalsIgnoreCase(cabinClass)) multiplier = 2.5;
+        else if ("First Class".equalsIgnoreCase(cabinClass)) multiplier = 4.0;
         
-        model.addAttribute("totalFare", farePerSeat * selectedSeats.size());
+        model.addAttribute("totalFare", flight.getFare() * multiplier * selectedSeats.size());
         return "user/payment";
     }
 

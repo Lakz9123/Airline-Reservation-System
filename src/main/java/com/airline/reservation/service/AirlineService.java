@@ -48,7 +48,7 @@ public class AirlineService {
     }
 
     public void deleteAirline(Long id) {
-        if (flightRepository.existsByScheduleRouteAirlineId(id)) {
+        if (flightRepository.existsByAirlineId(id)) {
             throw new IllegalStateException("Cannot delete airline because it is still referenced by existing flights.");
         }
         airlineRepository.deleteById(id);

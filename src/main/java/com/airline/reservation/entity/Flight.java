@@ -10,15 +10,36 @@ public class Flight {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "flight_number", nullable = false)
+    private String flightNumber;
+
     @ManyToOne(optional = false)
-    @JoinColumn(name = "schedule_id", nullable = false)
-    private Schedule schedule;
+    @JoinColumn(name = "airline_id", nullable = false)
+    private Airline airline;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "origin_airport_id", nullable = false)
+    private Airport originAirport;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "destination_airport_id", nullable = false)
+    private Airport destinationAirport;
 
     @Column(name = "departure_date_time", nullable = false)
     private LocalDateTime departureDateTime;
 
     @Column(name = "arrival_date_time", nullable = false)
     private LocalDateTime arrivalDateTime;
+
+    @Column(name = "duration_minutes", nullable = false)
+    private Integer durationMinutes;
+
+    @Column(nullable = false)
+    private Double fare;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "aircraft_id", nullable = false)
+    private Aircraft aircraft;
 
     @Column(name = "available_seats", nullable = false)
     private Integer availableSeats;
@@ -35,15 +56,23 @@ public class Flight {
     @Column(name = "first_class_fare")
     private Double firstClassFare;
 
+    // Constructors
     public Flight() {}
 
-    public Flight(Schedule schedule, LocalDateTime departureDateTime, LocalDateTime arrivalDateTime, Integer availableSeats) {
-        this.schedule = schedule;
+    public Flight(String flightNumber, Airline airline, Airport originAirport, Airport destinationAirport, LocalDateTime departureDateTime, LocalDateTime arrivalDateTime, Integer durationMinutes, Double fare, Aircraft aircraft, Integer availableSeats) {
+        this.flightNumber = flightNumber;
+        this.airline = airline;
+        this.originAirport = originAirport;
+        this.destinationAirport = destinationAirport;
         this.departureDateTime = departureDateTime;
         this.arrivalDateTime = arrivalDateTime;
+        this.durationMinutes = durationMinutes;
+        this.fare = fare;
+        this.aircraft = aircraft;
         this.availableSeats = availableSeats;
     }
 
+    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -52,12 +81,36 @@ public class Flight {
         this.id = id;
     }
 
-    public Schedule getSchedule() {
-        return schedule;
+    public String getFlightNumber() {
+        return flightNumber;
     }
 
-    public void setSchedule(Schedule schedule) {
-        this.schedule = schedule;
+    public void setFlightNumber(String flightNumber) {
+        this.flightNumber = flightNumber;
+    }
+
+    public Airline getAirline() {
+        return airline;
+    }
+
+    public void setAirline(Airline airline) {
+        this.airline = airline;
+    }
+
+    public Airport getOriginAirport() {
+        return originAirport;
+    }
+
+    public void setOriginAirport(Airport originAirport) {
+        this.originAirport = originAirport;
+    }
+
+    public Airport getDestinationAirport() {
+        return destinationAirport;
+    }
+
+    public void setDestinationAirport(Airport destinationAirport) {
+        this.destinationAirport = destinationAirport;
     }
 
     public LocalDateTime getDepartureDateTime() {
@@ -74,6 +127,34 @@ public class Flight {
 
     public void setArrivalDateTime(LocalDateTime arrivalDateTime) {
         this.arrivalDateTime = arrivalDateTime;
+    }
+
+    public Integer getDurationMinutes() {
+        return durationMinutes;
+    }
+
+    public void setDurationMinutes(Integer durationMinutes) {
+        this.durationMinutes = durationMinutes;
+    }
+
+    public Double getFare() {
+        return fare;
+    }
+
+    public void setFare(Double fare) {
+        this.fare = fare;
+    }
+
+    public Aircraft getAircraft() {
+        return aircraft;
+    }
+
+    public void setAircraft(Aircraft aircraft) {
+        this.aircraft = aircraft;
+    }
+
+    public Integer getTotalSeats() {
+        return aircraft != null ? aircraft.getCapacity() : 0;
     }
 
     public Integer getAvailableSeats() {
@@ -114,38 +195,5 @@ public class Flight {
 
     public void setFirstClassFare(Double firstClassFare) {
         this.firstClassFare = firstClassFare;
-    }
-
-    // Helper methods for templates
-    public String getFlightNumber() {
-        return "FL-" + schedule.getId() + "-" + id;
-    }
-
-    public Airline getAirline() {
-        return schedule.getRoute().getAirline();
-    }
-
-    public Aircraft getAircraft() {
-        return schedule.getAircraft();
-    }
-
-    public Airport getOriginAirport() {
-        return schedule.getRoute().getOriginAirport();
-    }
-
-    public Airport getDestinationAirport() {
-        return schedule.getRoute().getDestinationAirport();
-    }
-
-    public Integer getTotalSeats() {
-        return schedule.getAircraft() != null ? schedule.getAircraft().getCapacity() : 0;
-    }
-
-    public Integer getDurationMinutes() {
-        return schedule.getRoute().getStandardDurationMinutes();
-    }
-
-    public Double getFare() {
-        return economyFare;
     }
 }
