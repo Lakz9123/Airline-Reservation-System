@@ -11,13 +11,15 @@ import java.util.List;
 
 @Repository
 public interface FlightRepository extends JpaRepository<Flight, Long> {
-    @Query("SELECT f FROM Flight f WHERE f.originAirport.id = :originId AND f.destinationAirport.id = :destinationId AND f.departureDateTime >= :startOfDay AND f.departureDateTime <= :endOfDay AND (:maxFare IS NULL OR f.fare <= :maxFare) AND (:airline IS NULL OR :airline = '' OR LOWER(f.airlineName) LIKE LOWER(CONCAT('%', :airline, '%')))")
+    @Query("SELECT f FROM Flight f WHERE f.originAirport.id = :originId AND f.destinationAirport.id = :destinationId AND f.departureDateTime >= :startOfDay AND f.departureDateTime <= :endOfDay AND (:maxFare IS NULL OR f.fare <= :maxFare) AND (:airlineName IS NULL OR :airlineName = '' OR LOWER(f.airline.airlineName) LIKE LOWER(CONCAT('%', :airlineName, '%')))")
     List<Flight> searchFlights(
             @Param("originId") Long originId,
             @Param("destinationId") Long destinationId,
             @Param("startOfDay") LocalDateTime startOfDay,
             @Param("endOfDay") LocalDateTime endOfDay,
             @Param("maxFare") Double maxFare,
-            @Param("airline") String airline
+            @Param("airlineName") String airlineName
     );
+
+    boolean existsByAirlineId(Long airlineId);
 }

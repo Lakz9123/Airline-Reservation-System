@@ -34,7 +34,7 @@
         </div>
         <div class="col-6 col-md-2">
           <div class="fw-bold" th:text="${b.flight.flightNumber}">FL-101</div>
-          <div class="text-muted small" th:text="${b.flight.airlineName}">Airline</div>
+          <div class="text-muted small" th:text="${b.flight.airline.airlineName}">Airline</div>
         </div>
         <div class="col-6 col-md-3">
           <strong th:text="${b.flight.originAirport.airportCode} + ' (' + ${b.flight.originAirport.city} + ')'">Origin</strong> → <strong th:text="${b.flight.destinationAirport.airportCode} + ' (' + ${b.flight.destinationAirport.city} + ')'">Dest</strong>

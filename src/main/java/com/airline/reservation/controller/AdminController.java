@@ -5,6 +5,7 @@ import com.airline.reservation.service.BookingService;
 import com.airline.reservation.service.FlightService;
 import com.airline.reservation.service.UserService;
 import com.airline.reservation.service.AirportService;
+import com.airline.reservation.service.AirlineService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -18,12 +19,14 @@ public class AdminController {
     private final UserService userService;
     private final BookingService bookingService;
     private final AirportService airportService;
+    private final AirlineService airlineService;
 
-    public AdminController(FlightService flightService, UserService userService, BookingService bookingService, AirportService airportService) {
+    public AdminController(FlightService flightService, UserService userService, BookingService bookingService, AirportService airportService, AirlineService airlineService) {
         this.flightService = flightService;
         this.userService = userService;
         this.bookingService = bookingService;
         this.airportService = airportService;
+        this.airlineService = airlineService;
     }
 
     // 1. Dashboard
@@ -47,6 +50,7 @@ public class AdminController {
     public String showCreateFlightForm(Model model) {
         model.addAttribute("flight", new Flight());
         model.addAttribute("airports", airportService.getAllAirports());
+        model.addAttribute("airlines", airlineService.getAllAirlines());
         return "admin/flight-form";
     }
 
@@ -69,6 +73,7 @@ public class AdminController {
         }
         model.addAttribute("flight", flight);
         model.addAttribute("airports", airportService.getAllAirports());
+        model.addAttribute("airlines", airlineService.getAllAirlines());
         return "admin/flight-form";
     }
 

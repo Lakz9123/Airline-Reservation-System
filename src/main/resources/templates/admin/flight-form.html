@@ -25,8 +25,11 @@
                                 <input type="text" th:field="*{flightNumber}" class="form-control" id="flightNumber" required placeholder="e.g. AA-101">
                             </div>
                             <div class="col-md-6">
-                                <label for="airlineName" class="form-label fw-semibold">Airline Name</label>
-                                <input type="text" th:field="*{airlineName}" class="form-control" id="airlineName" required placeholder="e.g. American Airlines">
+                                <label for="airline" class="form-label fw-semibold">Airline</label>
+                                <select th:field="*{airline.id}" class="form-select" id="airline" required>
+                                    <option value="" disabled selected>Select Airline</option>
+                                    <option th:each="al : ${airlines}" th:value="${al.id}" th:text="${al.airlineName} + ' (' + ${al.country} + ')'"></option>
+                                </select>
                             </div>
                             
                             <div class="col-md-6">

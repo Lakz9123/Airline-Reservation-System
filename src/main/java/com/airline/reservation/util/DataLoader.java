@@ -4,10 +4,12 @@ import com.airline.reservation.entity.Booking;
 import com.airline.reservation.entity.Flight;
 import com.airline.reservation.entity.User;
 import com.airline.reservation.entity.Airport;
+import com.airline.reservation.entity.Airline;
 import com.airline.reservation.repository.BookingRepository;
 import com.airline.reservation.repository.FlightRepository;
 import com.airline.reservation.repository.UserRepository;
 import com.airline.reservation.repository.AirportRepository;
+import com.airline.reservation.repository.AirlineRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -22,13 +24,15 @@ public class DataLoader implements CommandLineRunner {
     private final FlightRepository flightRepository;
     private final BookingRepository bookingRepository;
     private final AirportRepository airportRepository;
+    private final AirlineRepository airlineRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public DataLoader(UserRepository userRepository, FlightRepository flightRepository, BookingRepository bookingRepository, AirportRepository airportRepository, PasswordEncoder passwordEncoder) {
+    public DataLoader(UserRepository userRepository, FlightRepository flightRepository, BookingRepository bookingRepository, AirportRepository airportRepository, AirlineRepository airlineRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.flightRepository = flightRepository;
         this.bookingRepository = bookingRepository;
         this.airportRepository = airportRepository;
+        this.airlineRepository = airlineRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -74,31 +78,48 @@ public class DataLoader implements CommandLineRunner {
             ccu = airportRepository.findByAirportCodeIgnoreCase("CCU").orElse(null);
         }
 
+        // Seed 5 Indian Airlines if none exist
+        Airline indigo = null, airIndia = null, spiceJet = null, vistara = null, akasaAir = null;
+        if (airlineRepository.count() == 0) {
+            indigo = new Airline("IndiGo", "https://upload.wikimedia.org/wikipedia/commons/f/f5/IndiGo_logo.svg", "India", "https://www.goindigo.in", "customer.relations@goindigo.in");
+            airIndia = new Airline("Air India", "https://upload.wikimedia.org/wikipedia/commons/d/df/Air_India_Logo_2023.svg", "India", "https://www.airindia.com", "contactus@airindia.com");
+            spiceJet = new Airline("SpiceJet", "https://upload.wikimedia.org/wikipedia/commons/e/ee/SpiceJet_logo.svg", "India", "https://www.spicejet.com", "custrelations@spicejet.com");
+            vistara = new Airline("Vistara", "https://upload.wikimedia.org/wikipedia/commons/a/ae/Vistara_logo.svg", "India", "https://www.airvistara.com", "custrelations@airvistara.com");
+            akasaAir = new Airline("Akasa Air", "https://upload.wikimedia.org/wikipedia/commons/d/da/Akasa_Air_logo.svg", "India", "https://www.akasaair.com", "info@akasaair.com");
+            airlineRepository.saveAll(Arrays.asList(indigo, airIndia, spiceJet, vistara, akasaAir));
+        } else {
+            indigo = airlineRepository.findByAirlineNameIgnoreCase("IndiGo").orElse(null);
+            airIndia = airlineRepository.findByAirlineNameIgnoreCase("Air India").orElse(null);
+            spiceJet = airlineRepository.findByAirlineNameIgnoreCase("SpiceJet").orElse(null);
+            vistara = airlineRepository.findByAirlineNameIgnoreCase("Vistara").orElse(null);
+            akasaAir = airlineRepository.findByAirlineNameIgnoreCase("Akasa Air").orElse(null);
+        }
+
         // 3. Seed 5 Sample Flights
         if (flightRepository.count() == 0) {
             LocalDateTime now = LocalDateTime.now();
 
-            Flight f1 = new Flight("AA-101", "American Airlines", del, bom, 
+            Flight f1 = new Flight("6E-101", indigo, del, bom, 
                     now.plusDays(2).withHour(10).withMinute(0).withSecond(0).withNano(0), 
                     now.plusDays(2).withHour(22).withMinute(30).withSecond(0).withNano(0), 
                     750, 450.00, 150, 148);
 
-            Flight f2 = new Flight("UA-202", "United Airlines", bom, blr, 
+            Flight f2 = new Flight("AI-202", airIndia, bom, blr, 
                     now.plusDays(3).withHour(8).withMinute(15).withSecond(0).withNano(0), 
                     now.plusDays(3).withHour(11).withMinute(45).withSecond(0).withNano(0), 
                     210, 250.00, 120, 119);
 
-            Flight f3 = new Flight("DL-303", "Delta Air Lines", maa, hyd, 
+            Flight f3 = new Flight("SG-303", spiceJet, maa, hyd, 
                     now.plusDays(1).withHour(14).withMinute(30).withSecond(0).withNano(0), 
                     now.plusDays(1).withHour(16).withMinute(45).withSecond(0).withNano(0), 
                     135, 150.00, 100, 100);
 
-            Flight f4 = new Flight("LH-404", "Lufthansa", del, ccu, 
+            Flight f4 = new Flight("UK-404", vistara, del, ccu, 
                     now.plusDays(5).withHour(13).withMinute(0).withSecond(0).withNano(0), 
                     now.plusDays(6).withHour(7).withMinute(15).withSecond(0).withNano(0), 
                     675, 850.00, 250, 250);
 
-            Flight f5 = new Flight("EK-505", "Emirates", blr, maa, 
+            Flight f5 = new Flight("QP-505", akasaAir, blr, maa, 
                     now.plusDays(4).withHour(6).withMinute(30).withSecond(0).withNano(0), 
                     now.plusDays(4).withHour(11).withMinute(0).withSecond(0).withNano(0), 
                     450, 550.00, 200, 200);

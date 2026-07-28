@@ -13,8 +13,9 @@ public class Flight {
     @Column(name = "flight_number", nullable = false)
     private String flightNumber;
 
-    @Column(name = "airline_name", nullable = false)
-    private String airlineName;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "airline_id", nullable = false)
+    private Airline airline;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "origin_airport_id", nullable = false)
@@ -45,9 +46,9 @@ public class Flight {
     // Constructors
     public Flight() {}
 
-    public Flight(String flightNumber, String airlineName, Airport originAirport, Airport destinationAirport, LocalDateTime departureDateTime, LocalDateTime arrivalDateTime, Integer durationMinutes, Double fare, Integer totalSeats, Integer availableSeats) {
+    public Flight(String flightNumber, Airline airline, Airport originAirport, Airport destinationAirport, LocalDateTime departureDateTime, LocalDateTime arrivalDateTime, Integer durationMinutes, Double fare, Integer totalSeats, Integer availableSeats) {
         this.flightNumber = flightNumber;
-        this.airlineName = airlineName;
+        this.airline = airline;
         this.originAirport = originAirport;
         this.destinationAirport = destinationAirport;
         this.departureDateTime = departureDateTime;
@@ -75,12 +76,12 @@ public class Flight {
         this.flightNumber = flightNumber;
     }
 
-    public String getAirlineName() {
-        return airlineName;
+    public Airline getAirline() {
+        return airline;
     }
 
-    public void setAirlineName(String airlineName) {
-        this.airlineName = airlineName;
+    public void setAirline(Airline airline) {
+        this.airline = airline;
     }
 
     public Airport getOriginAirport() {

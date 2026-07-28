@@ -44,7 +44,16 @@
                         </tr>
                         <tr th:each="flight : ${flights}">
                             <td><strong th:text="${flight.flightNumber}">AA-101</strong></td>
-                            <td th:text="${flight.airlineName}">Airline</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <img th:if="${flight.airline.logo != null && !flight.airline.logo.isEmpty()}" 
+                                         th:src="${flight.airline.logo}" 
+                                         alt="Logo" 
+                                         class="img-thumbnail" 
+                                         style="width: 30px; height: auto; max-height: 30px; object-fit: contain;">
+                                    <span th:text="${flight.airline.airlineName}">Airline</span>
+                                </div>
+                            </td>
                             <td>
                                 <span class="fw-semibold text-uppercase" th:text="${flight.originAirport.airportCode} + ' (' + ${flight.originAirport.city} + ')'">Origin</span> 
                                 <i class="bi bi-arrow-right text-muted mx-1"></i>

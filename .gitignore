@@ -34,3 +34,8 @@ build/
 
 ### Maven Wrapper (keep the shell scripts, ignore downloaded Maven) ###
 temp-maven/
+
+### Local environment secrets (never commit) ###
+.env
+*.env
+application-local.properties

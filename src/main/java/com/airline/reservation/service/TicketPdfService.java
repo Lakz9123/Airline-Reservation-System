@@ -212,7 +212,7 @@ public class TicketPdfService {
         drawDetailBlock(canvas, bf, bfBold, col2, detailTop, "FLIGHT",       booking.getFlight().getFlightNumber());
         drawDetailBlock(canvas, bf, bfBold, col3, detailTop, "DATE",
                 booking.getFlight().getDepartureDateTime().format(DATE_FMT));
-        drawDetailBlock(canvas, bf, bfBold, col4, detailTop, "AIRLINE",      booking.getFlight().getAirlineName());
+        drawDetailBlock(canvas, bf, bfBold, col4, detailTop, "AIRLINE",      booking.getFlight().getAirline().getAirlineName());
 
         float detailTop2 = detailTop - 50;
         drawDetailBlock(canvas, bf, bfBold, col1, detailTop2, "SEAT(S)",     booking.getSeatNumbers());

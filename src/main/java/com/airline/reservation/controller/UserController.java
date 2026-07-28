@@ -11,6 +11,7 @@ import com.airline.reservation.service.TicketPdfService;
 import com.airline.reservation.service.UserBookingService;
 import com.airline.reservation.service.UserService;
 import com.airline.reservation.service.AirportService;
+import com.airline.reservation.service.AirlineService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -38,6 +39,7 @@ public class UserController {
     private final EmailService emailService;
     private final QrCodeService qrCodeService;
     private final AirportService airportService;
+    private final AirlineService airlineService;
 
     public UserController(UserService userService,
                           FlightRepository flightRepository,
@@ -47,7 +49,8 @@ public class UserController {
                           BookingRepository bookingRepository,
                           EmailService emailService,
                           QrCodeService qrCodeService,
-                          AirportService airportService) {
+                          AirportService airportService,
+                          AirlineService airlineService) {
         this.userService = userService;
         this.flightRepository = flightRepository;
         this.userBookingService = userBookingService;
@@ -57,6 +60,7 @@ public class UserController {
         this.emailService = emailService;
         this.qrCodeService = qrCodeService;
         this.airportService = airportService;
+        this.airlineService = airlineService;
     }
 
     // ----- Helper: resolve current User entity -----
@@ -92,6 +96,7 @@ public class UserController {
     public String searchForm(Model model) {
         model.addAttribute("flights", Collections.emptyList());
         model.addAttribute("airports", airportService.getAllAirports());
+        model.addAttribute("airlines", airlineService.getAllAirlines());
         return "user/search";
     }
 
@@ -110,6 +115,7 @@ public class UserController {
         model.addAttribute("originId", originId);
         model.addAttribute("destinationId", destinationId);
         model.addAttribute("airports", airportService.getAllAirports());
+        model.addAttribute("airlines", airlineService.getAllAirlines());
         model.addAttribute("date", date);
         model.addAttribute("maxFare", maxFare);
         model.addAttribute("airline", airline);
