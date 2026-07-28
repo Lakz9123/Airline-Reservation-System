@@ -160,6 +160,10 @@ public class DataLoader implements CommandLineRunner {
                 double fare = 2500 + rand.nextDouble() * 6000; // Between 2500 and 8500 INR
                 
                 Flight f = new Flight(flightNum, airline, origin, dest, dep, arr, durationMinutes, fare, aircraft, aircraft.getCapacity());
+                f.setEconomyFare(Math.round(fare * 100.0) / 100.0);
+                f.setPremiumEconomyFare(Math.round(fare * 1.5 * 100.0) / 100.0);
+                f.setBusinessFare(Math.round(fare * 2.5 * 100.0) / 100.0);
+                f.setFirstClassFare(Math.round(fare * 4.0 * 100.0) / 100.0);
                 flightsToSave.add(f);
             }
             flightRepository.saveAll(flightsToSave);

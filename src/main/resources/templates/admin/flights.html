@@ -34,8 +34,7 @@
                             <th>Arrival</th>
                             <th>Duration</th>
                             <th>Aircraft</th>
-                            <th>Seats (Total/Avail)</th>
-                            <th>Fare</th>
+                            <th>Total Seats</th>
                             <th class="text-center">Actions</th>
                         </tr>
                     </thead>
@@ -44,16 +43,22 @@
                             <td colspan="10" class="text-center py-4 text-muted">No flights created yet. Click "Add New Flight" to create one.</td>
                         </tr>
                         <tr th:each="flight : ${flights}">
-                            <td><strong th:text="${flight.flightNumber}">AA-101</strong></td>
                             <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <img th:if="${flight.airline.logo != null && !flight.airline.logo.isEmpty()}" 
-                                         th:src="${flight.airline.logo}" 
-                                         alt="Logo" 
-                                         class="img-thumbnail" 
-                                         style="width: 50px; height: auto; max-height: 30px; object-fit: contain;">
-                                    <span th:text="${flight.airline.airlineName}">Airline</span>
-                                </div>
+                                <a th:href="@{/admin/flights/details/{id}(id=${flight.id})}" class="text-decoration-none text-dark">
+                                    <strong th:text="${flight.flightNumber}">AA-101</strong>
+                                </a>
+                            </td>
+                            <td>
+                                <a th:href="@{/admin/flights/details/{id}(id=${flight.id})}" class="text-decoration-none text-dark">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <img th:if="${flight.airline.logo != null && !flight.airline.logo.isEmpty()}" 
+                                             th:src="${flight.airline.logo}" 
+                                             alt="Logo" 
+                                             class="img-thumbnail" 
+                                             style="width: 50px; height: auto; max-height: 30px; object-fit: contain;">
+                                        <span th:text="${flight.airline.airlineName}">Airline</span>
+                                    </div>
+                                </a>
                             </td>
                             <td>
                                 <span class="fw-semibold text-uppercase" th:text="${flight.originAirport.airportCode} + ' (' + ${flight.originAirport.city} + ')'">Origin</span> 
@@ -68,9 +73,8 @@
                                 <small class="text-muted" th:text="${flight.aircraft != null ? flight.aircraft.aircraftNumber : 'N/A'}">Number</small>
                             </td>
                             <td>
-                                <div th:text="${flight.totalSeats + ' / ' + flight.availableSeats}"></div>
+                                <div th:text="${flight.totalSeats}"></div>
                             </td>
-                            <td>₹<span th:text="${#numbers.formatDecimal(flight.fare, 1, 2)}">0.00</span></td>
                             <td class="text-center">
                                 <div class="btn-group" role="group">
                                     <a th:href="@{/admin/flights/edit/{id}(id=${flight.id})}" class="btn btn-sm btn-outline-secondary me-2">

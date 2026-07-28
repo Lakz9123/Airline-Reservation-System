@@ -44,6 +44,18 @@ public class Flight {
     @Column(name = "available_seats", nullable = false)
     private Integer availableSeats;
 
+    @Column(name = "economy_fare")
+    private Double economyFare;
+
+    @Column(name = "premium_economy_fare")
+    private Double premiumEconomyFare;
+
+    @Column(name = "business_fare")
+    private Double businessFare;
+
+    @Column(name = "first_class_fare")
+    private Double firstClassFare;
+
     // Constructors
     public Flight() {}
 
@@ -151,5 +163,37 @@ public class Flight {
 
     public void setAvailableSeats(Integer availableSeats) {
         this.availableSeats = availableSeats;
+    }
+
+    public Double getEconomyFare() {
+        return economyFare;
+    }
+
+    public void setEconomyFare(Double economyFare) {
+        this.economyFare = economyFare;
+    }
+
+    public Double getPremiumEconomyFare() {
+        return premiumEconomyFare;
+    }
+
+    public void setPremiumEconomyFare(Double premiumEconomyFare) {
+        this.premiumEconomyFare = premiumEconomyFare;
+    }
+
+    public Double getBusinessFare() {
+        return businessFare;
+    }
+
+    public void setBusinessFare(Double businessFare) {
+        this.businessFare = businessFare;
+    }
+
+    public Double getFirstClassFare() {
+        return firstClassFare;
+    }
+
+    public void setFirstClassFare(Double firstClassFare) {
+        this.firstClassFare = firstClassFare;
     }
 }

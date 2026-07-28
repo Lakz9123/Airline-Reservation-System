@@ -93,6 +93,35 @@ public class AdminController {
         return "redirect:/admin/flights";
     }
 
+    @GetMapping("/flights/details/{id}")
+    public String showFlightDetails(@PathVariable("id") Long id, Model model) {
+        Flight flight = flightService.getFlightById(id).orElse(null);
+        if (flight == null) {
+            return "redirect:/admin/flights";
+        }
+        model.addAttribute("flight", flight);
+        return "admin/flight-details";
+    }
+
+    @PostMapping("/flights/details/{id}/fares")
+    public String updateFares(@PathVariable("id") Long id,
+                              @RequestParam("economyFare") Double economyFare,
+                              @RequestParam("premiumEconomyFare") Double premiumEconomyFare,
+                              @RequestParam("businessFare") Double businessFare,
+                              @RequestParam("firstClassFare") Double firstClassFare,
+                              RedirectAttributes redirectAttributes) {
+        Flight flight = flightService.getFlightById(id).orElse(null);
+        if (flight != null) {
+            flight.setEconomyFare(economyFare);
+            flight.setPremiumEconomyFare(premiumEconomyFare);
+            flight.setBusinessFare(businessFare);
+            flight.setFirstClassFare(firstClassFare);
+            flightService.saveFlight(flight);
+            redirectAttributes.addFlashAttribute("success", "Fares updated successfully.");
+        }
+        return "redirect:/admin/flights/details/" + id;
+    }
+
     // 3. View Bookings (Read-only)
     @GetMapping("/bookings")
     public String listBookings(Model model) {
