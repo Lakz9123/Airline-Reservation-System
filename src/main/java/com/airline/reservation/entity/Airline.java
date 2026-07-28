@@ -16,6 +16,7 @@ public class Airline {
     @Column(nullable = false, unique = true)
     private String airlineName;
 
+    @Column(columnDefinition = "TEXT")
     private String logo;
 
     @NotBlank(message = "Country is required")

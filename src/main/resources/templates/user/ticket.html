@@ -180,6 +180,10 @@
         <div class="detail-value" th:text="${booking.flight.airline.airlineName}">SkyFly</div>
       </div>
       <div>
+        <div class="detail-label">Aircraft</div>
+        <div class="detail-value" th:text="${booking.flight.aircraft.model}">Model</div>
+      </div>
+      <div>
         <div class="detail-label">Class</div>
         <div class="detail-value" th:text="${booking.cabinClass}">Economy</div>
       </div>
@@ -194,7 +198,7 @@
       <div>
         <div class="detail-label">Total Fare</div>
         <div class="detail-value text-primary">
-          $<span th:text="${#numbers.formatDecimal(booking.totalFare, 1, 2)}">0.00</span>
+          ₹<span th:text="${#numbers.formatDecimal(booking.totalFare, 1, 2)}">0.00</span>
         </div>
       </div>
       <div>

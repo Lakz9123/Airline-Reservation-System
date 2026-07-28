@@ -30,7 +30,7 @@
                         <div class="d-flex justify-content-between">
                             <span class="text-muted fs-5">Total Fare:</span>
                             <span class="fw-bold text-success fs-5">
-                                $<span th:text="${#numbers.formatDecimal(totalFare, 1, 2)}">0.00</span>
+                                ₹<span th:text="${#numbers.formatDecimal(totalFare, 1, 2)}">0.00</span>
                             </span>
                         </div>
                     </div>
@@ -66,7 +66,7 @@
 
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary btn-lg">
-                                Pay $<span th:text="${#numbers.formatDecimal(totalFare, 1, 2)}">0.00</span> & Confirm
+                                Pay ₹<span th:text="${#numbers.formatDecimal(totalFare, 1, 2)}">0.00</span> & Confirm
                             </button>
                             <a th:href="@{/user/book/{id}(id=${flight.id})}" class="btn btn-outline-secondary">
                                 Cancel & Back to Seats

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout('Manage Aircraft', ~{::section})}">
+<body>
+<section>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Aircraft Management</h2>
+        <a th:href="@{/admin/aircraft/new}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Add Aircraft
+        </a>
+    </div>
+
+    <!-- Alerts -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                    <tr>
+                        <th>Name</th>
+                        <th>Number</th>
+                        <th>Model</th>
+                        <th>Capacity</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="ac : ${aircrafts}">
+                        <td th:text="${ac.aircraftName}">Name</td>
+                        <td th:text="${ac.aircraftNumber}">Number</td>
+                        <td th:text="${ac.model}">Model</td>
+                        <td>
+                            <strong th:text="${ac.capacity}"></strong> total
+                            <small class="text-muted d-block">
+                                <span th:text="${ac.businessSeats}"></span> Bus. / <span th:text="${ac.economySeats}"></span> Eco.
+                            </small>
+                        </td>
+                        <td>
+                            <span class="badge" th:classappend="${ac.status.name() == 'ACTIVE' ? 'bg-success' : (ac.status.name() == 'MAINTENANCE' ? 'bg-warning' : 'bg-secondary')}" th:text="${ac.status}">ACTIVE</span>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a th:href="@{/admin/aircraft/edit/{id}(id=${ac.id})}" class="btn btn-outline-primary" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form th:action="@{/admin/aircraft/delete/{id}(id=${ac.id})}" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this aircraft?');">
+                                    <button type="submit" class="btn btn-outline-danger" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(aircrafts)}">
+                        <td colspan="6" class="text-center py-4 text-muted">No aircraft found.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

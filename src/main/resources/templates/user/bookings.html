@@ -47,7 +47,7 @@
         </div>
         <div class="col-6 col-md-2">
           <div class="text-muted small">Total Fare</div>
-          <div class="fw-bold text-primary">$<span th:text="${#numbers.formatDecimal(b.totalFare,1,2)}">0</span></div>
+          <div class="fw-bold text-primary">₹<span th:text="${#numbers.formatDecimal(b.totalFare,1,2)}">0</span></div>
         </div>
         <div class="col-6 col-md-1">
           <span class="badge rounded-pill bg-success px-3 py-2" th:if="${b.status=='CONFIRMED'}">CONFIRMED</span>

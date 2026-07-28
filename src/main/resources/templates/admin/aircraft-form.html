@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(${aircraft.id == null ? 'Add Aircraft' : 'Edit Aircraft'}, ~{::section})}">
+<body>
+<section>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h4 class="mb-0 text-primary" th:text="${aircraft.id == null ? 'Add New Aircraft' : 'Edit Aircraft'}">Add Aircraft</h4>
+                </div>
+                <div class="card-body">
+                    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+                    
+                    <form th:action="@{/admin/aircraft}" method="post" th:object="${aircraft}">
+                        <input type="hidden" th:field="*{id}" />
+                        
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="aircraftName" class="form-label">Aircraft Name</label>
+                                <input type="text" class="form-control" id="aircraftName" th:field="*{aircraftName}" placeholder="e.g. Skyline Explorer" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="aircraftNumber" class="form-label">Aircraft Number (Reg)</label>
+                                <input type="text" class="form-control" id="aircraftNumber" th:field="*{aircraftNumber}" placeholder="e.g. VT-ABC" required>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="model" class="form-label">Model</label>
+                                <input type="text" class="form-control" id="model" th:field="*{model}" placeholder="e.g. Boeing 737" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="status" class="form-label">Status</label>
+                                <select class="form-select" id="status" th:field="*{status}" required>
+                                    <option value="" disabled>Select status...</option>
+                                    <option th:each="st : ${statuses}" th:value="${st}" th:text="${st}"></option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <label for="capacity" class="form-label">Total Capacity</label>
+                                <input type="number" class="form-control" id="capacity" th:field="*{capacity}" min="1" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="businessSeats" class="form-label">Business Seats</label>
+                                <input type="number" class="form-control" id="businessSeats" th:field="*{businessSeats}" min="0" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="economySeats" class="form-label">Economy Seats</label>
+                                <input type="number" class="form-control" id="economySeats" th:field="*{economySeats}" min="0" required>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a th:href="@{/admin/aircraft}" class="btn btn-outline-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Save Aircraft</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

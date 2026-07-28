@@ -37,8 +37,9 @@ public class Flight {
     @Column(nullable = false)
     private Double fare;
 
-    @Column(name = "total_seats", nullable = false)
-    private Integer totalSeats;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "aircraft_id", nullable = false)
+    private Aircraft aircraft;
 
     @Column(name = "available_seats", nullable = false)
     private Integer availableSeats;
@@ -46,7 +47,7 @@ public class Flight {
     // Constructors
     public Flight() {}
 
-    public Flight(String flightNumber, Airline airline, Airport originAirport, Airport destinationAirport, LocalDateTime departureDateTime, LocalDateTime arrivalDateTime, Integer durationMinutes, Double fare, Integer totalSeats, Integer availableSeats) {
+    public Flight(String flightNumber, Airline airline, Airport originAirport, Airport destinationAirport, LocalDateTime departureDateTime, LocalDateTime arrivalDateTime, Integer durationMinutes, Double fare, Aircraft aircraft, Integer availableSeats) {
         this.flightNumber = flightNumber;
         this.airline = airline;
         this.originAirport = originAirport;
@@ -55,7 +56,7 @@ public class Flight {
         this.arrivalDateTime = arrivalDateTime;
         this.durationMinutes = durationMinutes;
         this.fare = fare;
-        this.totalSeats = totalSeats;
+        this.aircraft = aircraft;
         this.availableSeats = availableSeats;
     }
 
@@ -132,12 +133,16 @@ public class Flight {
         this.fare = fare;
     }
 
-    public Integer getTotalSeats() {
-        return totalSeats;
+    public Aircraft getAircraft() {
+        return aircraft;
     }
 
-    public void setTotalSeats(Integer totalSeats) {
-        this.totalSeats = totalSeats;
+    public void setAircraft(Aircraft aircraft) {
+        this.aircraft = aircraft;
+    }
+
+    public Integer getTotalSeats() {
+        return aircraft != null ? aircraft.getCapacity() : 0;
     }
 
     public Integer getAvailableSeats() {

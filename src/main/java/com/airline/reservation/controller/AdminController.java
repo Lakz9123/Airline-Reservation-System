@@ -6,6 +6,7 @@ import com.airline.reservation.service.FlightService;
 import com.airline.reservation.service.UserService;
 import com.airline.reservation.service.AirportService;
 import com.airline.reservation.service.AirlineService;
+import com.airline.reservation.service.AircraftService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -20,13 +21,15 @@ public class AdminController {
     private final BookingService bookingService;
     private final AirportService airportService;
     private final AirlineService airlineService;
+    private final AircraftService aircraftService;
 
-    public AdminController(FlightService flightService, UserService userService, BookingService bookingService, AirportService airportService, AirlineService airlineService) {
+    public AdminController(FlightService flightService, UserService userService, BookingService bookingService, AirportService airportService, AirlineService airlineService, AircraftService aircraftService) {
         this.flightService = flightService;
         this.userService = userService;
         this.bookingService = bookingService;
         this.airportService = airportService;
         this.airlineService = airlineService;
+        this.aircraftService = aircraftService;
     }
 
     // 1. Dashboard
@@ -51,6 +54,7 @@ public class AdminController {
         model.addAttribute("flight", new Flight());
         model.addAttribute("airports", airportService.getAllAirports());
         model.addAttribute("airlines", airlineService.getAllAirlines());
+        model.addAttribute("aircrafts", aircraftService.getActiveAircrafts());
         return "admin/flight-form";
     }
 
@@ -74,6 +78,7 @@ public class AdminController {
         model.addAttribute("flight", flight);
         model.addAttribute("airports", airportService.getAllAirports());
         model.addAttribute("airlines", airlineService.getAllAirlines());
+        model.addAttribute("aircrafts", aircraftService.getActiveAircrafts());
         return "admin/flight-form";
     }
 

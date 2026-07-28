@@ -27,6 +27,7 @@ public class EmailService {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setTo(booking.getUser().getEmail());
+            helper.setFrom("noreply@skyfly.com");
             helper.setSubject("Booking Confirmation - SkyFly Airlines");
             
             String htmlContent = "<h2>Booking Confirmed!</h2>"
@@ -37,7 +38,7 @@ public class EmailService {
                     + "<li><strong>Flight:</strong> " + booking.getFlight().getFlightNumber() + " (" + booking.getFlight().getAirline().getAirlineName() + ")</li>"
                     + "<li><strong>Route:</strong> " + booking.getFlight().getOriginAirport().getAirportCode() + " (" + booking.getFlight().getOriginAirport().getCity() + ") to " + booking.getFlight().getDestinationAirport().getAirportCode() + " (" + booking.getFlight().getDestinationAirport().getCity() + ")</li>"
                     + "<li><strong>Seats:</strong> " + booking.getSeatNumbers() + "</li>"
-                    + "<li><strong>Total Fare:</strong> $" + String.format("%.2f", booking.getTotalFare()) + "</li>"
+                    + "<li><strong>Total Fare:</strong> ₹" + String.format("%.2f", booking.getTotalFare()) + "</li>"
                     + "</ul>"
                     + "<p>Thank you for flying with us!</p>";
             
@@ -60,6 +61,7 @@ public class EmailService {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setTo(email);
+            helper.setFrom("noreply@skyfly.com");
             helper.setSubject("Password Reset - SkyFly Airlines");
             
             String htmlContent = "<h2>Password Reset Request</h2>"

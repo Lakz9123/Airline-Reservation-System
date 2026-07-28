@@ -24,7 +24,7 @@
           </div>
         </div>
         <div class="text-end">
-          <div class="fs-4 fw-bold text-primary">$<span th:text="${#numbers.formatDecimal(flight.fare,1,2)}">0</span> / seat</div>
+          <div class="fs-4 fw-bold text-primary">₹<span th:text="${#numbers.formatDecimal(flight.fare,1,2)}">0</span> / seat</div>
           <small class="text-muted"><span th:text="${flight.availableSeats}">0</span> seats available</small>
         </div>
       </div>
@@ -36,9 +36,9 @@
     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
   </div>
 
-  <!-- Legend -->
-  <div class="d-flex gap-3 mb-3 flex-wrap">
-    <span><button class="seat-btn seat-available" disabled></button> Available</span>
+  <div class="d-flex gap-3 mb-3 flex-wrap justify-content-center">
+    <span><button class="seat-btn seat-available" disabled style="background-color:#e0e0e0;"></button> Economy</span>
+    <span><button class="seat-btn seat-available" disabled style="background-color:#ffd700; border-color:#d4af37"></button> Business</span>
     <span><button class="seat-btn seat-booked" disabled></button> Booked</span>
     <span><button class="seat-btn seat-selected" disabled></button> Selected</span>
   </div>
@@ -67,7 +67,7 @@
       </div>
 
       <p class="mb-1">Selected seats: <strong id="selectedSeatDisplay">None</strong></p>
-      <p class="mb-3">Total fare: <strong id="totalFareDisplay">$0.00</strong></p>
+      <p class="mb-3">Total fare: <strong id="totalFareDisplay">₹0.00</strong></p>
       <button type="submit" class="btn btn-success btn-lg w-100 w-md-auto" id="confirmBtn" disabled>
         <i class="bi bi-check-circle"></i> Proceed to Payment
       </button>
@@ -80,6 +80,8 @@
   const allSeats   = /*[[${allSeats}]]*/ [];
   const bookedSeats = new Set(/*[[${bookedSeats}]]*/ []);
   const farePerSeat = /*[[${flight.fare}]]*/ 0;
+  const businessSeatsCount = /*[[${flight.aircraft != null ? flight.aircraft.businessSeats : 0}]]*/ 0;
+  const economySeatsCount = /*[[${flight.aircraft != null ? flight.aircraft.economySeats : flight.totalSeats}]]*/ 0;
 </script>
 <script>
   const seatMap = document.getElementById('seatMap');
@@ -92,43 +94,97 @@
 
   function renderSeats() {
     seatMap.innerHTML = '';
-    for (let i = 0; i < allSeats.length; i += 6) {
-      const rowDiv = document.createElement('div');
-      rowDiv.className = 'd-flex gap-2 justify-content-center';
-      // Insert aisle spacer after col 3
-      for (let j = 0; j < 6 && (i+j) < allSeats.length; j++) {
-        if (j === 3) {
-          const spacer = document.createElement('div');
-          spacer.style.width = '20px';
-          rowDiv.appendChild(spacer);
+    
+    let currentIndex = 0;
+    
+    // Render Business Class
+    if (businessSeatsCount > 0) {
+      const busDiv = document.createElement('div');
+      busDiv.className = 'w-100 text-center text-primary fw-bold my-2';
+      busDiv.textContent = '--- Business Class ---';
+      seatMap.appendChild(busDiv);
+      
+      while (currentIndex < businessSeatsCount && currentIndex < allSeats.length) {
+        const rowDiv = document.createElement('div');
+        rowDiv.className = 'd-flex gap-2 justify-content-center';
+        
+        for (let j = 0; j < 4 && currentIndex < businessSeatsCount && currentIndex < allSeats.length; j++, currentIndex++) {
+          if (j === 2) {
+            const spacer = document.createElement('div');
+            spacer.style.width = '30px';
+            rowDiv.appendChild(spacer);
+          }
+          createSeatBtn(allSeats[currentIndex], rowDiv, true);
         }
-        const seat = allSeats[i + j];
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.textContent = seat;
-        btn.className = 'seat-btn';
-        if (bookedSeats.has(seat)) {
-          btn.classList.add('seat-booked');
-          btn.disabled = true;
-        } else {
-          btn.classList.add('seat-available');
-          btn.addEventListener('click', () => toggleSeat(seat, btn));
-        }
-        rowDiv.appendChild(btn);
+        seatMap.appendChild(rowDiv);
       }
-      seatMap.appendChild(rowDiv);
+    }
+    
+    // Render Economy Class
+    if (economySeatsCount > 0) {
+      const ecoDiv = document.createElement('div');
+      ecoDiv.className = 'w-100 text-center text-secondary fw-bold my-2';
+      ecoDiv.textContent = '--- Economy Class ---';
+      seatMap.appendChild(ecoDiv);
+      
+      let ecoIndex = 0;
+      while (ecoIndex < economySeatsCount && currentIndex < allSeats.length) {
+        const rowDiv = document.createElement('div');
+        rowDiv.className = 'd-flex gap-2 justify-content-center';
+        
+        for (let j = 0; j < 6 && ecoIndex < economySeatsCount && currentIndex < allSeats.length; j++, currentIndex++, ecoIndex++) {
+          if (j === 3) {
+            const spacer = document.createElement('div');
+            spacer.style.width = '20px';
+            rowDiv.appendChild(spacer);
+          }
+          createSeatBtn(allSeats[currentIndex], rowDiv, false);
+        }
+        seatMap.appendChild(rowDiv);
+      }
     }
   }
 
-  function toggleSeat(seat, btn) {
+  function createSeatBtn(seat, rowDiv, isBusiness) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = seat;
+    btn.className = 'seat-btn';
+    
+    if (isBusiness) {
+      btn.style.backgroundColor = '#ffd700'; // Gold for business
+      btn.style.borderColor = '#d4af37';
+    }
+    
+    if (bookedSeats.has(seat)) {
+      btn.classList.add('seat-booked');
+      btn.disabled = true;
+      if (isBusiness) {
+        btn.style.opacity = '0.5';
+        btn.style.backgroundColor = '#8c8c8c';
+      }
+    } else {
+      btn.classList.add('seat-available');
+      btn.addEventListener('click', () => toggleSeat(seat, btn, isBusiness));
+    }
+    rowDiv.appendChild(btn);
+  }
+
+  function toggleSeat(seat, btn, isBusiness) {
     if (selectedSeats.has(seat)) {
       selectedSeats.delete(seat);
       btn.classList.remove('seat-selected');
       btn.classList.add('seat-available');
+      if(isBusiness) {
+        btn.style.backgroundColor = '#ffd700';
+      }
     } else {
       selectedSeats.add(seat);
       btn.classList.remove('seat-available');
       btn.classList.add('seat-selected');
+      if(isBusiness) {
+        btn.style.backgroundColor = '#28a745'; // override selected color slightly if needed, or rely on seat-selected class
+      }
     }
     updateSummary();
   }
@@ -147,7 +203,7 @@
     seatForm.querySelectorAll('input[name="selectedSeats"]').forEach(el => el.remove());
     if (selectedSeats.size === 0) {
       selectedSeatDisplay.textContent = 'None';
-      totalFareDisplay.textContent = '$0.00';
+      totalFareDisplay.textContent = '₹0.00';
       confirmBtn.disabled = true;
     } else {
       const arr = [...selectedSeats];
@@ -156,7 +212,7 @@
       const multiplier = getMultiplier(cabinClassSelect.value);
       const totalFare = arr.length * farePerSeat * multiplier;
       
-      totalFareDisplay.textContent = '$' + totalFare.toFixed(2);
+      totalFareDisplay.textContent = '₹' + totalFare.toFixed(2);
       confirmBtn.disabled = false;
       arr.forEach(s => {
         const inp = document.createElement('input');

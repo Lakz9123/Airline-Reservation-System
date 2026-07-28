@@ -5,17 +5,27 @@ import com.airline.reservation.entity.Flight;
 import com.airline.reservation.entity.User;
 import com.airline.reservation.entity.Airport;
 import com.airline.reservation.entity.Airline;
+import com.airline.reservation.entity.Aircraft;
+import com.airline.reservation.entity.AircraftStatus;
 import com.airline.reservation.repository.BookingRepository;
 import com.airline.reservation.repository.FlightRepository;
 import com.airline.reservation.repository.UserRepository;
 import com.airline.reservation.repository.AirportRepository;
 import com.airline.reservation.repository.AirlineRepository;
+import com.airline.reservation.repository.AircraftRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Random;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
 @Component
 public class DataLoader implements CommandLineRunner {
@@ -25,14 +35,16 @@ public class DataLoader implements CommandLineRunner {
     private final BookingRepository bookingRepository;
     private final AirportRepository airportRepository;
     private final AirlineRepository airlineRepository;
+    private final AircraftRepository aircraftRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public DataLoader(UserRepository userRepository, FlightRepository flightRepository, BookingRepository bookingRepository, AirportRepository airportRepository, AirlineRepository airlineRepository, PasswordEncoder passwordEncoder) {
+    public DataLoader(UserRepository userRepository, FlightRepository flightRepository, BookingRepository bookingRepository, AirportRepository airportRepository, AirlineRepository airlineRepository, AircraftRepository aircraftRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.flightRepository = flightRepository;
         this.bookingRepository = bookingRepository;
         this.airportRepository = airportRepository;
         this.airlineRepository = airlineRepository;
+        this.aircraftRepository = aircraftRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -58,35 +70,45 @@ public class DataLoader implements CommandLineRunner {
             userRepository.save(user2);
         }
 
-        // Seed 6 Indian Airports if none exist
-        Airport maa = null, blr = null, del = null, bom = null, hyd = null, ccu = null;
-        if (airportRepository.count() == 0) {
-            // Note: existing flight data will need reseeding since ddl-auto=update can't migrate strings to FKs.
-            maa = new Airport("MAA", "Chennai International Airport", "Chennai", "India", 4, "GMT+5:30");
-            blr = new Airport("BLR", "Kempegowda International Airport", "Bengaluru", "India", 2, "GMT+5:30");
-            del = new Airport("DEL", "Indira Gandhi International Airport", "New Delhi", "India", 3, "GMT+5:30");
-            bom = new Airport("BOM", "Chhatrapati Shivaji Maharaj International Airport", "Mumbai", "India", 2, "GMT+5:30");
-            hyd = new Airport("HYD", "Rajiv Gandhi International Airport", "Hyderabad", "India", 1, "GMT+5:30");
-            ccu = new Airport("CCU", "Netaji Subhash Chandra Bose International Airport", "Kolkata", "India", 1, "GMT+5:30");
-            airportRepository.saveAll(Arrays.asList(maa, blr, del, bom, hyd, ccu));
-        } else {
-            maa = airportRepository.findByAirportCodeIgnoreCase("MAA").orElse(null);
-            blr = airportRepository.findByAirportCodeIgnoreCase("BLR").orElse(null);
-            del = airportRepository.findByAirportCodeIgnoreCase("DEL").orElse(null);
-            bom = airportRepository.findByAirportCodeIgnoreCase("BOM").orElse(null);
-            hyd = airportRepository.findByAirportCodeIgnoreCase("HYD").orElse(null);
-            ccu = airportRepository.findByAirportCodeIgnoreCase("CCU").orElse(null);
+        // 3. Seed All Indian Airports from CSV
+        try {
+            Resource resource = new ClassPathResource("airports.csv");
+            if (resource.exists()) {
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
+                    String line;
+                    boolean header = true;
+                    while ((line = br.readLine()) != null) {
+                        if (header) { header = false; continue; }
+                        String[] data = line.split(",", -1);
+                        if (data.length >= 5) {
+                            String iata = data[0].trim();
+                            String name = data[1].trim();
+                            String city = data[2] == null || data[2].trim().isEmpty() ? name : data[2].trim();
+                            String country = data[3].trim();
+                            String tz = data[4].trim();
+                            getOrCreateAirport(iata, name, city, country, 1, tz);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        // Seed 5 Indian Airlines if none exist
+        // Seed 9 Indian Airlines if none exist
         Airline indigo = null, airIndia = null, spiceJet = null, vistara = null, akasaAir = null;
         if (airlineRepository.count() == 0) {
-            indigo = new Airline("IndiGo", "https://upload.wikimedia.org/wikipedia/commons/f/f5/IndiGo_logo.svg", "India", "https://www.goindigo.in", "customer.relations@goindigo.in");
-            airIndia = new Airline("Air India", "https://upload.wikimedia.org/wikipedia/commons/d/df/Air_India_Logo_2023.svg", "India", "https://www.airindia.com", "contactus@airindia.com");
-            spiceJet = new Airline("SpiceJet", "https://upload.wikimedia.org/wikipedia/commons/e/ee/SpiceJet_logo.svg", "India", "https://www.spicejet.com", "custrelations@spicejet.com");
-            vistara = new Airline("Vistara", "https://upload.wikimedia.org/wikipedia/commons/a/ae/Vistara_logo.svg", "India", "https://www.airvistara.com", "custrelations@airvistara.com");
-            akasaAir = new Airline("Akasa Air", "https://upload.wikimedia.org/wikipedia/commons/d/da/Akasa_Air_logo.svg", "India", "https://www.akasaair.com", "info@akasaair.com");
-            airlineRepository.saveAll(Arrays.asList(indigo, airIndia, spiceJet, vistara, akasaAir));
+            indigo = new Airline("IndiGo", "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20400%20150%22%3E%0A%3Crect%20width%3D%22400%22%20height%3D%22150%22%20fill%3D%22%23001B94%22/%3E%0A%3Ctext%20x%3D%2230%22%20y%3D%22100%22%20fill%3D%22white%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-size%3D%2280%22%20font-weight%3D%22bold%22%3EIndiGo%3C/text%3E%0A%3Ccircle%20cx%3D%22280%22%20cy%3D%2280%22%20r%3D%226%22%20fill%3D%22white%22/%3E%3Ccircle%20cx%3D%22300%22%20cy%3D%2270%22%20r%3D%226%22%20fill%3D%22white%22/%3E%3Ccircle%20cx%3D%22320%22%20cy%3D%2255%22%20r%3D%226%22%20fill%3D%22white%22/%3E%3Ccircle%20cx%3D%22340%22%20cy%3D%2240%22%20r%3D%226%22%20fill%3D%22white%22/%3E%0A%3C/svg%3E", "India", "https://www.goindigo.in", "customer.relations@goindigo.in");
+            airIndia = new Airline("Air India", "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20400%20150%22%3E%0A%3Crect%20width%3D%22400%22%20height%3D%22150%22%20fill%3D%22%23E31837%22/%3E%0A%3Ctext%20x%3D%2230%22%20y%3D%22100%22%20fill%3D%22white%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-size%3D%2260%22%20font-weight%3D%22900%22%3EAIR%20INDIA%3C/text%3E%0A%3Cpath%20d%3D%22M320%2C40%20Q380%2C40%20370%2C110%20Q340%2C60%20320%2C40%22%20fill%3D%22%23F3A71C%22/%3E%0A%3C/svg%3E", "India", "https://www.airindia.com", "contactus@airindia.com");
+            spiceJet = new Airline("SpiceJet", "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20400%20150%22%3E%0A%3Crect%20width%3D%22400%22%20height%3D%22150%22%20fill%3D%22%23DA251D%22/%3E%0A%3Ctext%20x%3D%22140%22%20y%3D%22100%22%20fill%3D%22white%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-size%3D%2270%22%20font-style%3D%22italic%22%20font-weight%3D%22bold%22%3Espicejet%3C/text%3E%0A%3Ccircle%20cx%3D%2250%22%20cy%3D%22110%22%20r%3D%2212%22%20fill%3D%22%23F9A01B%22/%3E%3Ccircle%20cx%3D%2280%22%20cy%3D%2295%22%20r%3D%2216%22%20fill%3D%22%23F9A01B%22/%3E%3Ccircle%20cx%3D%22110%22%20cy%3D%2270%22%20r%3D%2222%22%20fill%3D%22%23F9A01B%22/%3E%3Ccircle%20cx%3D%2280%22%20cy%3D%2245%22%20r%3D%2214%22%20fill%3D%22%23F9A01B%22/%3E%0A%3C/svg%3E", "India", "https://www.spicejet.com", "custrelations@spicejet.com");
+            vistara = new Airline("Vistara", "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20400%20150%22%3E%0A%3Crect%20width%3D%22400%22%20height%3D%22150%22%20fill%3D%22%233D1152%22/%3E%0A%3Ctext%20x%3D%22140%22%20y%3D%2295%22%20fill%3D%22white%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-size%3D%2265%22%20font-weight%3D%22100%22%3Evistara%3C/text%3E%0A%3Cpath%20d%3D%22M70%2C30%20L100%2C75%20L70%2C120%20L40%2C75%20Z%22%20fill%3D%22none%22%20stroke%3D%22%23C0934F%22%20stroke-width%3D%225%22/%3E%0A%3Cpath%20d%3D%22M70%2C50%20L90%2C75%20L70%2C100%20L50%2C75%20Z%22%20fill%3D%22none%22%20stroke%3D%22%23C0934F%22%20stroke-width%3D%223%22/%3E%0A%3C/svg%3E", "India", "https://www.airvistara.com", "custrelations@airvistara.com");
+            akasaAir = new Airline("Akasa Air", "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20400%20150%22%3E%0A%3Crect%20width%3D%22400%22%20height%3D%22150%22%20fill%3D%22%234C1C8D%22/%3E%0A%3Ctext%20x%3D%22120%22%20y%3D%22100%22%20fill%3D%22white%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-size%3D%2265%22%20font-weight%3D%22bold%22%3EAkasa%20Air%3C/text%3E%0A%3Cpath%20d%3D%22M60%2C110%20Q90%2C30%20100%2C20%20Q100%2C60%2085%2C110%20Z%22%20fill%3D%22%23F05E23%22/%3E%0A%3C/svg%3E", "India", "https://www.akasaair.com", "info@akasaair.com");
+            Airline aiExpress = new Airline("Air India Express", "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20400%20150%22%3E%0A%3Ctext%20x%3D%2280%22%20y%3D%2250%22%20fill%3D%22%23D91C36%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-size%3D%2225%22%20font-style%3D%22italic%22%20font-weight%3D%22900%22%3EAIR%20INDIA%3C/text%3E%0A%3Ctext%20x%3D%2220%22%20y%3D%22110%22%20fill%3D%22%23D91C36%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-size%3D%2275%22%20font-weight%3D%22normal%22%3Eexpress%3C/text%3E%0A%3C/svg%3E", "India", "https://www.airindiaexpress.com", "customersupport@airindiaexpress.com");
+            Airline allianceAir = new Airline("Alliance Air", "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20400%20150%22%3E%0A%3Crect%20width%3D%22400%22%20height%3D%22150%22%20fill%3D%22%23001C3A%22/%3E%0A%3Ctext%20x%3D%2230%22%20y%3D%2290%22%20fill%3D%22white%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-size%3D%2275%22%20font-style%3D%22italic%22%20font-weight%3D%22bold%22%3EAlliance%3C/text%3E%0A%3Cpolygon%20points%3D%22320%2C35%20340%2C35%20325%2C50%22%20fill%3D%22%23F47B20%22/%3E%0A%3Ctext%20x%3D%22160%22%20y%3D%22120%22%20fill%3D%22white%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-size%3D%2225%22%20font-style%3D%22italic%22%20font-weight%3D%22bold%22%20letter-spacing%3D%225%22%3EAIRLINES%3C/text%3E%0A%3C/svg%3E", "India", "https://www.allianceair.in", "support@allianceair.in");
+            Airline starAir = new Airline("Star Air", "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20400%20150%22%3E%0A%3Ctext%20x%3D%2240%22%20y%3D%22100%22%20fill%3D%22%23EE1B24%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-size%3D%2275%22%20font-style%3D%22italic%22%20font-weight%3D%22900%22%3ESTAR%3C/text%3E%0A%3Ctext%20x%3D%22240%22%20y%3D%22100%22%20fill%3D%22%2300207F%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-size%3D%2275%22%20font-style%3D%22italic%22%20font-weight%3D%22900%22%3Eair%3C/text%3E%0A%3Cpolygon%20points%3D%22285%2C35%20292%2C50%20308%2C50%20295%2C60%20300%2C75%20285%2C65%20270%2C75%20275%2C60%20262%2C50%20278%2C50%22%20fill%3D%22%2300207F%22/%3E%0A%3C/svg%3E", "India", "https://starair.in", "customercare@starair.in");
+            Airline flyBig = new Airline("FlyBig", "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20400%20150%22%3E%0A%3Cpath%20d%3D%22M80%2C80%20Q100%2C120%20120%2C120%20Q160%2C120%20220%2C50%20Q230%2C40%20210%2C35%20Q120%2C70%20120%2C90%20Q110%2C100%20100%2C90%20Z%22%20fill%3D%22%23AD1177%22/%3E%0A%3Ctext%20x%3D%22210%22%20y%3D%22110%22%20fill%3D%22%23AD1177%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-size%3D%2275%22%20font-weight%3D%22normal%22%3Eflybig.%3C/text%3E%0A%3C/svg%3E", "India", "https://flybig.in", "info@flybig.in");
+            
+            airlineRepository.saveAll(Arrays.asList(indigo, airIndia, spiceJet, vistara, akasaAir, aiExpress, allianceAir, starAir, flyBig));
         } else {
             indigo = airlineRepository.findByAirlineNameIgnoreCase("IndiGo").orElse(null);
             airIndia = airlineRepository.findByAirlineNameIgnoreCase("Air India").orElse(null);
@@ -95,43 +117,68 @@ public class DataLoader implements CommandLineRunner {
             akasaAir = airlineRepository.findByAirlineNameIgnoreCase("Akasa Air").orElse(null);
         }
 
-        // 3. Seed 5 Sample Flights
-        if (flightRepository.count() == 0) {
-            LocalDateTime now = LocalDateTime.now();
-
-            Flight f1 = new Flight("6E-101", indigo, del, bom, 
-                    now.plusDays(2).withHour(10).withMinute(0).withSecond(0).withNano(0), 
-                    now.plusDays(2).withHour(22).withMinute(30).withSecond(0).withNano(0), 
-                    750, 450.00, 150, 148);
-
-            Flight f2 = new Flight("AI-202", airIndia, bom, blr, 
-                    now.plusDays(3).withHour(8).withMinute(15).withSecond(0).withNano(0), 
-                    now.plusDays(3).withHour(11).withMinute(45).withSecond(0).withNano(0), 
-                    210, 250.00, 120, 119);
-
-            Flight f3 = new Flight("SG-303", spiceJet, maa, hyd, 
-                    now.plusDays(1).withHour(14).withMinute(30).withSecond(0).withNano(0), 
-                    now.plusDays(1).withHour(16).withMinute(45).withSecond(0).withNano(0), 
-                    135, 150.00, 100, 100);
-
-            Flight f4 = new Flight("UK-404", vistara, del, ccu, 
-                    now.plusDays(5).withHour(13).withMinute(0).withSecond(0).withNano(0), 
-                    now.plusDays(6).withHour(7).withMinute(15).withSecond(0).withNano(0), 
-                    675, 850.00, 250, 250);
-
-            Flight f5 = new Flight("QP-505", akasaAir, blr, maa, 
-                    now.plusDays(4).withHour(6).withMinute(30).withSecond(0).withNano(0), 
-                    now.plusDays(4).withHour(11).withMinute(0).withSecond(0).withNano(0), 
-                    450, 550.00, 200, 200);
-
-            flightRepository.saveAll(Arrays.asList(f1, f2, f3, f4, f5));
-
-            // 4. Seed Sample Bookings for Admin preview
-            Booking b1 = new Booking(user1, f1, "12A, 12B", now.minusDays(1), "CONFIRMED", 900.00, "Economy");
-            Booking b2 = new Booking(user1, f2, "14C", now.minusHours(5), "CONFIRMED", 250.00, "Economy");
-            Booking b3 = new Booking(user2, f1, "15A", now.minusDays(2), "CANCELLED", 450.00, "Economy");
-
-            bookingRepository.saveAll(Arrays.asList(b1, b2, b3));
+        // Seed 4 Aircraft if none exist
+        Aircraft ac1 = null, ac2 = null, ac3 = null, ac4 = null;
+        if (aircraftRepository.count() == 0) {
+            ac1 = new Aircraft("Boeing 737 Max", "VT-ABC", "Boeing 737", 180, 12, 168, AircraftStatus.ACTIVE);
+            ac2 = new Aircraft("Airbus A320neo", "VT-XYZ", "Airbus A320", 150, 10, 140, AircraftStatus.ACTIVE);
+            ac3 = new Aircraft("Boeing 777-300", "VT-DEF", "Boeing 777", 250, 40, 210, AircraftStatus.ACTIVE);
+            ac4 = new Aircraft("Airbus A321", "VT-PQR", "Airbus A321", 200, 20, 180, AircraftStatus.ACTIVE);
+            aircraftRepository.saveAll(Arrays.asList(ac1, ac2, ac3, ac4));
+        } else {
+            ac1 = aircraftRepository.findByAircraftNumberIgnoreCase("VT-ABC").orElse(null);
+            ac2 = aircraftRepository.findByAircraftNumberIgnoreCase("VT-XYZ").orElse(null);
+            ac3 = aircraftRepository.findByAircraftNumberIgnoreCase("VT-DEF").orElse(null);
+            ac4 = aircraftRepository.findByAircraftNumberIgnoreCase("VT-PQR").orElse(null);
         }
+
+        // 4. Generate Realistic Flights dynamically
+        List<Airport> allAirports = airportRepository.findAll();
+        List<Airline> allAirlines = airlineRepository.findAll();
+        List<Aircraft> allAircrafts = aircraftRepository.findAll();
+
+        if (flightRepository.count() < 10 && allAirports.size() > 1 && !allAirlines.isEmpty() && !allAircrafts.isEmpty()) {
+            Random rand = new Random();
+            List<Flight> flightsToSave = new ArrayList<>();
+            for (int i = 0; i < 300; i++) { // Generate 300 flights
+                Airport origin = allAirports.get(rand.nextInt(allAirports.size()));
+                Airport dest = allAirports.get(rand.nextInt(allAirports.size()));
+                while (origin.getId().equals(dest.getId())) {
+                    dest = allAirports.get(rand.nextInt(allAirports.size()));
+                }
+                Airline airline = allAirlines.get(rand.nextInt(allAirlines.size()));
+                Aircraft aircraft = allAircrafts.get(rand.nextInt(allAircrafts.size()));
+                
+                int daysAhead = 1 + rand.nextInt(30);
+                int hour = rand.nextInt(24);
+                int durationMinutes = 60 + rand.nextInt(180); // 1 to 4 hours
+                
+                LocalDateTime dep = LocalDateTime.now().plusDays(daysAhead).withHour(hour).withMinute(0).withSecond(0).withNano(0);
+                LocalDateTime arr = dep.plusMinutes(durationMinutes);
+                
+                String flightNum = airline.getAirlineName().substring(0, 2).toUpperCase() + "-" + (100 + rand.nextInt(900));
+                double fare = 2500 + rand.nextDouble() * 6000; // Between 2500 and 8500 INR
+                
+                Flight f = new Flight(flightNum, airline, origin, dest, dep, arr, durationMinutes, fare, aircraft, aircraft.getCapacity());
+                flightsToSave.add(f);
+            }
+            flightRepository.saveAll(flightsToSave);
+            
+            // Seed a few Bookings for Admin preview
+            if (!flightsToSave.isEmpty()) {
+                Flight sf = flightsToSave.get(0);
+                Booking b1 = new Booking(user1, sf, "12A, 12B", LocalDateTime.now().minusDays(1), "CONFIRMED", sf.getFare() * 2, "Economy");
+                Booking b2 = new Booking(user1, sf, "14C", LocalDateTime.now().minusHours(5), "CONFIRMED", sf.getFare(), "Economy");
+                Booking b3 = new Booking(user2, sf, "15A", LocalDateTime.now().minusDays(2), "CANCELLED", sf.getFare(), "Economy");
+                bookingRepository.saveAll(Arrays.asList(b1, b2, b3));
+            }
+        }
+    }
+
+    private Airport getOrCreateAirport(String code, String name, String city, String country, Integer terminals, String tz) {
+        return airportRepository.findByAirportCodeIgnoreCase(code).orElseGet(() -> {
+            Airport a = new Airport(code, name, city, country, terminals, tz);
+            return airportRepository.save(a);
+        });
     }
 }

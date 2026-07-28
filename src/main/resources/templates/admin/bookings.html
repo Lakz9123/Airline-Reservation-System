@@ -45,7 +45,7 @@
                             </td>
                             <td><code class="bg-light text-dark p-1 rounded" th:text="${booking.seatNumbers}">12A, 12B</code></td>
                             <td th:text="${#temporals.format(booking.bookingDate, 'yyyy-MM-dd HH:mm')}">Date</td>
-                            <td>$<span th:text="${#numbers.formatDecimal(booking.totalFare, 1, 2)}">0.00</span></td>
+                            <td>₹<span th:text="${#numbers.formatDecimal(booking.totalFare, 1, 2)}">0.00</span></td>
                             <td>
                                 <span class="badge bg-success" th:if="${booking.status == 'CONFIRMED'}">CONFIRMED</span>
                                 <span class="badge bg-danger" th:if="${booking.status == 'CANCELLED'}">CANCELLED</span>

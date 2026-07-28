@@ -30,20 +30,37 @@ public class UserBookingService {
 
     /**
      * Returns a list of all seat labels for a flight (e.g. A1, A2 … Z6),
-     * in rows of 6, plus the set of already-booked seat labels.
+     * divided into Business and Economy based on the aircraft config.
+     * We'll just generate them sequentially, but seat-selection.html will need to know which is which.
+     * To make it simple, we can return the labels. Business is the first N seats.
      */
     public List<String> generateSeatLabels(Flight flight) {
         List<String> seats = new ArrayList<>();
         int total = flight.getTotalSeats();
         int rowNum = 0;
         int count = 0;
-        while (count < total) {
+        
+        // Business Class (4 seats per row)
+        int busSeats = flight.getAircraft() != null ? flight.getAircraft().getBusinessSeats() : 0;
+        while (count < busSeats) {
             char rowChar = (char) ('A' + rowNum);
-            for (int col = 1; col <= 6 && count < total; col++, count++) {
+            for (int col = 1; col <= 4 && count < busSeats; col++, count++) {
                 seats.add("" + rowChar + col);
             }
             rowNum++;
         }
+        
+        // Economy Class (6 seats per row)
+        int ecoSeats = flight.getAircraft() != null ? flight.getAircraft().getEconomySeats() : flight.getTotalSeats();
+        int ecoCount = 0;
+        while (ecoCount < ecoSeats) {
+            char rowChar = (char) ('A' + rowNum);
+            for (int col = 1; col <= 6 && ecoCount < ecoSeats; col++, count++, ecoCount++) {
+                seats.add("" + rowChar + col);
+            }
+            rowNum++;
+        }
+        
         return seats;
     }
 

@@ -10,14 +10,14 @@
   <div class="card shadow-sm border-0 mb-4">
     <div class="card-body p-4">
       <form th:action="@{/user/search/results}" method="get" class="row g-3 align-items-end">
-        <div class="col-md-2">
+        <div class="col-md-3">
           <label class="form-label fw-semibold">From (Origin)</label>
           <select class="form-select" name="originId" required>
             <option value="" disabled th:selected="${originId == null}">Select Origin</option>
             <option th:each="ap : ${airports}" th:value="${ap.id}" th:text="${ap.airportCode} + ' - ' + ${ap.city}" th:selected="${ap.id == originId}"></option>
           </select>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-3">
           <label class="form-label fw-semibold">To (Destination)</label>
           <select class="form-select" name="destinationId" required>
             <option value="" disabled th:selected="${destinationId == null}">Select Destination</option>
@@ -27,10 +27,6 @@
         <div class="col-md-2">
           <label class="form-label fw-semibold">Departure Date</label>
           <input type="date" class="form-control" name="date" th:value="${date}" required>
-        </div>
-        <div class="col-md-2">
-          <label class="form-label fw-semibold">Max Fare ($)</label>
-          <input type="number" step="0.01" class="form-control" name="maxFare" th:value="${maxFare}" placeholder="Opt limit">
         </div>
         <div class="col-md-2">
           <label class="form-label fw-semibold">Airline</label>
@@ -64,12 +60,12 @@
                          th:src="${f.airline.logo}" 
                          alt="Logo" 
                          class="img-thumbnail" 
-                         style="width: 30px; height: auto; max-height: 30px; object-fit: contain;">
+                         style="width: 50px; height: auto; max-height: 30px; object-fit: contain;">
                     <span class="badge bg-primary fs-6" th:text="${f.flightNumber}">FL-101</span>
                   </div>
                   <small class="text-muted" th:text="${f.airline.airlineName}">Airline</small>
                 </div>
-                <div class="col-md-4 text-center">
+                <div class="col-md-3 text-center">
                   <div class="d-flex align-items-center justify-content-center gap-2">
                     <div>
                       <div class="fs-5 fw-bold" th:text="${#temporals.format(f.departureDateTime,'HH:mm')}">00:00</div>
@@ -87,13 +83,17 @@
                   <small class="text-muted" th:text="${#temporals.format(f.departureDateTime,'dd MMM yyyy')}">Date</small>
                 </div>
                 <div class="col-md-2 text-center">
+                  <div class="text-muted small">Aircraft</div>
+                  <div class="fw-bold text-dark" th:text="${f.aircraft != null ? f.aircraft.model : 'Unknown'}">Model</div>
+                </div>
+                <div class="col-md-2 text-center">
                   <div class="text-muted small">Available Seats</div>
                   <div class="fw-bold" th:classappend="${f.availableSeats < 10} ? 'text-danger' : 'text-success'"
                        th:text="${f.availableSeats}">0</div>
                 </div>
-                <div class="col-md-2 text-center">
-                  <div class="text-muted small">Fare / seat</div>
-                  <div class="fs-5 fw-bold text-primary">$<span th:text="${#numbers.formatDecimal(f.fare,1,2)}">0</span></div>
+                <div class="col-md-1 text-center">
+                  <div class="text-muted small">Fare</div>
+                  <div class="fs-5 fw-bold text-primary">₹<span th:text="${#numbers.formatDecimal(f.fare,1,2)}">0</span></div>
                 </div>
                 <div class="col-md-2 text-end">
                   <a th:if="${f.availableSeats > 0}" th:href="@{/user/book/{id}(id=${f.id})}" class="btn btn-success">

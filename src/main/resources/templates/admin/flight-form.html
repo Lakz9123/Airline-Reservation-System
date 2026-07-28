@@ -57,12 +57,15 @@
                             </div>
 
                             <div class="col-md-4">
-                                <label for="fare" class="form-label fw-semibold">Fare ($)</label>
+                                <label for="fare" class="form-label fw-semibold">Fare (₹)</label>
                                 <input type="number" step="0.01" th:field="*{fare}" class="form-control" id="fare" required placeholder="0.00" min="0">
                             </div>
                             <div class="col-md-4">
-                                <label for="totalSeats" class="form-label fw-semibold">Total Seats</label>
-                                <input type="number" th:field="*{totalSeats}" class="form-control" id="totalSeats" required min="1" placeholder="e.g. 150">
+                                <label for="aircraft" class="form-label">Aircraft</label>
+                                <select class="form-select" id="aircraft" th:field="*{aircraft}" required>
+                                    <option value="" disabled>Select aircraft...</option>
+                                    <option th:each="ac : ${aircrafts}" th:value="${ac.id}" th:text="${ac.aircraftName + ' (' + ac.aircraftNumber + ') - Cap: ' + ac.capacity}"></option>
+                                </select>
                             </div>
                             <div class="col-md-4" th:if="${flight.id != null}">
                                 <label for="availableSeats" class="form-label fw-semibold">Available Seats (Read-only)</label>
