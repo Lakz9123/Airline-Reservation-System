@@ -1,50 +1,112 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{layout :: html_head('Register')}"></head>
-<body>
+<body class="bg-light">
 <div th:replace="~{layout :: navbar}"></div>
 
-<main class="container">
+<main class="container py-5">
   <div class="row justify-content-center">
-    <div class="col-md-5">
-      <div class="card shadow border-0 mt-5">
-        <div class="card-body p-4">
-          <h2 class="text-center mb-4 fw-bold text-primary"><i class="bi bi-person-plus-fill"></i> Create Account</h2>
+    <div class="col-md-6 col-lg-5">
+      <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-body p-4 p-md-5">
+          <div class="text-center mb-4">
+            <div class="bg-success bg-opacity-10 text-success rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
+              <i class="bi bi-person-plus-fill display-6"></i>
+            </div>
+            <h3 class="fw-bold text-dark mb-1">Create Account</h3>
+            <p class="text-muted small">Join SkyFly Airlines for seamless booking and digital boarding</p>
+          </div>
 
-          <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" th:text="${error}">
+          <!-- Alert Error -->
+          <div th:if="${error}" class="alert alert-danger alert-dismissible fade show rounded-3 small" role="alert">
+            <i class="bi bi-exclamation-circle-fill me-2"></i>
+            <span th:text="${error}">An error occurred</span>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
           </div>
 
-          <form th:action="@{/register}" method="post">
+          <form th:action="@{/register}" method="post" id="registerForm">
             <div class="mb-3">
-              <label for="name" class="form-label">Full Name</label>
-              <input type="text" class="form-control" id="name" name="name" required placeholder="John Doe">
+              <label for="name" class="form-label fw-semibold">Full Name</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light text-muted"><i class="bi bi-person"></i></span>
+                <input type="text" class="form-control" id="name" name="name" required placeholder="John Doe" th:value="${name != null ? name : ''}" autofocus>
+              </div>
             </div>
+
             <div class="mb-3">
-              <label for="email" class="form-label">Email Address</label>
-              <input type="email" class="form-control" id="email" name="email" required placeholder="you@example.com">
+              <label for="email" class="form-label fw-semibold">Email Address</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light text-muted"><i class="bi bi-envelope"></i></span>
+                <input type="email" class="form-control" id="email" name="email" required placeholder="you@example.com" th:value="${email != null ? email : ''}">
+              </div>
             </div>
+
             <div class="mb-3">
-              <label for="password" class="form-label">Password <small class="text-muted">(min 6 chars)</small></label>
-              <input type="password" class="form-control" id="password" name="password" required placeholder="Password">
+              <label for="password" class="form-label fw-semibold">Password <small class="text-muted font-monospace">(min 6 chars)</small></label>
+              <div class="input-group">
+                <span class="input-group-text bg-light text-muted"><i class="bi bi-lock"></i></span>
+                <input type="password" class="form-control" id="password" name="password" required minlength="6" placeholder="Choose a secure password">
+                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                  <i class="bi bi-eye" id="toggleIcon"></i>
+                </button>
+              </div>
             </div>
-            <div class="mb-3">
-              <label for="confirmPassword" class="form-label">Confirm Password</label>
-              <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required placeholder="Repeat password">
+
+            <div class="mb-4">
+              <label for="confirmPassword" class="form-label fw-semibold">Confirm Password</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light text-muted"><i class="bi bi-shield-lock"></i></span>
+                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required placeholder="Repeat password">
+              </div>
+              <div id="passwordMismatch" class="text-danger small mt-1 d-none">
+                <i class="bi bi-x-circle me-1"></i> Passwords do not match.
+              </div>
             </div>
-            <div class="d-grid">
-              <button type="submit" class="btn btn-success btn-lg">Register</button>
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-success btn-lg rounded-3 fw-bold py-2" id="submitBtn">
+                <i class="bi bi-check-circle me-1"></i> Create Account
+              </button>
             </div>
           </form>
         </div>
-      </div>
-      <div class="text-center mt-3">
-        <span class="text-muted">Already have an account?</span>
-        <a th:href="@{/login}" class="ms-1 fw-semibold">Sign in</a>
+        <div class="card-footer bg-light border-0 text-center py-3 rounded-bottom-4">
+          <span class="text-muted small">Already have an account?</span>
+          <a th:href="@{/login}" class="ms-1 fw-bold text-success text-decoration-none">Sign in here</a>
+        </div>
       </div>
     </div>
   </div>
 </main>
+
+<script>
+  document.getElementById('togglePassword')?.addEventListener('click', function () {
+    const passwordInput = document.getElementById('password');
+    const toggleIcon = document.getElementById('toggleIcon');
+    if (passwordInput.type === 'password') {
+      passwordInput.type = 'text';
+      toggleIcon.classList.replace('bi-eye', 'bi-eye-slash');
+    } else {
+      passwordInput.type = 'password';
+      toggleIcon.classList.replace('bi-eye-slash', 'bi-eye');
+    }
+  });
+
+  const pwd = document.getElementById('password');
+  const confirmPwd = document.getElementById('confirmPassword');
+  const mismatchAlert = document.getElementById('passwordMismatch');
+
+  function checkMatch() {
+    if (confirmPwd.value && pwd.value !== confirmPwd.value) {
+      mismatchAlert.classList.remove('d-none');
+    } else {
+      mismatchAlert.classList.add('d-none');
+    }
+  }
+
+  pwd?.addEventListener('input', checkMatch);
+  confirmPwd?.addEventListener('input', checkMatch);
+</script>
 
 <div th:replace="~{layout :: footer}"></div>
 <div th:replace="~{layout :: html_scripts}"></div>

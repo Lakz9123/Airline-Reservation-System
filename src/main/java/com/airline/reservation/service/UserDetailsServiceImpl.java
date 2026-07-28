@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 
+import org.springframework.security.authentication.DisabledException;
+
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
@@ -21,11 +23,16 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+        if (email == null || email.isBlank()) {
+            throw new UsernameNotFoundException("Email cannot be empty");
+        }
+        
+        String cleanEmail = email.trim().toLowerCase();
+        User user = userRepository.findByEmailIgnoreCase(cleanEmail)
+                .orElseThrow(() -> new UsernameNotFoundException("No account found with email: " + cleanEmail));
 
         if (!user.isEnabled()) {
-            throw new UsernameNotFoundException("User account is disabled: " + email);
+            throw new DisabledException("Your account has been disabled. Please contact support.");
         }
 
         return new org.springframework.security.core.userdetails.User(

@@ -1,53 +1,89 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{layout :: html_head('Login')}"></head>
-<body>
+<body class="bg-light">
 <div th:replace="~{layout :: navbar}"></div>
 
-<main class="container">
+<main class="container py-5">
   <div class="row justify-content-center">
-    <div class="col-md-5">
-      <div class="card shadow border-0 mt-5">
-        <div class="card-body p-4">
-          <h2 class="text-center mb-4 fw-bold text-primary"><i class="bi bi-airplane-fill"></i> SkyFly Login</h2>
+    <div class="col-md-6 col-lg-5">
+      <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-body p-4 p-md-5">
+          <div class="text-center mb-4">
+            <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
+              <i class="bi bi-airplane-fill display-6"></i>
+            </div>
+            <h3 class="fw-bold text-dark mb-1">Welcome Back</h3>
+            <p class="text-muted small">Sign in to manage your bookings and flight schedules</p>
+          </div>
 
-          <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show">
+          <!-- Alert Notifications -->
+          <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show rounded-3 small" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
             Invalid email or password, or account is disabled.
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
           </div>
-          <div th:if="${param.logout}" class="alert alert-success alert-dismissible fade show">
+          <div th:if="${param.logout}" class="alert alert-success alert-dismissible fade show rounded-3 small" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
             Logged out successfully.
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
           </div>
-          <div th:if="${success}" class="alert alert-success alert-dismissible fade show" th:text="${success}">
+          <div th:if="${success}" class="alert alert-success alert-dismissible fade show rounded-3 small" role="alert" th:text="${success}">
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
           </div>
 
-          <form th:action="@{/login}" method="post">
+          <form th:action="@{/login}" method="post" id="loginForm">
             <div class="mb-3">
-              <label for="email" class="form-label">Email Address</label>
-              <input type="email" class="form-control" id="email" name="email" required placeholder="you@example.com">
-            </div>
-            <div class="mb-3">
-              <div class="d-flex justify-content-between align-items-center">
-                <label for="password" class="form-label mb-0">Password</label>
-                <a th:href="@{/forgot-password}" class="small text-decoration-none">Forgot password?</a>
+              <label for="email" class="form-label fw-semibold">Email Address</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light text-muted"><i class="bi bi-envelope"></i></span>
+                <input type="email" class="form-control" id="email" name="email" required placeholder="you@example.com" autofocus th:value="${param.email != null ? param.email : ''}">
               </div>
-              <input type="password" class="form-control mt-1" id="password" name="password" required placeholder="Password">
             </div>
-            <div class="d-grid">
-              <button type="submit" class="btn btn-primary btn-lg">Sign In</button>
+
+            <div class="mb-4">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <label for="password" class="form-label fw-semibold mb-0">Password</label>
+                <a th:href="@{/forgot-password}" class="small text-decoration-none text-primary fw-semibold">Forgot password?</a>
+              </div>
+              <div class="input-group">
+                <span class="input-group-text bg-light text-muted"><i class="bi bi-lock"></i></span>
+                <input type="password" class="form-control" id="password" name="password" required placeholder="Enter your password">
+                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                  <i class="bi bi-eye" id="toggleIcon"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary btn-lg rounded-3 fw-bold py-2">
+                <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
+              </button>
             </div>
           </form>
         </div>
-      </div>
-      <div class="text-center mt-3">
-        <span class="text-muted">Don't have an account?</span>
-        <a th:href="@{/register}" class="ms-1 fw-semibold">Register here</a>
+        <div class="card-footer bg-light border-0 text-center py-3 rounded-bottom-4">
+          <span class="text-muted small">Don't have an account?</span>
+          <a th:href="@{/register}" class="ms-1 fw-bold text-primary text-decoration-none">Register here</a>
+        </div>
       </div>
     </div>
   </div>
 </main>
+
+<script>
+  document.getElementById('togglePassword')?.addEventListener('click', function () {
+    const passwordInput = document.getElementById('password');
+    const toggleIcon = document.getElementById('toggleIcon');
+    if (passwordInput.type === 'password') {
+      passwordInput.type = 'text';
+      toggleIcon.classList.replace('bi-eye', 'bi-eye-slash');
+    } else {
+      passwordInput.type = 'password';
+      toggleIcon.classList.replace('bi-eye-slash', 'bi-eye');
+    }
+  });
+</script>
 
 <div th:replace="~{layout :: footer}"></div>
 <div th:replace="~{layout :: html_scripts}"></div>

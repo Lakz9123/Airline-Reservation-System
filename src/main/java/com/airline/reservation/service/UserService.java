@@ -24,18 +24,21 @@ public class UserService {
     }
 
     public User registerUser(User user) {
-        if (userRepository.existsByEmail(user.getEmail())) {
-            throw new IllegalArgumentException("Email is already registered");
+        String normalizedEmail = user.getEmail() != null ? user.getEmail().trim().toLowerCase() : "";
+        if (userRepository.existsByEmailIgnoreCase(normalizedEmail)) {
+            throw new IllegalArgumentException("Email is already registered. Please log in.");
         }
+        user.setEmail(normalizedEmail);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        if (user.getRole() == null) {
+        if (user.getRole() == null || user.getRole().isBlank()) {
             user.setRole("ROLE_USER");
         }
         return userRepository.save(user);
     }
 
     public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
+        if (email == null) return Optional.empty();
+        return userRepository.findByEmailIgnoreCase(email.trim());
     }
 
     public Optional<User> findById(Long id) {
