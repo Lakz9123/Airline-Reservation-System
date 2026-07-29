@@ -27,12 +27,48 @@
                             <span class="fw-bold text-primary" th:text="${cabinClass}">Economy</span>
                         </div>
                         <hr>
+                        <!-- Fare Breakdown -->
+                        <div class="d-flex justify-content-between mb-1" th:if="${discountAmount > 0}">
+                            <span class="text-muted">Original Fare:</span>
+                            <span>₹<span th:text="${#numbers.formatDecimal(originalFare, 1, 2)}">0.00</span></span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2" th:if="${discountAmount > 0}">
+                            <span class="text-muted">Discount Applied:</span>
+                            <span class="text-success">-₹<span th:text="${#numbers.formatDecimal(discountAmount, 1, 2)}">0.00</span></span>
+                        </div>
+                        
                         <div class="d-flex justify-content-between">
-                            <span class="text-muted fs-5">Total Fare:</span>
+                            <span class="text-muted fs-5">Final Fare:</span>
                             <span class="fw-bold text-success fs-5">
                                 ₹<span th:text="${#numbers.formatDecimal(totalFare, 1, 2)}">0.00</span>
                             </span>
                         </div>
+                    </div>
+
+                    <!-- Coupon Application Form -->
+                    <div th:if="${appliedCouponDiscount == null || appliedCouponDiscount == 0.0}">
+                        <div th:if="${couponError}" class="alert alert-danger p-2 small mb-3">
+                            <i class="bi bi-exclamation-triangle-fill"></i> <span th:text="${couponError}"></span>
+                        </div>
+                        <form th:action="@{/user/payment/{id}/apply-coupon(id=${flight.id})}" method="post" class="mb-4">
+                            <th:block th:each="seat : ${selectedSeats}">
+                                <input type="hidden" name="selectedSeats" th:value="${seat}">
+                            </th:block>
+                            <input type="hidden" name="cabinClass" th:value="${cabinClass}">
+                            <input type="hidden" name="originalFare" th:value="${originalFare}">
+                            
+                            <label class="form-label text-muted small fw-bold">APPLY COUPON CODE</label>
+                            <div class="input-group">
+                                <input type="text" name="couponCode" class="form-control text-uppercase" placeholder="Enter promo code" required>
+                                <button class="btn btn-outline-primary" type="submit">Apply</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Coupon Success Message -->
+                    <div th:if="${couponSuccess}" class="alert alert-success p-2 small mb-4">
+                        <i class="bi bi-check-circle-fill"></i> <span th:text="${couponSuccess}"></span>
+                        <div class="mt-1 fw-bold">Code Applied: <span th:text="${appliedCouponCode}"></span></div>
                     </div>
 
                     <!-- Mock Payment Form -->
@@ -42,6 +78,7 @@
                             <input type="hidden" name="selectedSeats" th:value="${seat}">
                         </th:block>
                         <input type="hidden" name="cabinClass" th:value="${cabinClass}">
+                        <input type="hidden" name="appliedCouponCode" th:value="${appliedCouponCode}">
 
                         <div class="mb-3">
                             <label class="form-label text-muted small fw-bold">CARD NUMBER</label>

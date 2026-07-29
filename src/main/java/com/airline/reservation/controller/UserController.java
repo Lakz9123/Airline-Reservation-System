@@ -25,6 +25,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.math.BigDecimal;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -45,6 +47,7 @@ public class UserController {
     private final AirlineService airlineService;
     private final BarcodeService barcodeService;
     private final BoardingPassPdfService boardingPassPdfService;
+    private final com.airline.reservation.service.CouponService couponService;
 
     public UserController(UserService userService,
                           FlightRepository flightRepository,
@@ -57,7 +60,8 @@ public class UserController {
                           AirportService airportService,
                           AirlineService airlineService,
                           BarcodeService barcodeService,
-                          BoardingPassPdfService boardingPassPdfService) {
+                          BoardingPassPdfService boardingPassPdfService,
+                          com.airline.reservation.service.CouponService couponService) {
         this.userService = userService;
         this.flightRepository = flightRepository;
         this.userBookingService = userBookingService;
@@ -70,6 +74,7 @@ public class UserController {
         this.airlineService = airlineService;
         this.barcodeService = barcodeService;
         this.boardingPassPdfService = boardingPassPdfService;
+        this.couponService = couponService;
     }
 
     // ----- Helper: resolve current User entity -----
@@ -186,20 +191,54 @@ public class UserController {
         else if ("Business Class".equalsIgnoreCase(cabinClass)) multiplier = 2.5;
         else if ("First Class".equalsIgnoreCase(cabinClass)) multiplier = 4.0;
         
-        model.addAttribute("totalFare", flight.getFare() * multiplier * selectedSeats.size());
+        Double originalFare = flight.getFare() * multiplier * selectedSeats.size();
+        model.addAttribute("originalFare", originalFare);
+        
+        Double discountAmount = 0.0;
+        if (model.containsAttribute("appliedCouponDiscount")) {
+             discountAmount = (Double) model.getAttribute("appliedCouponDiscount");
+        }
+        
+        model.addAttribute("discountAmount", discountAmount);
+        model.addAttribute("totalFare", originalFare - discountAmount);
         return "user/payment";
+    }
+
+    @PostMapping("/payment/{flightId}/apply-coupon")
+    public String applyCoupon(@PathVariable Long flightId,
+                              @RequestParam("couponCode") String couponCode,
+                              @RequestParam("originalFare") Double originalFare,
+                              @RequestParam("selectedSeats") List<String> selectedSeats,
+                              @RequestParam("cabinClass") String cabinClass,
+                              @AuthenticationPrincipal UserDetails principal,
+                              RedirectAttributes redirectAttributes) {
+        User user = getCurrentUser(principal);
+        redirectAttributes.addFlashAttribute("selectedSeats", selectedSeats);
+        redirectAttributes.addFlashAttribute("cabinClass", cabinClass);
+        
+        try {
+            BigDecimal discount = couponService.validateAndCalculateDiscount(couponCode, user, originalFare);
+            redirectAttributes.addFlashAttribute("appliedCouponCode", couponCode);
+            redirectAttributes.addFlashAttribute("appliedCouponDiscount", discount.doubleValue());
+            redirectAttributes.addFlashAttribute("couponSuccess", "Coupon applied successfully! You saved ₹" + discount.doubleValue());
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("couponError", e.getMessage());
+        }
+        
+        return "redirect:/user/payment/" + flightId;
     }
 
     @PostMapping("/payment/{flightId}")
     public String processPayment(@PathVariable Long flightId,
                                  @RequestParam("selectedSeats") List<String> selectedSeats,
                                  @RequestParam("cabinClass") String cabinClass,
+                                 @RequestParam(value = "appliedCouponCode", required = false) String appliedCouponCode,
                                  @AuthenticationPrincipal UserDetails principal,
                                  RedirectAttributes redirectAttributes) {
         User user = getCurrentUser(principal);
         try {
             // Mock payment processing happens here
-            Booking booking = userBookingService.bookSeats(user, flightId, selectedSeats, cabinClass);
+            Booking booking = userBookingService.bookSeats(user, flightId, selectedSeats, cabinClass, appliedCouponCode);
             emailService.sendBookingConfirmation(booking);
             redirectAttributes.addFlashAttribute("bookingSuccess", true);
             return "redirect:/user/bookings";

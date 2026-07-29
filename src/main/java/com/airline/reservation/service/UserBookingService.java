@@ -18,10 +18,12 @@ public class UserBookingService {
 
     private final BookingRepository bookingRepository;
     private final FlightRepository flightRepository;
+    private final CouponService couponService;
 
-    public UserBookingService(BookingRepository bookingRepository, FlightRepository flightRepository) {
+    public UserBookingService(BookingRepository bookingRepository, FlightRepository flightRepository, CouponService couponService) {
         this.bookingRepository = bookingRepository;
         this.flightRepository = flightRepository;
+        this.couponService = couponService;
     }
 
     /** Returns all bookings for the given user, newest first. */
@@ -147,7 +149,7 @@ public class UserBookingService {
      * Returns the saved Booking.
      */
     @Transactional
-    public Booking bookSeats(User user, Long flightId, List<String> requestedSeats, String cabinClass) {
+    public Booking bookSeats(User user, Long flightId, List<String> requestedSeats, String cabinClass, String appliedCouponCode) {
         if (requestedSeats == null || requestedSeats.isEmpty()) {
             throw new IllegalArgumentException("Please select at least one seat.");
         }
@@ -184,8 +186,27 @@ public class UserBookingService {
         double totalFare = flight.getFare() * multiplier * requestedSeats.size();
         String seatNumbersStr = String.join(", ", requestedSeats);
 
+        // Apply coupon if provided
+        double discountAmount = 0.0;
+        com.airline.reservation.entity.Coupon coupon = null;
+        if (appliedCouponCode != null && !appliedCouponCode.isBlank()) {
+            java.math.BigDecimal discount = couponService.validateAndCalculateDiscount(appliedCouponCode, user, totalFare);
+            discountAmount = discount.doubleValue();
+            totalFare -= discountAmount;
+            coupon = couponService.findByCode(appliedCouponCode).orElse(null);
+        }
+
         Booking booking = new Booking(user, flight, seatNumbersStr, LocalDateTime.now(), "CONFIRMED", totalFare, cabinClass);
-        return bookingRepository.save(booking);
+        booking.setDiscountAmount(discountAmount);
+        booking.setCouponCode(appliedCouponCode);
+        
+        booking = bookingRepository.save(booking);
+
+        if (coupon != null) {
+            couponService.recordCouponUsage(coupon, user, booking);
+        }
+        
+        return booking;
     }
 
     /**

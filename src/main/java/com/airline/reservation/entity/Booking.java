@@ -42,6 +42,12 @@ public class Booking {
     @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean departureReminderSent = false;
 
+    @Column(name = "discount_amount")
+    private Double discountAmount = 0.0;
+
+    @Column(name = "coupon_code")
+    private String couponCode;
+
     // Constructors
     public Booking() {}
 
@@ -143,5 +149,21 @@ public class Booking {
 
     public void setDepartureReminderSent(boolean departureReminderSent) {
         this.departureReminderSent = departureReminderSent;
+    }
+
+    public Double getDiscountAmount() {
+        return discountAmount;
+    }
+
+    public void setDiscountAmount(Double discountAmount) {
+        this.discountAmount = discountAmount;
+    }
+
+    public String getCouponCode() {
+        return couponCode;
+    }
+
+    public void setCouponCode(String couponCode) {
+        this.couponCode = couponCode;
     }
 }
