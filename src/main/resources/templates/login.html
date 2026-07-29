@@ -18,11 +18,20 @@
           </div>
 
           <!-- Alert Notifications -->
-          <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show rounded-3 small" role="alert">
+          <!-- Account not found: email doesn't exist in DB -->
+          <div th:if="${param.error == 'notfound'}" class="alert alert-warning alert-dismissible fade show rounded-3 small" role="alert">
+            <i class="bi bi-person-x-fill me-2"></i>
+            <strong>Account not found.</strong> No account is registered with that email.
+            <a th:href="@{/register}" class="alert-link ms-1">Create an account here</a>.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+          <!-- Wrong password or disabled account -->
+          <div th:if="${param.error == 'badcredentials' or param.error == 'true'}" class="alert alert-danger alert-dismissible fade show rounded-3 small" role="alert">
             <i class="bi bi-exclamation-triangle-fill me-2"></i>
             Invalid email or password, or account is disabled.
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
           </div>
+
           <div th:if="${param.logout}" class="alert alert-success alert-dismissible fade show rounded-3 small" role="alert">
             <i class="bi bi-check-circle-fill me-2"></i>
             Logged out successfully.

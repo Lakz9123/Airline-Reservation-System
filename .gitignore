@@ -39,3 +39,8 @@ temp-maven/
 .env
 *.env
 application-local.properties
+
+### H2 File-Based Database (runtime data, never commit) ###
+data/
+*.mv.db
+*.trace.db
