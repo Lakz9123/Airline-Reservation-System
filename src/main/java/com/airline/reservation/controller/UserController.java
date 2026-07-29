@@ -141,9 +141,11 @@ public class UserController {
                 .orElseThrow(() -> new IllegalArgumentException("Flight not found"));
         List<String> allSeats = userBookingService.generateSeatLabels(flight);
         Set<String> bookedSeats = userBookingService.getBookedSeats(flight);
+        UserBookingService.SeatSectionCounts seatCounts = userBookingService.getSeatSectionCounts(flight);
         model.addAttribute("flight", flight);
         model.addAttribute("allSeats", allSeats);
         model.addAttribute("bookedSeats", bookedSeats);
+        model.addAttribute("seatCounts", seatCounts);
         return "user/seat-selection";
     }
 
@@ -315,6 +317,7 @@ public class UserController {
         
         List<String> allSeats = userBookingService.generateSeatLabels(flight);
         Set<String> bookedSeats = userBookingService.getBookedSeats(flight);
+        UserBookingService.SeatSectionCounts seatCounts = userBookingService.getSeatSectionCounts(flight);
         
         // Exclude the user's current seats from bookedSeats so they appear available to select
         List<String> currentSeats = Arrays.asList(booking.getSeatNumbers().split(",\\s*"));
@@ -323,6 +326,7 @@ public class UserController {
         model.addAttribute("allSeats", allSeats);
         model.addAttribute("bookedSeats", bookedSeats);
         model.addAttribute("currentSeats", currentSeats);
+        model.addAttribute("seatCounts", seatCounts);
 
         return "user/checkin-seat";
     }

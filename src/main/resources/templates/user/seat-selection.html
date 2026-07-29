@@ -24,7 +24,7 @@
           </div>
         </div>
         <div class="text-end">
-          <div class="fs-4 fw-bold text-primary">₹<span th:text="${#numbers.formatDecimal(flight.fare,1,2)}">0</span> / seat</div>
+          <div class="fs-4 fw-bold text-primary">From ₹<span th:text="${#numbers.formatDecimal(flight.economyFare ?: flight.fare, 1, 2)}">0</span></div>
           <small class="text-muted"><span th:text="${flight.availableSeats}">0</span> seats available</small>
         </div>
       </div>
@@ -36,11 +36,32 @@
     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
   </div>
 
-  <div class="d-flex gap-3 mb-3 flex-wrap justify-content-center">
-    <span><button class="seat-btn seat-available" disabled style="background-color:#e0e0e0;"></button> Economy</span>
-    <span><button class="seat-btn seat-available" disabled style="background-color:#ffd700; border-color:#d4af37"></button> Business</span>
-    <span><button class="seat-btn seat-booked" disabled></button> Booked</span>
-    <span><button class="seat-btn seat-selected" disabled></button> Selected</span>
+  <!-- Legend -->
+  <div class="d-flex gap-3 mb-3 flex-wrap justify-content-center align-items-center">
+    <span class="d-flex align-items-center gap-1">
+      <button class="seat-btn" disabled style="background-color:#9C1B2E;border-color:#7a1525;color:#fff;width:32px;height:32px;font-size:10px;border-radius:6px;border:2px solid;"></button>
+      <span class="small fw-semibold">First Class</span>
+    </span>
+    <span class="d-flex align-items-center gap-1">
+      <button class="seat-btn" disabled style="background-color:#B8860B;border-color:#8b6508;color:#fff;width:32px;height:32px;font-size:10px;border-radius:6px;border:2px solid;"></button>
+      <span class="small fw-semibold">Business</span>
+    </span>
+    <span class="d-flex align-items-center gap-1">
+      <button class="seat-btn" disabled style="background-color:#1565C0;border-color:#0d4a94;color:#fff;width:32px;height:32px;font-size:10px;border-radius:6px;border:2px solid;"></button>
+      <span class="small fw-semibold">Premium Economy</span>
+    </span>
+    <span class="d-flex align-items-center gap-1">
+      <button class="seat-btn" disabled style="background-color:#546E7A;border-color:#37474f;color:#fff;width:32px;height:32px;font-size:10px;border-radius:6px;border:2px solid;"></button>
+      <span class="small fw-semibold">Economy</span>
+    </span>
+    <span class="d-flex align-items-center gap-1">
+      <button class="seat-btn seat-booked" disabled style="width:32px;height:32px;font-size:10px;border-radius:6px;"></button>
+      <span class="small fw-semibold">Booked</span>
+    </span>
+    <span class="d-flex align-items-center gap-1">
+      <button class="seat-btn seat-selected" disabled style="width:32px;height:32px;font-size:10px;border-radius:6px;"></button>
+      <span class="small fw-semibold">Selected</span>
+    </span>
   </div>
 
   <!-- Seat Map -->
@@ -55,14 +76,14 @@
 
     <div class="card border-0 shadow-sm p-3 p-md-4 mb-4">
       <h5 class="fw-bold">Booking Summary</h5>
-      
+
       <div class="mb-3">
         <label for="cabinClass" class="form-label fw-bold">Cabin Class</label>
         <select class="form-select" id="cabinClass" name="cabinClass" onchange="updateSummary()">
-          <option value="Economy">Economy (1x Fare)</option>
-          <option value="Premium Economy">Premium Economy (1.5x Fare)</option>
-          <option value="Business Class">Business Class (2.5x Fare)</option>
-          <option value="First Class">First Class (4x Fare)</option>
+          <option value="Economy">Economy</option>
+          <option value="Premium Economy">Premium Economy</option>
+          <option value="Business Class">Business Class</option>
+          <option value="First Class">First Class</option>
         </select>
       </div>
 
@@ -77,124 +98,136 @@
 
 <!-- Pass data from Thymeleaf → JS -->
 <script th:inline="javascript">
-  const allSeats   = /*[[${allSeats}]]*/ [];
+  const allSeats    = /*[[${allSeats}]]*/ [];
   const bookedSeats = new Set(/*[[${bookedSeats}]]*/ []);
   const farePerSeat = /*[[${flight.fare}]]*/ 0;
-  const businessSeatsCount = /*[[${flight.aircraft != null ? flight.aircraft.businessSeats : 0}]]*/ 0;
-  const economySeatsCount = /*[[${flight.aircraft != null ? flight.aircraft.economySeats : flight.totalSeats}]]*/ 0;
+
+  // Actual per-class fares from the flight entity
+  const economyFare        = /*[[${flight.economyFare ?: flight.fare}]]*/ 0;
+  const premiumEconomyFare = /*[[${flight.premiumEconomyFare ?: (flight.fare * 1.5)}]]*/ 0;
+  const businessFare       = /*[[${flight.businessFare ?: (flight.fare * 2.5)}]]*/ 0;
+  const firstClassFare     = /*[[${flight.firstClassFare ?: (flight.fare * 4.0)}]]*/ 0;
+
+  // Four-section seat counts (derived server-side from aircraft config)
+  const seatCounts = {
+    firstClass:     /*[[${seatCounts.firstClass}]]*/ 0,
+    business:       /*[[${seatCounts.business}]]*/ 0,
+    premiumEconomy: /*[[${seatCounts.premiumEconomy}]]*/ 0,
+    economy:        /*[[${seatCounts.economy}]]*/ 0
+  };
 </script>
 <script>
-  const seatMap = document.getElementById('seatMap');
+  const seatMap             = document.getElementById('seatMap');
   const selectedSeatDisplay = document.getElementById('selectedSeatDisplay');
-  const totalFareDisplay = document.getElementById('totalFareDisplay');
-  const confirmBtn = document.getElementById('confirmBtn');
-  const seatForm = document.getElementById('seatForm');
-  const cabinClassSelect = document.getElementById('cabinClass');
+  const totalFareDisplay    = document.getElementById('totalFareDisplay');
+  const confirmBtn          = document.getElementById('confirmBtn');
+  const seatForm            = document.getElementById('seatForm');
+  const cabinClassSelect    = document.getElementById('cabinClass');
   let selectedSeats = new Set();
+
+  // Cabin zone boundaries (cumulative index into allSeats[])
+  const zones = [
+    { name: 'First Class',     count: seatCounts.firstClass,     color: '#9C1B2E', border: '#7a1525', cols: 4, aisle: 2, value: 'First Class'     },
+    { name: 'Business Class',  count: seatCounts.business,       color: '#B8860B', border: '#8b6508', cols: 4, aisle: 2, value: 'Business Class'   },
+    { name: 'Premium Economy', count: seatCounts.premiumEconomy, color: '#1565C0', border: '#0d4a94', cols: 5, aisle: 2, value: 'Premium Economy'  },
+    { name: 'Economy',         count: seatCounts.economy,        color: '#546E7A', border: '#37474f', cols: 6, aisle: 3, value: 'Economy'          }
+  ];
+
+  // Build a seat→zone lookup: { seatLabel -> zone }
+  const seatZoneMap = {};
+  let idx = 0;
+  for (const zone of zones) {
+    for (let i = 0; i < zone.count && idx < allSeats.length; i++, idx++) {
+      seatZoneMap[allSeats[idx]] = zone;
+    }
+  }
 
   function renderSeats() {
     seatMap.innerHTML = '';
-    
     let currentIndex = 0;
-    
-    // Render Business Class
-    if (businessSeatsCount > 0) {
-      const busDiv = document.createElement('div');
-      busDiv.className = 'w-100 text-center text-primary fw-bold my-2';
-      busDiv.textContent = '--- Business Class ---';
-      seatMap.appendChild(busDiv);
-      
-      while (currentIndex < businessSeatsCount && currentIndex < allSeats.length) {
+
+    for (const zone of zones) {
+      if (zone.count <= 0) continue;
+
+      // Section header
+      const header = document.createElement('div');
+      header.className = 'w-100 text-center fw-bold my-2 py-1 rounded';
+      header.style.backgroundColor = zone.color + '22'; // subtle tint
+      header.style.color = zone.color;
+      header.style.borderLeft = `4px solid ${zone.color}`;
+      header.textContent = `— ${zone.name} —`;
+      seatMap.appendChild(header);
+
+      let zoneCount = 0;
+      while (zoneCount < zone.count && currentIndex < allSeats.length) {
         const rowDiv = document.createElement('div');
         rowDiv.className = 'd-flex gap-2 justify-content-center';
-        
-        for (let j = 0; j < 4 && currentIndex < businessSeatsCount && currentIndex < allSeats.length; j++, currentIndex++) {
-          if (j === 2) {
+
+        for (let j = 0; j < zone.cols && zoneCount < zone.count && currentIndex < allSeats.length; j++, currentIndex++, zoneCount++) {
+          if (j === zone.aisle) {
             const spacer = document.createElement('div');
-            spacer.style.width = '30px';
+            spacer.style.width = '24px';
             rowDiv.appendChild(spacer);
           }
-          createSeatBtn(allSeats[currentIndex], rowDiv, true);
-        }
-        seatMap.appendChild(rowDiv);
-      }
-    }
-    
-    // Render Economy Class
-    if (economySeatsCount > 0) {
-      const ecoDiv = document.createElement('div');
-      ecoDiv.className = 'w-100 text-center text-secondary fw-bold my-2';
-      ecoDiv.textContent = '--- Economy Class ---';
-      seatMap.appendChild(ecoDiv);
-      
-      let ecoIndex = 0;
-      while (ecoIndex < economySeatsCount && currentIndex < allSeats.length) {
-        const rowDiv = document.createElement('div');
-        rowDiv.className = 'd-flex gap-2 justify-content-center';
-        
-        for (let j = 0; j < 6 && ecoIndex < economySeatsCount && currentIndex < allSeats.length; j++, currentIndex++, ecoIndex++) {
-          if (j === 3) {
-            const spacer = document.createElement('div');
-            spacer.style.width = '20px';
-            rowDiv.appendChild(spacer);
-          }
-          createSeatBtn(allSeats[currentIndex], rowDiv, false);
+          createSeatBtn(allSeats[currentIndex], rowDiv, zone);
         }
         seatMap.appendChild(rowDiv);
       }
     }
   }
 
-  function createSeatBtn(seat, rowDiv, isBusiness) {
+  function createSeatBtn(seat, rowDiv, zone) {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.textContent = seat;
     btn.className = 'seat-btn';
-    
-    if (isBusiness) {
-      btn.style.backgroundColor = '#ffd700'; // Gold for business
-      btn.style.borderColor = '#d4af37';
-    }
-    
+    btn.style.width = '42px';
+    btn.style.height = '42px';
+    btn.style.fontSize = '10px';
+    btn.style.borderRadius = '6px';
+    btn.style.fontWeight = '600';
+    btn.dataset.zone = zone.value;
+
     if (bookedSeats.has(seat)) {
       btn.classList.add('seat-booked');
       btn.disabled = true;
-      if (isBusiness) {
-        btn.style.opacity = '0.5';
-        btn.style.backgroundColor = '#8c8c8c';
-      }
     } else {
+      btn.style.backgroundColor = zone.color;
+      btn.style.borderColor = zone.border;
+      btn.style.color = '#fff';
       btn.classList.add('seat-available');
-      btn.addEventListener('click', () => toggleSeat(seat, btn, isBusiness));
+      btn.addEventListener('click', () => toggleSeat(seat, btn, zone));
     }
     rowDiv.appendChild(btn);
   }
 
-  function toggleSeat(seat, btn, isBusiness) {
+  function toggleSeat(seat, btn, zone) {
     if (selectedSeats.has(seat)) {
       selectedSeats.delete(seat);
       btn.classList.remove('seat-selected');
       btn.classList.add('seat-available');
-      if(isBusiness) {
-        btn.style.backgroundColor = '#ffd700';
-      }
+      btn.style.backgroundColor = zone.color;
+      btn.style.borderColor = zone.border;
+      btn.style.color = '#fff';
     } else {
       selectedSeats.add(seat);
       btn.classList.remove('seat-available');
       btn.classList.add('seat-selected');
-      if(isBusiness) {
-        btn.style.backgroundColor = '#28a745'; // override selected color slightly if needed, or rely on seat-selected class
-      }
+      btn.style.backgroundColor = '';
+      btn.style.borderColor = '';
+      btn.style.color = '';
+      // Auto-sync cabin class dropdown to the zone of the last selected seat
+      cabinClassSelect.value = zone.value;
     }
     updateSummary();
   }
 
-  function getMultiplier(cabinClass) {
+  function getFarePerSeat(cabinClass) {
     switch (cabinClass) {
-      case 'Premium Economy': return 1.5;
-      case 'Business Class': return 2.5;
-      case 'First Class': return 4.0;
-      default: return 1.0;
+      case 'First Class':     return firstClassFare     || (farePerSeat * 4.0);
+      case 'Business Class':  return businessFare       || (farePerSeat * 2.5);
+      case 'Premium Economy': return premiumEconomyFare || (farePerSeat * 1.5);
+      default:                return economyFare        || farePerSeat;
     }
   }
 
@@ -208,16 +241,16 @@
     } else {
       const arr = [...selectedSeats];
       selectedSeatDisplay.textContent = arr.join(', ');
-      
-      const multiplier = getMultiplier(cabinClassSelect.value);
-      const totalFare = arr.length * farePerSeat * multiplier;
-      
-      totalFareDisplay.textContent = '₹' + totalFare.toFixed(2);
+
+      const perSeat = getFarePerSeat(cabinClassSelect.value);
+      const total = arr.length * perSeat;
+      totalFareDisplay.textContent = '₹' + total.toFixed(2);
       confirmBtn.disabled = false;
+
       arr.forEach(s => {
         const inp = document.createElement('input');
-        inp.type = 'hidden';
-        inp.name = 'selectedSeats';
+        inp.type  = 'hidden';
+        inp.name  = 'selectedSeats';
         inp.value = s;
         seatForm.appendChild(inp);
       });

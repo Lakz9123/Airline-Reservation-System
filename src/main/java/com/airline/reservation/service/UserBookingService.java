@@ -29,40 +29,96 @@ public class UserBookingService {
     }
 
     /**
+     * Derives realistic four-cabin seat counts from the aircraft's two stored values
+     * (businessSeats, economySeats) without changing the Aircraft schema.
+     *
+     * Proportions:
+     *  - First Class     = businessSeats / 4  (min 2)
+     *  - Business        = businessSeats - firstClassSeats
+     *  - Premium Economy = economySeats  / 4  (min 4)
+     *  - Economy         = economySeats  - premiumEconomySeats
+     */
+    public static class SeatSectionCounts {
+        public final int firstClass;
+        public final int business;
+        public final int premiumEconomy;
+        public final int economy;
+
+        public SeatSectionCounts(int firstClass, int business, int premiumEconomy, int economy) {
+            this.firstClass = firstClass;
+            this.business = business;
+            this.premiumEconomy = premiumEconomy;
+            this.economy = economy;
+        }
+    }
+
+    public SeatSectionCounts getSeatSectionCounts(Flight flight) {
+        int busTotal = flight.getAircraft() != null ? flight.getAircraft().getBusinessSeats() : 0;
+        int ecoTotal = flight.getAircraft() != null
+                ? flight.getAircraft().getEconomySeats()
+                : flight.getTotalSeats();
+
+        int firstClass    = Math.max(2, busTotal / 4);
+        int business      = busTotal - firstClass;
+        int premiumEconomy = Math.max(4, ecoTotal / 4);
+        int economy       = ecoTotal - premiumEconomy;
+
+        return new SeatSectionCounts(firstClass, business, premiumEconomy, economy);
+    }
+
+    /**
      * Returns a list of all seat labels for a flight (e.g. A1, A2 … Z6),
-     * divided into Business and Economy based on the aircraft config.
-     * We'll just generate them sequentially, but seat-selection.html will need to know which is which.
-     * To make it simple, we can return the labels. Business is the first N seats.
+     * divided into four cabin sections: First Class, Business, Premium Economy, Economy.
+     * Seat counts are derived via getSeatSectionCounts() — no Aircraft schema changes needed.
      */
     public List<String> generateSeatLabels(Flight flight) {
+        SeatSectionCounts counts = getSeatSectionCounts(flight);
         List<String> seats = new ArrayList<>();
-        int total = flight.getTotalSeats();
         int rowNum = 0;
+
+        // First Class: 4 seats per row (2 + aisle + 2)
         int count = 0;
-        
-        // Business Class (4 seats per row)
-        int busSeats = flight.getAircraft() != null ? flight.getAircraft().getBusinessSeats() : 0;
-        while (count < busSeats) {
+        while (count < counts.firstClass) {
             char rowChar = (char) ('A' + rowNum);
-            for (int col = 1; col <= 4 && count < busSeats; col++, count++) {
+            for (int col = 1; col <= 4 && count < counts.firstClass; col++, count++) {
                 seats.add("" + rowChar + col);
             }
             rowNum++;
         }
-        
-        // Economy Class (6 seats per row)
-        int ecoSeats = flight.getAircraft() != null ? flight.getAircraft().getEconomySeats() : flight.getTotalSeats();
-        int ecoCount = 0;
-        while (ecoCount < ecoSeats) {
+
+        // Business Class: 4 seats per row (2 + aisle + 2)
+        count = 0;
+        while (count < counts.business) {
             char rowChar = (char) ('A' + rowNum);
-            for (int col = 1; col <= 6 && ecoCount < ecoSeats; col++, count++, ecoCount++) {
+            for (int col = 1; col <= 4 && count < counts.business; col++, count++) {
                 seats.add("" + rowChar + col);
             }
             rowNum++;
         }
-        
+
+        // Premium Economy: 5 seats per row (2 + aisle + 3)
+        count = 0;
+        while (count < counts.premiumEconomy) {
+            char rowChar = (char) ('A' + rowNum);
+            for (int col = 1; col <= 5 && count < counts.premiumEconomy; col++, count++) {
+                seats.add("" + rowChar + col);
+            }
+            rowNum++;
+        }
+
+        // Economy: 6 seats per row (3 + aisle + 3)
+        count = 0;
+        while (count < counts.economy) {
+            char rowChar = (char) ('A' + rowNum);
+            for (int col = 1; col <= 6 && count < counts.economy; col++, count++) {
+                seats.add("" + rowChar + col);
+            }
+            rowNum++;
+        }
+
         return seats;
     }
+
 
     /**
      * Returns the set of booked seat labels for a flight
