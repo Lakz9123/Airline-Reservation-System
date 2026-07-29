@@ -79,6 +79,9 @@ public class RegisterController {
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
             return "register";
+        } catch (Exception e) {
+            model.addAttribute("error", "An error occurred during registration. Please try again.");
+            return "register";
         }
     }
 }

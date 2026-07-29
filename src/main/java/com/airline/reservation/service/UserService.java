@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.transaction.annotation.Transactional;
+
 @Service
 public class UserService {
 
@@ -23,6 +25,7 @@ public class UserService {
         return userRepository.findAll();
     }
 
+    @Transactional
     public User registerUser(User user) {
         String normalizedEmail = user.getEmail() != null ? user.getEmail().trim().toLowerCase() : "";
         if (userRepository.existsByEmailIgnoreCase(normalizedEmail)) {
