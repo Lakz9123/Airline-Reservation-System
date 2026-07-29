@@ -211,7 +211,7 @@
 
     <!-- Barcode strip -->
     <div class="barcode-strip">
-      <img th:if="${qrBase64 != null}" th:src="'data:image/png;base64,' + ${qrBase64}" alt="QR Code" style="width: 60px; height: 60px; mix-blend-mode: multiply;" />
+      <img th:if="${qrBase64 != null}" th:src="${qrBase64}" alt="QR Code" style="width: 80px; height: 80px; mix-blend-mode: multiply;" />
       <span>This is an official SkyFly Airlines e-ticket. Present at airport check-in counter.</span>
       <span th:text="'*' + ${bookingRef} + '*'">*SKY-00001*</span>
     </div>
