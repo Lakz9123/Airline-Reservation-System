@@ -71,6 +71,14 @@
                                 <label for="availableSeats" class="form-label fw-semibold">Available Seats (Read-only)</label>
                                 <input type="number" th:field="*{availableSeats}" class="form-control" id="availableSeats" readonly>
                             </div>
+                            <div class="col-md-4" th:if="${flight.id != null}">
+                                <label for="flightStatus" class="form-label fw-semibold">Flight Status</label>
+                                <select th:field="*{flightStatus}" class="form-select" id="flightStatus">
+                                    <option th:each="status : ${T(com.airline.reservation.entity.FlightStatus).values()}"
+                                            th:value="${status}"
+                                            th:text="${status.label}"></option>
+                                </select>
+                            </div>
                         </div>
 
                         <div class="d-flex justify-content-between mt-4">

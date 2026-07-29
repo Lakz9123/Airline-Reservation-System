@@ -1,6 +1,7 @@
 package com.airline.reservation.controller;
 
 import com.airline.reservation.entity.Flight;
+import com.airline.reservation.entity.FlightStatus;
 import com.airline.reservation.service.BookingService;
 import com.airline.reservation.service.FlightService;
 import com.airline.reservation.service.UserService;
@@ -135,6 +136,19 @@ public class AdminController {
             flight.setBoardingZone(boardingZone);
             flightService.saveFlight(flight);
             redirectAttributes.addFlashAttribute("success", "Boarding information updated successfully.");
+        }
+        return "redirect:/admin/flights/details/" + id;
+    }
+
+    @PostMapping("/flights/details/{id}/status")
+    public String updateStatus(@PathVariable("id") Long id,
+                               @RequestParam("flightStatus") FlightStatus flightStatus,
+                               RedirectAttributes redirectAttributes) {
+        Flight flight = flightService.getFlightById(id).orElse(null);
+        if (flight != null) {
+            flight.setFlightStatus(flightStatus);
+            flightService.saveFlight(flight);
+            redirectAttributes.addFlashAttribute("success", "Flight status updated to " + flightStatus.getLabel() + " successfully.");
         }
         return "redirect:/admin/flights/details/" + id;
     }

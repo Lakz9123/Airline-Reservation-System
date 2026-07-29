@@ -30,6 +30,7 @@
                             <th>Flight No.</th>
                             <th>Airline</th>
                             <th>Route</th>
+                            <th>Status</th>
                             <th>Departure</th>
                             <th>Arrival</th>
                             <th>Duration</th>
@@ -64,6 +65,12 @@
                                 <span class="fw-semibold text-uppercase" th:text="${flight.originAirport.airportCode} + ' (' + ${flight.originAirport.city} + ')'">Origin</span> 
                                 <i class="bi bi-arrow-right text-muted mx-1"></i>
                                 <span class="fw-semibold text-uppercase" th:text="${flight.destinationAirport.airportCode} + ' (' + ${flight.destinationAirport.city} + ')'">Destination</span>
+                            </td>
+                            <td>
+                                <span th:with="s=${flight.flightStatus ?: T(com.airline.reservation.entity.FlightStatus).SCHEDULED}"
+                                      th:class="|badge ${s.badgeClass}|"
+                                      th:text="${s.label}"
+                                      th:style="${s.name() == 'DEPARTED' ? 'background-color: #6f42c1 !important' : ''}">SCHEDULED</span>
                             </td>
                             <td th:text="${#temporals.format(flight.departureDateTime, 'yyyy-MM-dd HH:mm')}">Departure</td>
                             <td th:text="${#temporals.format(flight.arrivalDateTime, 'yyyy-MM-dd HH:mm')}">Arrival</td>

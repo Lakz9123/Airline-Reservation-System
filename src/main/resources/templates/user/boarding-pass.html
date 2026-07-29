@@ -103,7 +103,13 @@
     <!-- Header -->
     <div class="bp-header">
       <div>
-        <h3>✈ <span th:text="${booking.flight.airline.airlineName}">Airline</span></h3>
+        <h3>
+          ✈ <span th:text="${booking.flight.airline.airlineName}">Airline</span>
+          <span th:with="s=${booking.flight.flightStatus ?: T(com.airline.reservation.entity.FlightStatus).SCHEDULED}"
+                th:class="|badge ms-2 fs-6 align-middle ${s.badgeClass}|"
+                th:text="${s.label}"
+                th:style="${s.name() == 'DEPARTED' ? 'background-color: #6f42c1 !important' : ''}">SCHEDULED</span>
+        </h3>
         <div style="font-size:.85rem; color:#10b981; font-weight:600; letter-spacing:2px;">BOARDING PASS</div>
       </div>
       <div class="text-end">

@@ -2,6 +2,7 @@ package com.airline.reservation.service;
 
 import com.airline.reservation.entity.Booking;
 import com.airline.reservation.entity.Flight;
+import com.airline.reservation.entity.FlightStatus;
 import com.airline.reservation.entity.User;
 import com.airline.reservation.repository.BookingRepository;
 import com.airline.reservation.repository.FlightRepository;
@@ -222,16 +223,19 @@ public class UserBookingService {
      * Must be CONFIRMED, NOT_CHECKED_IN, and within 48h to 1h of departure.
      */
     public boolean isEligibleForCheckIn(Booking booking) {
-        if (!"CONFIRMED".equals(booking.getStatus())) return false;
-        if (!"NOT_CHECKED_IN".equals(booking.getCheckInStatus())) return false;
-
+        if (!"CONFIRMED".equals(booking.getStatus())) {
+            return false;
+        }
+        if ("CHECKED_IN".equals(booking.getCheckInStatus())) {
+            return false;
+        }
+        if (booking.getFlight().getFlightStatus() != null && 
+           (booking.getFlight().getFlightStatus() == FlightStatus.CANCELLED || booking.getFlight().getFlightStatus() == FlightStatus.LANDED)) {
+            return false;
+        }
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime departure = booking.getFlight().getDepartureDateTime();
-        
-        LocalDateTime checkInStart = departure.minusHours(48);
-        LocalDateTime checkInEnd = departure.minusHours(1);
-
-        return now.isAfter(checkInStart) && now.isBefore(checkInEnd);
+        return now.isAfter(departure.minusHours(48)) && now.isBefore(departure.minusHours(1));
     }
 
     /**

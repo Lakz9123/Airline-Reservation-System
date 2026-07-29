@@ -2,6 +2,7 @@ package com.airline.reservation.controller;
 
 import com.airline.reservation.entity.Booking;
 import com.airline.reservation.entity.Flight;
+import com.airline.reservation.entity.FlightStatus;
 import com.airline.reservation.entity.User;
 import com.airline.reservation.repository.BookingRepository;
 import com.airline.reservation.repository.FlightRepository;
@@ -304,6 +305,12 @@ public class UserController {
                 .orElseThrow(() -> new IllegalArgumentException("Booking not found"));
         if (!booking.getUser().getId().equals(user.getId())) {
             throw new SecurityException("Access denied");
+        }
+        
+        if (booking.getFlight().getFlightStatus() != null && 
+           (booking.getFlight().getFlightStatus() == FlightStatus.CANCELLED || booking.getFlight().getFlightStatus() == FlightStatus.LANDED)) {
+            redirectAttributes.addFlashAttribute("error", "Check-in is not available for this flight.");
+            return "redirect:/user/bookings";
         }
 
         if (!userBookingService.isEligibleForCheckIn(booking)) {

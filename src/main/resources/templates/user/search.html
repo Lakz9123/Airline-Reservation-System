@@ -62,6 +62,10 @@
                          class="img-thumbnail" 
                          style="width: 50px; height: auto; max-height: 30px; object-fit: contain;">
                     <span class="badge bg-primary fs-6" th:text="${f.flightNumber}">FL-101</span>
+                    <span th:with="s=${f.flightStatus ?: T(com.airline.reservation.entity.FlightStatus).SCHEDULED}"
+                          th:class="|badge ${s.badgeClass}|"
+                          th:text="${s.label}"
+                          th:style="${s.name() == 'DEPARTED' ? 'background-color: #6f42c1 !important' : ''}">SCHEDULED</span>
                   </div>
                   <small class="text-muted" th:text="${f.airline.airlineName}">Airline</small>
                 </div>
@@ -96,10 +100,13 @@
                   <div class="fs-5 fw-bold text-primary">₹<span th:text="${#numbers.formatDecimal(f.fare,1,2)}">0</span></div>
                 </div>
                 <div class="col-md-2 text-end">
-                  <a th:if="${f.availableSeats > 0}" th:href="@{/user/book/{id}(id=${f.id})}" class="btn btn-success">
-                    <i class="bi bi-cursor-fill"></i> Select Seats
-                  </a>
-                  <span th:if="${f.availableSeats == 0}" class="badge bg-danger p-2">Sold Out</span>
+                  <th:block th:with="isCancelled=${f.flightStatus != null && f.flightStatus.name() == 'CANCELLED'}">
+                      <a th:if="${f.availableSeats > 0 && !isCancelled}" th:href="@{/user/book/{id}(id=${f.id})}" class="btn btn-success">
+                        <i class="bi bi-cursor-fill"></i> Select Seats
+                      </a>
+                      <span th:if="${f.availableSeats == 0 && !isCancelled}" class="badge bg-danger p-2">Sold Out</span>
+                      <span th:if="${isCancelled}" class="badge bg-danger p-2">Flight Cancelled</span>
+                  </th:block>
                 </div>
               </div>
             </div>

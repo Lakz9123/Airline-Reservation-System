@@ -32,7 +32,13 @@
                         <tbody>
                             <tr>
                                 <th class="w-25 text-muted">Flight Number</th>
-                                <td class="fw-bold fs-5" th:text="${flight.flightNumber}"></td>
+                                <td>
+                                    <span class="fw-bold fs-5" th:text="${flight.flightNumber}"></span>
+                                    <span th:with="s=${flight.flightStatus ?: T(com.airline.reservation.entity.FlightStatus).SCHEDULED}"
+                                          th:class="|badge ms-2 ${s.badgeClass}|"
+                                          th:text="${s.label}"
+                                          th:style="${s.name() == 'DEPARTED' ? 'background-color: #6f42c1 !important' : ''}">SCHEDULED</span>
+                                </td>
                             </tr>
                             <tr>
                                 <th class="text-muted">Airline</th>
@@ -178,6 +184,33 @@
                         </div>
                         <div class="mt-4 text-end">
                             <button type="submit" class="btn btn-info text-white px-4 fw-bold"><i class="bi bi-save"></i> Save Boarding Info</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Flight Status Card -->
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-secondary text-white fw-bold">
+                    <i class="bi bi-activity"></i> Flight Status
+                </div>
+                <div class="card-body">
+                    <form th:action="@{/admin/flights/details/{id}/status(id=${flight.id})}" method="post" class="row g-3 align-items-center">
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold mb-0">Current Status</label>
+                        </div>
+                        <div class="col-md-5">
+                            <select class="form-select" name="flightStatus">
+                                <option th:each="status : ${T(com.airline.reservation.entity.FlightStatus).values()}"
+                                        th:value="${status}"
+                                        th:text="${status.label}"
+                                        th:selected="${flight.flightStatus == status}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 text-end">
+                            <button type="submit" class="btn btn-secondary fw-bold w-100"><i class="bi bi-arrow-repeat"></i> Update Status</button>
                         </div>
                     </form>
                 </div>

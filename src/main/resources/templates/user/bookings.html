@@ -33,7 +33,13 @@
           <span class="badge rounded-pill bg-danger fs-6 px-3" th:if="${b.status=='CANCELLED'}">✗</span>
         </div>
         <div class="col-6 col-md-2">
-          <div class="fw-bold" th:text="${b.flight.flightNumber}">FL-101</div>
+          <div class="fw-bold d-flex align-items-center gap-1">
+            <span th:text="${b.flight.flightNumber}">FL-101</span>
+            <span th:with="s=${b.flight.flightStatus ?: T(com.airline.reservation.entity.FlightStatus).SCHEDULED}"
+                  th:class="|badge ${s.badgeClass}|"
+                  th:text="${s.label}"
+                  th:style="${s.name() == 'DEPARTED' ? 'background-color: #6f42c1 !important' : ''}">SCHEDULED</span>
+          </div>
           <div class="text-muted small" th:text="${b.flight.airline.airlineName}">Airline</div>
         </div>
         <div class="col-6 col-md-3">
@@ -57,36 +63,55 @@
           <span class="badge rounded-pill bg-secondary px-3 py-2" th:if="${b.status=='CONFIRMED' and b.checkInStatus=='NOT_CHECKED_IN'}">NOT CHECKED IN</span>
         </div>
         <div class="col-12 col-md-1 text-md-end d-flex d-md-block gap-1 flex-wrap"
-             th:with="now=${#temporals.createNow()}, dep=${b.flight.departureDateTime}, isCheckInWindow=${now.isAfter(dep.minusHours(48)) and now.isBefore(dep.minusHours(1))}">
+             th:with="now=${#temporals.createNow()}, 
+                      dep=${b.flight.departureDateTime}, 
+                      isCheckInWindow=${now.isAfter(dep.minusHours(48)) and now.isBefore(dep.minusHours(1))},
+                      fStatus=${b.flight.flightStatus != null ? b.flight.flightStatus.name() : 'SCHEDULED'},
+                      isActive=${fStatus != 'CANCELLED' and fStatus != 'LANDED'}">
+          
           <a th:if="${b.status=='CONFIRMED'}"
              th:href="@{/user/ticket/{id}(id=${b.id})}"
              class="btn btn-outline-primary btn-sm mb-1">
             <i class="bi bi-ticket-perforated"></i> Ticket
           </a>
-          <a th:if="${b.status=='CONFIRMED' and b.checkInStatus=='NOT_CHECKED_IN' and isCheckInWindow}"
-             th:href="@{/user/checkin/{id}(id=${b.id})}"
-             class="btn btn-warning btn-sm mb-1">
-            <i class="bi bi-check2-circle"></i> Check In
-          </a>
-          <button th:if="${b.status=='CONFIRMED' and b.checkInStatus=='NOT_CHECKED_IN' and !isCheckInWindow}"
-                  class="btn btn-secondary btn-sm mb-1"
-                  disabled
-                  data-bs-toggle="tooltip"
-                  data-bs-placement="top"
-                  title="Check-in opens 48 hours before departure">
-            <i class="bi bi-check2-circle"></i> Check In
-          </button>
-          <a th:if="${b.status=='CONFIRMED' and b.checkInStatus=='CHECKED_IN'}"
+
+          <!-- Check In Button Logic -->
+          <th:block th:if="${b.status=='CONFIRMED' and b.checkInStatus=='NOT_CHECKED_IN' and isActive}">
+              <a th:if="${isCheckInWindow and fStatus != 'BOARDING'}"
+                 th:href="@{/user/checkin/{id}(id=${b.id})}"
+                 class="btn btn-warning btn-sm mb-1">
+                <i class="bi bi-check2-circle"></i> Check In
+              </a>
+              <a th:if="${isCheckInWindow and fStatus == 'BOARDING'}"
+                 th:href="@{/user/checkin/{id}(id=${b.id})}"
+                 class="btn btn-primary btn-md mb-1 placeholder-wave shadow" style="animation: pulse 2s infinite;">
+                <i class="bi bi-check2-circle"></i> CHECK IN NOW
+              </a>
+              <button th:if="${!isCheckInWindow}"
+                      class="btn btn-secondary btn-sm mb-1"
+                      disabled
+                      data-bs-toggle="tooltip"
+                      data-bs-placement="top"
+                      title="Check-in opens 48 hours before departure">
+                <i class="bi bi-check2-circle"></i> Check In
+              </button>
+          </th:block>
+
+          <a th:if="${b.status=='CONFIRMED' and b.checkInStatus=='CHECKED_IN' and isActive}"
              th:href="@{/user/checkin/{id}/ready(id=${b.id})}"
-             class="btn btn-outline-success btn-sm mb-1">
+             th:classappend="${fStatus == 'BOARDING' ? 'btn-primary shadow fw-bold placeholder-wave' : 'btn-outline-success'}"
+             class="btn btn-sm mb-1"
+             th:style="${fStatus == 'BOARDING' ? 'animation: pulse 2s infinite;' : ''}">
             <i class="bi bi-door-open"></i> Boarding Pass
           </a>
+
           <a th:if="${b.status=='CONFIRMED'}"
              th:href="@{/user/ticket/{id}/download(id=${b.id})}"
              class="btn btn-success btn-sm mb-1">
             <i class="bi bi-file-earmark-pdf-fill"></i> PDF
           </a>
-          <form th:if="${b.status=='CONFIRMED'}" th:action="@{/user/bookings/cancel/{id}(id=${b.id})}" method="post"
+
+          <form th:if="${b.status=='CONFIRMED' and isActive}" th:action="@{/user/bookings/cancel/{id}(id=${b.id})}" method="post"
                 onsubmit="return confirm('Cancel this booking? Your seats will be released.')">
             <button type="submit" class="btn btn-outline-danger btn-sm w-100">Cancel</button>
           </form>

@@ -66,6 +66,10 @@ public class Flight {
     @Column(name = "boarding_zone")
     private String boardingZone;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "flight_status", nullable = false, columnDefinition = "VARCHAR(20) DEFAULT 'SCHEDULED'")
+    private FlightStatus flightStatus = FlightStatus.SCHEDULED;
+
     // Constructors
     public Flight() {}
 
@@ -234,5 +238,13 @@ public class Flight {
     /** Boarding time = departure minus 45 minutes */
     public LocalDateTime getBoardingTime() {
         return departureDateTime != null ? departureDateTime.minusMinutes(45) : null;
+    }
+
+    public FlightStatus getFlightStatus() {
+        return flightStatus;
+    }
+
+    public void setFlightStatus(FlightStatus flightStatus) {
+        this.flightStatus = flightStatus;
     }
 }
