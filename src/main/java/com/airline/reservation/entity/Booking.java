@@ -36,7 +36,7 @@ public class Booking {
     @Column(nullable = false)
     private String checkInStatus = "NOT_CHECKED_IN"; // NOT_CHECKED_IN, CHECKED_IN
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean reminderSent = false;
 
     @Column(nullable = false, columnDefinition = "boolean default false")
