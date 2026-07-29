@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: html_head('My Notifications')}"></head>
+<style>
+  .notif-card {
+    border-left: 4px solid transparent;
+    transition: background 0.2s, border-color 0.2s;
+    cursor: pointer;
+  }
+  .notif-card.unread {
+    background: rgba(59,130,246,0.06) !important;
+    border-left-color: #3b82f6;
+  }
+  .notif-card:hover { background: rgba(0,0,0,0.03) !important; }
+
+  .notif-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+  .icon-FLIGHT_DELAYED    { background: #fff7ed; color: #f97316; }
+  .icon-GATE_CHANGED      { background: #eff6ff; color: #3b82f6; }
+  .icon-BOARDING_STARTED  { background: #f0fdf4; color: #22c55e; }
+  .icon-FLIGHT_CANCELLED  { background: #fef2f2; color: #ef4444; }
+  .icon-DEPARTURE_REMINDER{ background: #faf5ff; color: #a855f7; }
+
+  .notif-type-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+  .badge-FLIGHT_DELAYED    { background: #fff7ed; color: #ea580c; border: 1px solid #fdba74; }
+  .badge-GATE_CHANGED      { background: #eff6ff; color: #2563eb; border: 1px solid #93c5fd; }
+  .badge-BOARDING_STARTED  { background: #f0fdf4; color: #16a34a; border: 1px solid #86efac; }
+  .badge-FLIGHT_CANCELLED  { background: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; }
+  .badge-DEPARTURE_REMINDER{ background: #faf5ff; color: #9333ea; border: 1px solid #d8b4fe; }
+
+  .empty-state { padding: 80px 20px; text-align: center; color: #94a3b8; }
+  .empty-state .bi { font-size: 4rem; display: block; margin-bottom: 16px; }
+</style>
+<body>
+<div th:replace="~{layout :: user_navbar}"></div>
+
+<main class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+
+      <!-- Header -->
+      <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+          <h2 class="fw-bold mb-1"><i class="bi bi-bell-fill text-primary me-2"></i>My Notifications</h2>
+          <p class="text-muted mb-0"
+             th:text="${unreadCount > 0} ? ${unreadCount} + ' unread notification(s)' : 'All caught up!'">
+          </p>
+        </div>
+        <form th:if="${!notifications.isEmpty()}" th:action="@{/user/notifications/read-all}" method="post">
+          <button type="submit" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-check2-all"></i> Mark All Read
+          </button>
+        </form>
+      </div>
+
+      <!-- Alert Flash -->
+      <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+
+      <!-- Notifications List -->
+      <div th:if="${notifications.isEmpty()}" class="card border-0 shadow-sm">
+        <div class="card-body empty-state">
+          <i class="bi bi-bell-slash"></i>
+          <h5 class="fw-semibold text-muted">No notifications yet</h5>
+          <p class="text-muted small">You'll be notified here when there are flight updates.</p>
+          <a th:href="@{/user/bookings}" class="btn btn-primary mt-3">
+            <i class="bi bi-journal-check"></i> View My Bookings
+          </a>
+        </div>
+      </div>
+
+      <div th:if="${!notifications.isEmpty()}" class="d-flex flex-column gap-2">
+        <div th:each="n : ${notifications}"
+             th:classappend="${!n.read} ? 'unread' : ''"
+             class="card border-0 shadow-sm notif-card p-3">
+          <div class="d-flex align-items-start gap-3">
+            <!-- Icon -->
+            <div th:class="'notif-icon icon-' + ${n.type.name()}">
+              <span th:text="${n.type.name() == 'FLIGHT_DELAYED'} ? '⏰' :
+                             (n.type.name() == 'GATE_CHANGED' ? '🚪' :
+                             (n.type.name() == 'BOARDING_STARTED' ? '🛫' :
+                             (n.type.name() == 'FLIGHT_CANCELLED' ? '❌' : '🔔')))">🔔</span>
+            </div>
+
+            <!-- Content -->
+            <div class="flex-grow-1">
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <span th:class="'notif-type-badge badge-' + ${n.type.name()}"
+                      th:text="${n.type.name() == 'FLIGHT_DELAYED'} ? 'Delayed' :
+                               (n.type.name() == 'GATE_CHANGED' ? 'Gate Change' :
+                               (n.type.name() == 'BOARDING_STARTED' ? 'Boarding' :
+                               (n.type.name() == 'FLIGHT_CANCELLED' ? 'Cancelled' : 'Departure Reminder')))">Type</span>
+                <span class="text-muted small"
+                      th:text="${#temporals.format(n.sentAt, 'dd MMM yyyy, HH:mm')}">date</span>
+                <span th:if="${!n.read}" class="badge bg-primary ms-auto" style="font-size:.6rem;">NEW</span>
+              </div>
+              <p class="mb-1" th:text="${n.message}">Notification message.</p>
+              <small class="text-muted">
+                Flight: <strong th:text="${n.booking.flight.flightNumber}">FL-101</strong>
+                · Booking: <strong th:text="${'SKY-' + #strings.padLeft('' + n.booking.id, 5, '0')}">SKY-00001</strong>
+              </small>
+            </div>
+
+            <!-- Mark Read -->
+            <div th:if="${!n.read}">
+              <form th:action="@{/user/notifications/read/{id}(id=${n.id})}" method="post">
+                <button type="submit" class="btn btn-outline-secondary btn-sm"
+                        title="Mark as read">
+                  <i class="bi bi-check2"></i>
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<div th:replace="~{layout :: footer}"></div>
+<div th:replace="~{layout :: html_scripts}"></div>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Notification — SkyFly Airlines</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; color: #1a202c; }
+        .wrapper { max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
+
+        .header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+            padding: 32px 40px;
+            text-align: center;
+            color: white;
+        }
+        .header .logo { font-size: 28px; font-weight: 800; letter-spacing: 1px; margin-bottom: 4px; }
+        .header .tagline { font-size: 13px; color: #94a3b8; letter-spacing: 2px; text-transform: uppercase; }
+
+        .notification-banner {
+            padding: 20px 40px;
+            text-align: center;
+        }
+        .notification-banner.FLIGHT_DELAYED { background: #fff7ed; border-bottom: 3px solid #f97316; }
+        .notification-banner.GATE_CHANGED { background: #eff6ff; border-bottom: 3px solid #3b82f6; }
+        .notification-banner.BOARDING_STARTED { background: #f0fdf4; border-bottom: 3px solid #22c55e; }
+        .notification-banner.FLIGHT_CANCELLED { background: #fef2f2; border-bottom: 3px solid #ef4444; }
+        .notification-banner.DEPARTURE_REMINDER { background: #faf5ff; border-bottom: 3px solid #a855f7; }
+
+        .notification-banner .icon { font-size: 40px; margin-bottom: 8px; }
+        .notification-banner .type-label {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 4px;
+        }
+        .notification-banner.FLIGHT_DELAYED .type-label { color: #ea580c; }
+        .notification-banner.GATE_CHANGED .type-label { color: #2563eb; }
+        .notification-banner.BOARDING_STARTED .type-label { color: #16a34a; }
+        .notification-banner.FLIGHT_CANCELLED .type-label { color: #dc2626; }
+        .notification-banner.DEPARTURE_REMINDER .type-label { color: #9333ea; }
+
+        .notification-banner h2 { font-size: 20px; font-weight: 700; color: #1a202c; }
+
+        .body { padding: 32px 40px; }
+        .greeting { font-size: 16px; color: #374151; margin-bottom: 16px; }
+        .message-box {
+            background: #f8fafc;
+            border-left: 4px solid #e2e8f0;
+            border-radius: 0 8px 8px 0;
+            padding: 16px 20px;
+            margin: 20px 0;
+            font-size: 15px;
+            color: #374151;
+            line-height: 1.6;
+        }
+
+        .flight-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .flight-card .row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .flight-card .label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; }
+        .flight-card .value { font-size: 15px; font-weight: 600; color: #1a202c; }
+        .route { display: flex; align-items: center; gap: 16px; text-align: center; }
+        .route .airport { font-size: 22px; font-weight: 800; color: #0f172a; }
+        .route .arrow { color: #94a3b8; font-size: 20px; flex: 1; }
+
+        .cta { text-align: center; margin: 28px 0; }
+        .cta a {
+            display: inline-block;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            text-decoration: none;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .footer {
+            background: #0f172a;
+            padding: 24px 40px;
+            text-align: center;
+            color: #64748b;
+            font-size: 12px;
+        }
+        .footer a { color: #38bdf8; text-decoration: none; }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">✈ SkyFly Airlines</div>
+        <div class="tagline">Passenger Notification</div>
+    </div>
+
+    <!-- Notification Banner -->
+    <div th:class="'notification-banner ' + ${notificationType}">
+        <div class="icon"
+             th:text="${notificationType == 'FLIGHT_DELAYED'} ? '⏰' :
+                      (${notificationType == 'GATE_CHANGED'} ? '🚪' :
+                      (${notificationType == 'BOARDING_STARTED'} ? '🛫' :
+                      (${notificationType == 'FLIGHT_CANCELLED'} ? '❌' : '🔔')))">🔔</div>
+        <div class="type-label"
+             th:text="${notificationType == 'FLIGHT_DELAYED'} ? 'Flight Delayed' :
+                      (${notificationType == 'GATE_CHANGED'} ? 'Gate Changed' :
+                      (${notificationType == 'BOARDING_STARTED'} ? 'Boarding Started' :
+                      (${notificationType == 'FLIGHT_CANCELLED'} ? 'Flight Cancelled' : 'Departure Reminder')))">
+        </div>
+        <h2>Important Flight Update</h2>
+    </div>
+
+    <!-- Body -->
+    <div class="body">
+        <p class="greeting">Hi <strong th:text="${userName}">Passenger</strong>,</p>
+
+        <div class="message-box">
+            <span th:text="${message}">Your flight has been updated.</span>
+        </div>
+
+        <!-- Flight Details Card -->
+        <div class="flight-card">
+            <div class="row">
+                <div>
+                    <div class="label">Booking Reference</div>
+                    <div class="value" th:text="${bookingRef}">SKY-00001</div>
+                </div>
+                <div>
+                    <div class="label">Flight</div>
+                    <div class="value" th:text="${flightNumber}">FL-101</div>
+                </div>
+                <div>
+                    <div class="label">Airline</div>
+                    <div class="value" th:text="${airlineName}">SkyFly</div>
+                </div>
+            </div>
+            <div class="route">
+                <div>
+                    <div class="airport" th:text="${#strings.substringBefore(origin,' ')}">DEL</div>
+                    <div class="label" th:text="${origin}">Delhi</div>
+                </div>
+                <div class="arrow">→</div>
+                <div>
+                    <div class="airport" th:text="${#strings.substringBefore(destination,' ')}">BOM</div>
+                    <div class="label" th:text="${destination}">Mumbai</div>
+                </div>
+            </div>
+            <div class="row" style="margin-top:12px; margin-bottom:0;">
+                <div>
+                    <div class="label">Departure</div>
+                    <div class="value" th:text="${departureTime}">01 Jan 2026 07:00</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="cta">
+            <a th:href="${notificationsUrl}">View All Notifications</a>
+        </div>
+
+        <p style="color:#94a3b8; font-size:13px; text-align:center;">
+            You're receiving this because you have a confirmed booking on this flight. If you need assistance, please contact your airline.
+        </p>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>© 2026 SkyFly Airlines · <a th:href="${notificationsUrl}">Manage Notifications</a></p>
+    </div>
+</div>
+</body>
+</html>

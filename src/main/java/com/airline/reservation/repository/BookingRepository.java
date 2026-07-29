@@ -20,4 +20,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findByStatusAndCheckInStatusAndReminderSentFalseAndFlight_DepartureDateTimeBetween(
             String status, String checkInStatus, java.time.LocalDateTime start, java.time.LocalDateTime end);
+
+    List<Booking> findByFlightAndStatus(Flight flight, String status);
+
+    List<Booking> findByStatusAndDepartureReminderSentFalseAndFlight_DepartureDateTimeBetween(
+            String status, java.time.LocalDateTime start, java.time.LocalDateTime end);
 }

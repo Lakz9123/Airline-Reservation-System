@@ -121,4 +121,51 @@ public class EmailService {
             logger.error("Error occurred while sending password reset email: ", e);
         }
     }
+
+    @Async
+    public void sendNotificationEmail(com.airline.reservation.entity.Notification notification) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            String userEmail = notification.getBooking().getUser().getEmail();
+            String flightNumber = notification.getBooking().getFlight().getFlightNumber();
+
+            helper.setTo(userEmail);
+            helper.setFrom("noreply@skyfly.com");
+            helper.setSubject(getEmailSubject(notification.getType(), flightNumber));
+
+            Context context = new Context();
+            context.setVariable("userName", notification.getBooking().getUser().getName());
+            context.setVariable("bookingRef", String.format("SKY-%05d", notification.getBooking().getId()));
+            context.setVariable("flightNumber", flightNumber);
+            context.setVariable("airlineName", notification.getBooking().getFlight().getAirline().getAirlineName());
+            context.setVariable("origin", notification.getBooking().getFlight().getOriginAirport().getAirportCode()
+                    + " (" + notification.getBooking().getFlight().getOriginAirport().getCity() + ")");
+            context.setVariable("destination", notification.getBooking().getFlight().getDestinationAirport().getAirportCode()
+                    + " (" + notification.getBooking().getFlight().getDestinationAirport().getCity() + ")");
+            context.setVariable("departureTime", notification.getBooking().getFlight().getDepartureDateTime().format(DATE_FORMATTER));
+            context.setVariable("message", notification.getMessage());
+            context.setVariable("notificationType", notification.getType().name());
+            context.setVariable("notificationsUrl", BASE_URL + "/user/notifications");
+
+            String htmlContent = templateEngine.process("emails/notification", context);
+            helper.setText(htmlContent, true);
+
+            mailSender.send(message);
+            logger.info("Sent {} notification email to {}", notification.getType(), userEmail);
+        } catch (Exception e) {
+            logger.error("Error sending notification email for type {}: {}", notification.getType(), e.getMessage());
+        }
+    }
+
+    private String getEmailSubject(com.airline.reservation.entity.NotificationType type, String flightNumber) {
+        return switch (type) {
+            case FLIGHT_DELAYED -> "Flight Delayed: " + flightNumber + " — SkyFly Airlines";
+            case GATE_CHANGED -> "Gate Change: " + flightNumber + " — SkyFly Airlines";
+            case BOARDING_STARTED -> "Boarding Now: " + flightNumber + " — SkyFly Airlines";
+            case FLIGHT_CANCELLED -> "Flight Cancelled: " + flightNumber + " — SkyFly Airlines";
+            case DEPARTURE_REMINDER -> "Departure Reminder: " + flightNumber + " — SkyFly Airlines";
+        };
+    }
 }

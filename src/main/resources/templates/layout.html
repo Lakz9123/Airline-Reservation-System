@@ -107,6 +107,15 @@
                 <li class="nav-item"><a class="nav-link" th:href="@{/user/profile}"><i class="bi bi-person-circle"></i> Profile</a></li>
             </ul>
             <ul class="navbar-nav ms-auto align-items-center gap-2">
+                <!-- Notification Bell -->
+                <li class="nav-item">
+                    <a class="btn btn-outline-light btn-sm position-relative" th:href="@{/user/notifications}">
+                        <i class="bi bi-bell-fill"></i>
+                        <span th:if="${(unreadNotificationCount != null) and (unreadNotificationCount > 0)}"
+                              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                              th:text="${unreadNotificationCount}">0</span>
+                    </a>
+                </li>
                 <li class="nav-item">
                     <span class="navbar-text text-white me-1">
                         <i class="bi bi-person-circle"></i>

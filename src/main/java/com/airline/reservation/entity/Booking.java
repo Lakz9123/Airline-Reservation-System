@@ -39,6 +39,9 @@ public class Booking {
     @Column(nullable = false)
     private boolean reminderSent = false;
 
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean departureReminderSent = false;
+
     // Constructors
     public Booking() {}
 
@@ -132,5 +135,13 @@ public class Booking {
 
     public void setReminderSent(boolean reminderSent) {
         this.reminderSent = reminderSent;
+    }
+
+    public boolean isDepartureReminderSent() {
+        return departureReminderSent;
+    }
+
+    public void setDepartureReminderSent(boolean departureReminderSent) {
+        this.departureReminderSent = departureReminderSent;
     }
 }

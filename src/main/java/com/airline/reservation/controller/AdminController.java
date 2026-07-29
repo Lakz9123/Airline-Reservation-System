@@ -2,8 +2,10 @@ package com.airline.reservation.controller;
 
 import com.airline.reservation.entity.Flight;
 import com.airline.reservation.entity.FlightStatus;
+import com.airline.reservation.entity.NotificationType;
 import com.airline.reservation.service.BookingService;
 import com.airline.reservation.service.FlightService;
+import com.airline.reservation.service.NotificationService;
 import com.airline.reservation.service.UserService;
 import com.airline.reservation.service.AirportService;
 import com.airline.reservation.service.AirlineService;
@@ -23,14 +25,16 @@ public class AdminController {
     private final AirportService airportService;
     private final AirlineService airlineService;
     private final AircraftService aircraftService;
+    private final NotificationService notificationService;
 
-    public AdminController(FlightService flightService, UserService userService, BookingService bookingService, AirportService airportService, AirlineService airlineService, AircraftService aircraftService) {
+    public AdminController(FlightService flightService, UserService userService, BookingService bookingService, AirportService airportService, AirlineService airlineService, AircraftService aircraftService, NotificationService notificationService) {
         this.flightService = flightService;
         this.userService = userService;
         this.bookingService = bookingService;
         this.airportService = airportService;
         this.airlineService = airlineService;
         this.aircraftService = aircraftService;
+        this.notificationService = notificationService;
     }
 
     // 1. Dashboard
@@ -131,10 +135,23 @@ public class AdminController {
                                      RedirectAttributes redirectAttributes) {
         Flight flight = flightService.getFlightById(id).orElse(null);
         if (flight != null) {
+            // Detect gate/terminal change
+            boolean gateChanged = !java.util.Objects.equals(flight.getGateNumber(), gateNumber)
+                    || !java.util.Objects.equals(flight.getTerminal(), terminal);
+
             flight.setGateNumber(gateNumber);
             flight.setTerminal(terminal);
             flight.setBoardingZone(boardingZone);
             flightService.saveFlight(flight);
+
+            if (gateChanged && (gateNumber != null || terminal != null)) {
+                try {
+                    notificationService.notifyGateChange(flight);
+                } catch (Exception e) {
+                    // don't fail the update if notification fails
+                }
+            }
+
             redirectAttributes.addFlashAttribute("success", "Boarding information updated successfully.");
         }
         return "redirect:/admin/flights/details/" + id;
@@ -146,8 +163,31 @@ public class AdminController {
                                RedirectAttributes redirectAttributes) {
         Flight flight = flightService.getFlightById(id).orElse(null);
         if (flight != null) {
+            FlightStatus oldStatus = flight.getFlightStatus();
             flight.setFlightStatus(flightStatus);
             flightService.saveFlight(flight);
+
+            // Trigger notifications only when status actually changes
+            if (oldStatus != flightStatus) {
+                try {
+                    String flightNum = flight.getFlightNumber();
+                    switch (flightStatus) {
+                        case DELAYED -> notificationService.notifyFlightStatusChange(flight,
+                                NotificationType.FLIGHT_DELAYED,
+                                "Your flight " + flightNum + " has been delayed. Please check the departure board for updated times.");
+                        case BOARDING -> notificationService.notifyFlightStatusChange(flight,
+                                NotificationType.BOARDING_STARTED,
+                                "Boarding has started for flight " + flightNum + ". Please proceed to your gate immediately.");
+                        case CANCELLED -> notificationService.notifyFlightStatusChange(flight,
+                                NotificationType.FLIGHT_CANCELLED,
+                                "We regret to inform you that flight " + flightNum + " has been cancelled. Please contact the airline for rebooking assistance.");
+                        default -> {} // No notification for SCHEDULED, DEPARTED, LANDED
+                    }
+                } catch (Exception e) {
+                    // don't fail the status update if notification fails
+                }
+            }
+
             redirectAttributes.addFlashAttribute("success", "Flight status updated to " + flightStatus.getLabel() + " successfully.");
         }
         return "redirect:/admin/flights/details/" + id;
