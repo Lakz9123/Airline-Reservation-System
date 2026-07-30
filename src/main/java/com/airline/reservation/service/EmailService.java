@@ -51,6 +51,17 @@ public class EmailService {
             context.setVariable("totalFare", String.format("%.2f", booking.getTotalFare()));
             context.setVariable("bookingUrl", BASE_URL + "/user/bookings");
 
+            if (booking.getDiscountAmount() != null && booking.getDiscountAmount() > 0) {
+                double discountAmt = booking.getDiscountAmount();
+                double originalFare = booking.getTotalFare() + discountAmt;
+                double discountPercentage = (discountAmt / originalFare) * 100.0;
+                
+                context.setVariable("couponCode", booking.getCouponCode());
+                context.setVariable("originalFare", String.format("%.2f", originalFare));
+                context.setVariable("discountAmount", String.format("%.2f", discountAmt));
+                context.setVariable("discountPercentage", String.format("%.1f", discountPercentage));
+            }
+
             String htmlContent = templateEngine.process("emails/booking-confirmation", context);
             helper.setText(htmlContent, true);
 

@@ -57,6 +57,31 @@
                             </tr>
                         </table>
 
+                        <!-- Coupon Savings Section -->
+                        <table th:if="${discountAmount != null}" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#e8f4fd; border:1px solid #b8daff; border-radius:6px; padding:20px; margin-bottom:25px;">
+                            <tr>
+                                <td colspan="2" style="padding-bottom:15px; font-size:16px; font-weight:bold; color:#0d6efd; text-align:center;">
+                                    🎉 Congratulations! You saved money on your booking.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding-bottom:10px; font-size:14px; color:#555555;">Coupon Code:</td>
+                                <td style="padding-bottom:10px; font-size:14px; font-weight:bold; color:#333333;" align="right" th:text="${couponCode}">AIR10</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-bottom:10px; font-size:14px; color:#555555;">Original Fare:</td>
+                                <td style="padding-bottom:10px; font-size:14px; font-weight:600; color:#333333;" align="right" th:text="'₹' + ${originalFare}">₹5,000.00</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-bottom:10px; font-size:14px; color:#555555;">Discount:</td>
+                                <td style="padding-bottom:10px; font-size:14px; font-weight:bold; color:#198754;" align="right" th:text="'₹' + ${discountAmount} + ' (' + ${discountPercentage} + '%)'">₹500.00 (10.0%)</td>
+                            </tr>
+                            <tr>
+                                <td style="border-top:1px solid #b8daff; padding-top:10px; font-size:15px; font-weight:bold; color:#333333;">Final Amount Paid:</td>
+                                <td style="border-top:1px solid #b8daff; padding-top:10px; font-size:18px; font-weight:bold; color:#198754;" align="right" th:text="'₹' + ${totalFare}">₹4,500.00</td>
+                            </tr>
+                        </table>
+
                         <!-- CTA Button -->
                         <table border="0" cellpadding="0" cellspacing="0" width="100%">
                             <tr>
@@ -68,6 +93,10 @@
                         
                         <p style="margin:0; font-size:13px; color:#888888; text-align:center;">
                             Online check-in opens 48 hours prior to scheduled departure. Have a safe journey!
+                        </p>
+                        
+                        <p style="margin:25px 0 0 0; font-size:14px; line-height:1.5; color:#555555; text-align:center; font-style:italic;">
+                            Thank you for choosing SkyFly Airline Reservation System. We hope you have a safe and pleasant journey. We look forward to serving you again!
                         </p>
                     </td>
                 </tr>
