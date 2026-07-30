@@ -48,6 +48,13 @@ public class EmailService {
             context.setVariable("departureTime", booking.getFlight().getDepartureDateTime().format(DATE_FORMATTER));
             context.setVariable("seatNumbers", booking.getSeatNumbers());
             context.setVariable("cabinClass", booking.getCabinClass());
+            
+            if (booking.getBaggage() != null && (booking.getBaggage().getExtraCheckedBagCount() > 0 || booking.getBaggage().getExtraWeightKg() > 0)) {
+                context.setVariable("baggageInfo", "+" + booking.getBaggage().getExtraCheckedBagCount() + " bag(s), +" + booking.getBaggage().getExtraWeightKg() + " kg");
+            } else {
+                context.setVariable("baggageInfo", "Included only");
+            }
+
             context.setVariable("totalFare", String.format("%.2f", booking.getTotalFare()));
             context.setVariable("bookingUrl", BASE_URL + "/user/bookings");
 

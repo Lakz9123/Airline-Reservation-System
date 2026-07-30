@@ -18,6 +18,7 @@ import com.airline.reservation.service.AirlineService;
 import com.airline.reservation.service.CouponService;
 import com.airline.reservation.service.CouponService;
 import com.airline.reservation.service.WalletService;
+import com.airline.reservation.service.BaggageService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -52,6 +53,7 @@ public class UserController {
     private final BoardingPassPdfService boardingPassPdfService;
     private final CouponService couponService;
     private final WalletService walletService;
+    private final BaggageService baggageService;
 
     public UserController(UserService userService,
                           FlightRepository flightRepository,
@@ -66,7 +68,8 @@ public class UserController {
                           BarcodeService barcodeService,
                           BoardingPassPdfService boardingPassPdfService,
                           CouponService couponService,
-                          WalletService walletService) {
+                          WalletService walletService,
+                          BaggageService baggageService) {
         this.userService = userService;
         this.flightRepository = flightRepository;
         this.userBookingService = userBookingService;
@@ -81,6 +84,7 @@ public class UserController {
         this.boardingPassPdfService = boardingPassPdfService;
         this.couponService = couponService;
         this.walletService = walletService;
+        this.baggageService = baggageService;
     }
 
     // ----- Helper: resolve current User entity -----
@@ -218,6 +222,12 @@ public class UserController {
         com.airline.reservation.entity.Wallet wallet = walletService.getOrCreateWallet(currentUser);
         model.addAttribute("walletBalance", wallet.getBalance());
 
+        // Baggage 
+        com.airline.reservation.entity.BaggageAllowance allowance = baggageService.getAllowanceForCabinClass(cabinClass);
+        com.airline.reservation.entity.BaggagePricing pricing = baggageService.getPricing();
+        model.addAttribute("baggageAllowance", allowance);
+        model.addAttribute("baggagePricing", pricing);
+
         return "user/payment";
     }
 
@@ -254,11 +264,13 @@ public class UserController {
                                  @RequestParam("cabinClass") String cabinClass,
                                  @RequestParam(value = "appliedCouponCode", required = false) String appliedCouponCode,
                                  @RequestParam(value = "useWalletBalance", required = false) Boolean useWalletBalance,
+                                 @RequestParam(value = "extraBags", required = false) Integer extraBags,
+                                 @RequestParam(value = "extraWeightKg", required = false) Integer extraWeightKg,
                                  @AuthenticationPrincipal UserDetails principal,
                                  RedirectAttributes redirectAttributes) {
         User user = getCurrentUser(principal);
         try {
-            Booking booking = userBookingService.bookSeats(user, flightId, selectedSeats, cabinClass, appliedCouponCode);
+            Booking booking = userBookingService.bookSeats(user, flightId, selectedSeats, cabinClass, appliedCouponCode, extraBags, extraWeightKg);
 
             // Wallet debit if user opted to use wallet balance
             if (Boolean.TRUE.equals(useWalletBalance)) {

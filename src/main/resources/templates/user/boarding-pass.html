@@ -190,8 +190,12 @@
         <div class="bp-detail-value" th:text="${#temporals.format(booking.flight.arrivalDateTime, 'HH:mm')}">09:15</div>
       </div>
       <div class="bp-detail-block">
-        <div class="bp-detail-label">Airline</div>
-        <div class="bp-detail-value" th:text="${booking.flight.airline.airlineName}">IndiGo</div>
+        <div class="bp-detail-label">Baggage</div>
+        <div class="bp-detail-value">
+          <span th:if="${booking.baggage != null and (booking.baggage.extraCheckedBagCount > 0 or booking.baggage.extraWeightKg > 0)}"
+                th:text="'+' + ${booking.baggage.extraCheckedBagCount} + ' bag, +' + ${booking.baggage.extraWeightKg} + ' kg'"></span>
+          <span th:if="${booking.baggage == null or (booking.baggage.extraCheckedBagCount == 0 and booking.baggage.extraWeightKg == 0)}">Included</span>
+        </div>
       </div>
     </div>
 

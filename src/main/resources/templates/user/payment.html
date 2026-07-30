@@ -26,6 +26,35 @@
                         </div>
                     </div>
 
+                    <!-- Baggage Section -->
+                    <h6 class="fw-bold mb-3 border-bottom pb-2">Baggage Details</h6>
+                    <div class="bg-light p-3 rounded mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted"><i class="bi bi-briefcase"></i> Included Allowance:</span>
+                            <span class="fw-bold text-dark">
+                                <span th:text="${baggageAllowance.cabinBagWeightLimit} + ' kg Cabin, '"></span>
+                                <span th:text="${baggageAllowance.checkedBagCountIncluded} + ' Checked Bag(s) up to ' + ${baggageAllowance.checkedBagWeightLimit} + ' kg'"></span>
+                            </span>
+                        </div>
+                        <hr>
+                        <div class="row g-3 align-items-center mb-2">
+                            <div class="col-md-6">
+                                <label for="extraBagsInput" class="form-label small fw-bold mb-0">Extra Checked Bag(s) (₹<span th:text="${#numbers.formatDecimal(baggagePricing.costPerExtraBag, 1, 0)}"></span>/bag)</label>
+                            </div>
+                            <div class="col-md-6">
+                                <input type="number" class="form-control form-control-sm" id="extraBagsInput" min="0" value="0" onchange="recalculateFare()">
+                            </div>
+                        </div>
+                        <div class="row g-3 align-items-center">
+                            <div class="col-md-6">
+                                <label for="extraWeightKgInput" class="form-label small fw-bold mb-0">Extra Weight (₹<span th:text="${#numbers.formatDecimal(baggagePricing.costPerExtraKg, 1, 0)}"></span>/kg)</label>
+                            </div>
+                            <div class="col-md-6">
+                                <input type="number" class="form-control form-control-sm" id="extraWeightKgInput" min="0" value="0" onchange="recalculateFare()">
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Fare Breakdown -->
                     <h6 class="fw-bold mb-3 border-bottom pb-2">Fare Breakdown</h6>
                     <div class="bg-light p-3 rounded mb-4" id="fareBreakdown">
@@ -40,6 +69,11 @@
                         <div class="d-flex justify-content-between mb-2">
                             <span class="text-muted">Convenience Fee:</span>
                             <span>₹<span th:text="${#numbers.formatDecimal(convenienceFee, 1, 2)}">0.00</span></span>
+                        </div>
+
+                        <div id="baggageCostRow" class="d-none justify-content-between mb-2">
+                            <span class="text-muted">Extra Baggage:</span>
+                            <span>+₹<span id="baggageCostDisplay">0.00</span></span>
                         </div>
                         
                         <div id="couponDiscountRow" class="d-none justify-content-between mb-2">
@@ -114,6 +148,8 @@
                         </th:block>
                         <input type="hidden" name="cabinClass" th:value="${cabinClass}">
                         <input type="hidden" name="appliedCouponCode" id="appliedCouponCode" value="">
+                        <input type="hidden" name="extraBags" id="formExtraBags" value="0">
+                        <input type="hidden" name="extraWeightKg" id="formExtraWeightKg" value="0">
                         
                         <!-- Wallet Checkbox -->
                         <div class="card bg-light border-0 mb-4" th:if="${walletBalance != null && walletBalance > 0}">
@@ -167,10 +203,30 @@
 <script th:inline="javascript">
     const baseTotalFare = /*[[${totalFare}]]*/ 0.0;
     const walletBalance = /*[[${walletBalance != null ? walletBalance : 0.0}]]*/ 0.0;
+    const costPerExtraBag = /*[[${baggagePricing.costPerExtraBag}]]*/ 0.0;
+    const costPerExtraKg = /*[[${baggagePricing.costPerExtraKg}]]*/ 0.0;
     let currentCouponDiscount = 0.0;
     
     function recalculateFare() {
-        let finalFare = baseTotalFare - currentCouponDiscount;
+        const extraBags = parseInt(document.getElementById('extraBagsInput')?.value || 0);
+        const extraKg = parseInt(document.getElementById('extraWeightKgInput')?.value || 0);
+        
+        document.getElementById('formExtraBags').value = extraBags;
+        document.getElementById('formExtraWeightKg').value = extraKg;
+        
+        const baggageCost = (extraBags * costPerExtraBag) + (extraKg * costPerExtraKg);
+        
+        if (baggageCost > 0) {
+            document.getElementById('baggageCostRow').classList.remove('d-none');
+            document.getElementById('baggageCostRow').classList.add('d-flex');
+            document.getElementById('baggageCostDisplay').innerText = baggageCost.toFixed(2);
+        } else {
+            document.getElementById('baggageCostRow').classList.add('d-none');
+            document.getElementById('baggageCostRow').classList.remove('d-flex');
+        }
+
+        let finalFare = baseTotalFare + baggageCost - currentCouponDiscount;
+        document.getElementById('finalFareDisplay').innerText = finalFare.toFixed(2);
         
         const useWalletCheckbox = document.getElementById('useWalletBalance');
         let walletApplied = 0.0;
@@ -230,7 +286,11 @@
                 document.getElementById('discountAmountDisplay').innerText = data.discountAmount.toFixed(2);
                 
                 currentCouponDiscount = data.discountAmount;
-                const finalBeforeWallet = baseTotalFare - currentCouponDiscount;
+                const extraBags = parseInt(document.getElementById('extraBagsInput')?.value || 0);
+                const extraKg = parseInt(document.getElementById('extraWeightKgInput')?.value || 0);
+                const baggageCost = (extraBags * costPerExtraBag) + (extraKg * costPerExtraKg);
+                
+                const finalBeforeWallet = baseTotalFare + baggageCost - currentCouponDiscount;
                 document.getElementById('finalFareDisplay').innerText = finalBeforeWallet.toFixed(2);
                 
                 document.getElementById('savingsRow').classList.remove('d-none');
@@ -270,7 +330,6 @@
         document.getElementById('savingsRow').classList.add('d-none');
         
         currentCouponDiscount = 0.0;
-        document.getElementById('finalFareDisplay').innerText = baseTotalFare.toFixed(2);
         recalculateFare();
     }
 </script>

@@ -21,7 +21,8 @@
                             <th>Customer</th>
                             <th>Flight No.</th>
                             <th>Route</th>
-                            <th>Seats</th>
+                            <th>Seats / Cabin</th>
+                            <th>Baggage</th>
                             <th>Booking Date</th>
                             <th>Total Fare</th>
                             <th>Status</th>
@@ -43,7 +44,20 @@
                                 <i class="bi bi-arrow-right text-muted mx-1"></i>
                                 <span class="fw-semibold text-uppercase" th:text="${booking.flight.destinationAirport.airportCode}">Destination</span>
                             </td>
-                            <td><code class="bg-light text-dark p-1 rounded" th:text="${booking.seatNumbers}">12A, 12B</code></td>
+                            <td>
+                                <code class="bg-light text-dark p-1 rounded d-block mb-1" th:text="${booking.seatNumbers}">12A, 12B</code>
+                                <small class="badge bg-secondary" th:text="${booking.cabinClass}"></small>
+                            </td>
+                            <td>
+                                <small th:if="${booking.baggage != null and (booking.baggage.extraCheckedBagCount > 0 or booking.baggage.extraWeightKg > 0)}">
+                                    <span class="badge bg-info text-dark">
+                                        +<span th:text="${booking.baggage.extraCheckedBagCount}"></span> bag(s), +<span th:text="${booking.baggage.extraWeightKg}"></span> kg
+                                    </span>
+                                </small>
+                                <small th:if="${booking.baggage == null or (booking.baggage.extraCheckedBagCount == 0 and booking.baggage.extraWeightKg == 0)}">
+                                    <span class="text-muted">Included only</span>
+                                </small>
+                            </td>
                             <td th:text="${#temporals.format(booking.bookingDate, 'yyyy-MM-dd HH:mm')}">Date</td>
                             <td>₹<span th:text="${#numbers.formatDecimal(booking.totalFare, 1, 2)}">0.00</span></td>
                             <td>

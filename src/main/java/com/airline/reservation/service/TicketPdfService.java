@@ -217,24 +217,26 @@ public class TicketPdfService {
         float detailTop2 = detailTop - 50;
         drawDetailBlock(canvas, bf, bfBold, col1, detailTop2, "SEAT(S)",     booking.getSeatNumbers());
         drawDetailBlock(canvas, bf, bfBold, col2, detailTop2, "CLASS",       booking.getCabinClass() != null ? booking.getCabinClass().toUpperCase() : "ECONOMY");
-        drawDetailBlock(canvas, bf, bfBold, col3, detailTop2, "STATUS",      booking.getStatus());
+        String baggageStr = "Included";
+        if (booking.getBaggage() != null && (booking.getBaggage().getExtraCheckedBagCount() > 0 || booking.getBaggage().getExtraWeightKg() > 0)) {
+            baggageStr = "+" + booking.getBaggage().getExtraCheckedBagCount() + "b, +" + booking.getBaggage().getExtraWeightKg() + "kg";
+        }
+        drawDetailBlock(canvas, bf, bfBold, col3, detailTop2, "BAGGAGE",     baggageStr);
+        drawDetailBlock(canvas, bf, bfBold, col4, detailTop2, "STATUS",      booking.getStatus());
         
+        float detailTop3 = detailTop2 - 50;
         // Coupon / fare row
         if (booking.getDiscountAmount() != null && booking.getDiscountAmount() > 0) {
             double original = booking.getTotalFare() + booking.getDiscountAmount();
-            drawDetailBlock(canvas, bf, bfBold, col4, detailTop2, "ORIGINAL FARE",
+            drawDetailBlock(canvas, bf, bfBold, col1, detailTop3, "ORIGINAL FARE",
                     String.format("INR %.2f", original));
-            
-            float detailTop3 = detailTop2 - 50;
-            drawDetailBlock(canvas, bf, bfBold, col1, detailTop3, "COUPON APPLIED", booking.getCouponCode() != null ? booking.getCouponCode() : "-");
-            drawDetailBlock(canvas, bf, bfBold, col2, detailTop3, "DISCOUNT",
-                    "-INR " + String.format("%.2f", booking.getDiscountAmount()));
+            drawDetailBlock(canvas, bf, bfBold, col2, detailTop3, "COUPON", booking.getCouponCode() != null ? booking.getCouponCode() : "-");
             drawDetailBlock(canvas, bf, bfBold, col3, detailTop3, "YOU SAVED",
                     "INR " + String.format("%.2f", booking.getDiscountAmount()));
-            drawDetailBlock(canvas, bf, bfBold, col4, detailTop3, "FINAL AMOUNT PAID",
+            drawDetailBlock(canvas, bf, bfBold, col4, detailTop3, "FINAL PAID",
                     String.format("INR %.2f", booking.getTotalFare()));
         } else {
-            drawDetailBlock(canvas, bf, bfBold, col4, detailTop2, "TOTAL FARE",
+            drawDetailBlock(canvas, bf, bfBold, col1, detailTop3, "TOTAL FARE",
                     String.format("INR %.2f", booking.getTotalFare()));
         }
 

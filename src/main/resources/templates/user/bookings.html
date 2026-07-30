@@ -56,7 +56,15 @@
         <div class="col-6 col-md-2">
           <div class="text-muted small">Seats / Cabin</div>
           <code th:text="${b.seatNumbers}">A1, A2</code><br>
-          <small class="badge bg-secondary mt-1" th:text="${b.cabinClass}">Economy</small>
+          <small class="badge bg-secondary mt-1 mb-2" th:text="${b.cabinClass}">Economy</small>
+          
+          <div class="text-muted small">Baggage</div>
+          <small class="text-dark fw-bold" th:if="${b.baggage != null and (b.baggage.extraCheckedBagCount > 0 or b.baggage.extraWeightKg > 0)}">
+            +<span th:text="${b.baggage.extraCheckedBagCount}"></span> bag(s), +<span th:text="${b.baggage.extraWeightKg}"></span> kg
+          </small>
+          <small class="text-muted" th:if="${b.baggage == null or (b.baggage.extraCheckedBagCount == 0 and b.baggage.extraWeightKg == 0)}">
+            Included only
+          </small>
         </div>
         <div class="col-6 col-md-2">
           <div class="text-muted small">Fare</div>

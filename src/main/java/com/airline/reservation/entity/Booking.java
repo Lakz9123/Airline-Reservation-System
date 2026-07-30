@@ -48,6 +48,9 @@ public class Booking {
     @Column(name = "coupon_code")
     private String couponCode;
 
+    @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private BookingBaggage baggage;
+
     // Constructors
     public Booking() {}
 
@@ -165,5 +168,16 @@ public class Booking {
 
     public void setCouponCode(String couponCode) {
         this.couponCode = couponCode;
+    }
+
+    public BookingBaggage getBaggage() {
+        return baggage;
+    }
+
+    public void setBaggage(BookingBaggage baggage) {
+        this.baggage = baggage;
+        if (baggage != null) {
+            baggage.setBooking(this);
+        }
     }
 }

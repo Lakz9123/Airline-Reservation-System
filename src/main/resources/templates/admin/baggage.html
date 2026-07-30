@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: html_head('Baggage Management')}"></head>
+<body>
+<div th:replace="~{layout :: navbar}"></div>
+
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3 class="fw-bold"><i class="bi bi-briefcase"></i> Baggage Management</h3>
+            <p class="text-muted">Manage cabin class allowances and extra baggage pricing.</p>
+        </div>
+    </div>
+    
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle me-2"></i><span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold">Cabin Class Allowances</h5>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Cabin Class</th>
+                                <th>Cabin Bag (kg)</th>
+                                <th>Checked Bags</th>
+                                <th>Checked Wt. (kg)</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="allowance : ${allowances}">
+                                <td class="fw-bold" th:text="${allowance.cabinClass}">Economy</td>
+                                <td>
+                                    <form th:action="@{/admin/baggage/allowance/update}" method="post" class="d-flex align-items-center">
+                                        <input type="hidden" name="cabinClass" th:value="${allowance.cabinClass}">
+                                        <input type="number" name="cabinBagWeightLimit" class="form-control form-control-sm me-2" style="width: 70px" th:value="${allowance.cabinBagWeightLimit}" required min="0">
+                                </td>
+                                <td>
+                                        <input type="number" name="checkedBagCountIncluded" class="form-control form-control-sm me-2" style="width: 70px" th:value="${allowance.checkedBagCountIncluded}" required min="0">
+                                </td>
+                                <td>
+                                        <input type="number" name="checkedBagWeightLimit" class="form-control form-control-sm me-2" style="width: 70px" th:value="${allowance.checkedBagWeightLimit}" required min="0">
+                                </td>
+                                <td>
+                                        <button type="submit" class="btn btn-sm btn-primary">Save</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold">Extra Baggage Pricing</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form th:action="@{/admin/baggage/pricing/update}" method="post">
+                        <div class="mb-3">
+                            <label class="form-label text-muted fw-bold small">Cost Per Extra Bag (₹)</label>
+                            <input type="number" step="0.01" name="costPerExtraBag" class="form-control" th:value="${pricing.costPerExtraBag}" required min="0">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label text-muted fw-bold small">Cost Per Extra Kg (₹)</label>
+                            <input type="number" step="0.01" name="costPerExtraKg" class="form-control" th:value="${pricing.costPerExtraKg}" required min="0">
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success">Update Pricing</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{layout :: html_scripts}"></div>
+</body>
+</html>

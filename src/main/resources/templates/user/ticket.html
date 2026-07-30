@@ -207,6 +207,14 @@
              th:classappend="${booking.status == 'CONFIRMED'} ? 'status-confirmed' : 'status-cancelled'"
              th:text="${booking.status}">CONFIRMED</div>
       </div>
+      <div>
+        <div class="detail-label">Baggage</div>
+        <div class="detail-value">
+          <span th:if="${booking.baggage != null and (booking.baggage.extraCheckedBagCount > 0 or booking.baggage.extraWeightKg > 0)}"
+                th:text="'+' + ${booking.baggage.extraCheckedBagCount} + ' bag, +' + ${booking.baggage.extraWeightKg} + ' kg'"></span>
+          <span th:if="${booking.baggage == null or (booking.baggage.extraCheckedBagCount == 0 and booking.baggage.extraWeightKg == 0)}">Included</span>
+        </div>
+      </div>
     </div>
 
     <!-- Barcode strip -->

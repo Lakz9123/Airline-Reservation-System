@@ -235,8 +235,13 @@ public class BoardingPassPdfService {
                 booking.getFlight().getDepartureDateTime().format(TIME_FMT));
         drawDetailBlock(canvas, bf, bfBold, col3, detailTop3, "ARRIVAL",
                 booking.getFlight().getArrivalDateTime().format(TIME_FMT));
-        drawDetailBlock(canvas, bf, bfBold, col4, detailTop3, "AIRLINE",
-                booking.getFlight().getAirline().getAirlineName());
+        
+        String baggageStr = "Included";
+        if (booking.getBaggage() != null && (booking.getBaggage().getExtraCheckedBagCount() > 0 || booking.getBaggage().getExtraWeightKg() > 0)) {
+            baggageStr = "+" + booking.getBaggage().getExtraCheckedBagCount() + "b, +" + booking.getBaggage().getExtraWeightKg() + "kg";
+        }
+        drawDetailBlock(canvas, bf, bfBold, col4, detailTop3, "BAGGAGE",
+                baggageStr);
 
         // ── Barcode (Code128) ──
         String barcodeText = String.format("SKY%05d", booking.getId());

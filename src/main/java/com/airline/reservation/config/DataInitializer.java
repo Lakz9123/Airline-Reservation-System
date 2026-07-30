@@ -8,6 +8,13 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
+
+import com.airline.reservation.entity.BaggageAllowance;
+import com.airline.reservation.entity.BaggagePricing;
+import com.airline.reservation.repository.BaggageAllowanceRepository;
+import com.airline.reservation.repository.BaggagePricingRepository;
 
 import com.airline.reservation.entity.Coupon;
 import com.airline.reservation.entity.DiscountType;
@@ -59,6 +66,22 @@ public class DataInitializer {
                 couponRepository.save(c2);
                 couponRepository.save(c3);
                 logger.info("✅ Seeded 3 sample coupons.");
+            }
+        };
+    }
+    @Bean
+    public CommandLineRunner seedBaggageData(BaggageAllowanceRepository allowanceRepo, BaggagePricingRepository pricingRepo) {
+        return args -> {
+            if (pricingRepo.count() == 0) {
+                pricingRepo.save(new BaggagePricing(new java.math.BigDecimal("1500.00"), new java.math.BigDecimal("500.00")));
+                logger.info("[OK] Seeded default BaggagePricing.");
+            }
+            if (allowanceRepo.count() == 0) {
+                allowanceRepo.save(new BaggageAllowance("Economy", 7, 15, 1));
+                allowanceRepo.save(new BaggageAllowance("Premium Economy", 10, 20, 2));
+                allowanceRepo.save(new BaggageAllowance("Business Class", 12, 30, 2));
+                allowanceRepo.save(new BaggageAllowance("First Class", 15, 40, 3));
+                logger.info("[OK] Seeded default BaggageAllowances.");
             }
         };
     }

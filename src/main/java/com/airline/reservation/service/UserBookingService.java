@@ -22,13 +22,15 @@ public class UserBookingService {
     private final CouponService couponService;
     private final WalletService walletService;
     private final LoyaltyService loyaltyService;
+    private final BaggageService baggageService;
 
-    public UserBookingService(BookingRepository bookingRepository, FlightRepository flightRepository, CouponService couponService, WalletService walletService, LoyaltyService loyaltyService) {
+    public UserBookingService(BookingRepository bookingRepository, FlightRepository flightRepository, CouponService couponService, WalletService walletService, LoyaltyService loyaltyService, BaggageService baggageService) {
         this.bookingRepository = bookingRepository;
         this.flightRepository = flightRepository;
         this.couponService = couponService;
         this.walletService = walletService;
         this.loyaltyService = loyaltyService;
+        this.baggageService = baggageService;
     }
 
     /** Returns all bookings for the given user, newest first. */
@@ -154,7 +156,7 @@ public class UserBookingService {
      * Returns the saved Booking.
      */
     @Transactional
-    public Booking bookSeats(User user, Long flightId, List<String> requestedSeats, String cabinClass, String appliedCouponCode) {
+    public Booking bookSeats(User user, Long flightId, List<String> requestedSeats, String cabinClass, String appliedCouponCode, Integer extraBags, Integer extraWeightKg) {
         if (requestedSeats == null || requestedSeats.isEmpty()) {
             throw new IllegalArgumentException("Please select at least one seat.");
         }
@@ -195,6 +197,16 @@ public class UserBookingService {
 
         String seatNumbersStr = String.join(", ", requestedSeats);
 
+        // Compute baggage cost
+        int extraBagCount = (extraBags != null) ? extraBags : 0;
+        int extraWeight = (extraWeightKg != null) ? extraWeightKg : 0;
+        java.math.BigDecimal baggageCost = java.math.BigDecimal.ZERO;
+        com.airline.reservation.entity.BaggagePricing pricing = baggageService.getPricing();
+        if (extraBagCount > 0 || extraWeight > 0) {
+            baggageCost = baggageService.calculateExtraBaggageCost(extraBagCount, extraWeight);
+            totalFare += baggageCost.doubleValue();
+        }
+
         // Apply coupon if provided
         double discountAmount = 0.0;
         com.airline.reservation.entity.Coupon coupon = null;
@@ -208,7 +220,13 @@ public class UserBookingService {
         Booking booking = new Booking(user, flight, seatNumbersStr, LocalDateTime.now(), "CONFIRMED", totalFare, cabinClass);
         booking.setDiscountAmount(discountAmount);
         booking.setCouponCode(appliedCouponCode);
-        
+
+        // Set up Baggage
+        com.airline.reservation.entity.BookingBaggage bookingBaggage = new com.airline.reservation.entity.BookingBaggage(
+                booking, extraBagCount, extraWeight, pricing.getCostPerExtraBag(), pricing.getCostPerExtraKg(), baggageCost
+        );
+        booking.setBaggage(bookingBaggage);
+
         booking = bookingRepository.save(booking);
 
         if (coupon != null) {
