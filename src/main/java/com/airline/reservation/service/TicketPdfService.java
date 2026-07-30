@@ -218,8 +218,25 @@ public class TicketPdfService {
         drawDetailBlock(canvas, bf, bfBold, col1, detailTop2, "SEAT(S)",     booking.getSeatNumbers());
         drawDetailBlock(canvas, bf, bfBold, col2, detailTop2, "CLASS",       booking.getCabinClass() != null ? booking.getCabinClass().toUpperCase() : "ECONOMY");
         drawDetailBlock(canvas, bf, bfBold, col3, detailTop2, "STATUS",      booking.getStatus());
-        drawDetailBlock(canvas, bf, bfBold, col4, detailTop2, "TOTAL FARE",
-                String.format("$%.2f", booking.getTotalFare()));
+        
+        // Coupon / fare row
+        if (booking.getDiscountAmount() != null && booking.getDiscountAmount() > 0) {
+            double original = booking.getTotalFare() + booking.getDiscountAmount();
+            drawDetailBlock(canvas, bf, bfBold, col4, detailTop2, "ORIGINAL FARE",
+                    String.format("INR %.2f", original));
+            
+            float detailTop3 = detailTop2 - 50;
+            drawDetailBlock(canvas, bf, bfBold, col1, detailTop3, "COUPON APPLIED", booking.getCouponCode() != null ? booking.getCouponCode() : "-");
+            drawDetailBlock(canvas, bf, bfBold, col2, detailTop3, "DISCOUNT",
+                    "-INR " + String.format("%.2f", booking.getDiscountAmount()));
+            drawDetailBlock(canvas, bf, bfBold, col3, detailTop3, "YOU SAVED",
+                    "INR " + String.format("%.2f", booking.getDiscountAmount()));
+            drawDetailBlock(canvas, bf, bfBold, col4, detailTop3, "FINAL AMOUNT PAID",
+                    String.format("INR %.2f", booking.getTotalFare()));
+        } else {
+            drawDetailBlock(canvas, bf, bfBold, col4, detailTop2, "TOTAL FARE",
+                    String.format("INR %.2f", booking.getTotalFare()));
+        }
 
         // ── QR Code ────────────────────────────────────────────────────────
         float barX = cardX + cardW - 100;

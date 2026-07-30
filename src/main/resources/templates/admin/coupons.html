@@ -28,8 +28,8 @@
                         <th>Code</th>
                         <th>Type</th>
                         <th>Value</th>
-                        <th>Expiry Date</th>
-                        <th>Limits</th>
+                        <th>Validity (From - Until)</th>
+                        <th>Limits & Usage</th>
                         <th>Status</th>
                         <th>Actions</th>
                     </tr>
@@ -46,9 +46,10 @@
                             <small class="text-muted d-block" th:if="${c.maxDiscountAmount != null}">Max ₹<span th:text="${c.maxDiscountAmount}"></span></small>
                             <small class="text-muted d-block" th:if="${c.minBookingAmount != null}">Min ₹<span th:text="${c.minBookingAmount}"></span></small>
                         </td>
-                        <td th:text="${c.expiryDate}"></td>
-                        <td>
-                            <small class="d-block">Total: <span th:text="${c.usageLimit != null ? c.usageLimit : '∞'}"></span></small>
+                        <td th:text="${c.validFrom} + ' to ' + ${c.expiryDate}"></td>
+                        <td th:with="count=${@couponService.getUsageCount(c)}">
+                            <small class="d-block">Total Limit: <span th:text="${c.usageLimit != null ? c.usageLimit : '∞'}"></span></small>
+                            <small class="d-block text-primary">Remaining: <span th:text="${c.usageLimit != null ? (c.usageLimit - count) : '∞'}"></span></small>
                             <small class="d-block">Per User: <span th:text="${c.usageLimitPerUser != null ? c.usageLimitPerUser : '∞'}"></span></small>
                         </td>
                         <td>

@@ -70,6 +70,10 @@ public class CouponService {
             throw new IllegalArgumentException("This coupon has expired.");
         }
 
+        if (coupon.getValidFrom() != null && coupon.getValidFrom().isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("This coupon is not yet valid.");
+        }
+
         BigDecimal amount = BigDecimal.valueOf(bookingAmount);
 
         if (coupon.getMinBookingAmount() != null && amount.compareTo(coupon.getMinBookingAmount()) < 0) {
@@ -113,5 +117,9 @@ public class CouponService {
     public void recordCouponUsage(Coupon coupon, User user, Booking booking) {
         CouponUsage usage = new CouponUsage(coupon, user, booking, LocalDateTime.now());
         couponUsageRepository.save(usage);
+    }
+
+    public long getUsageCount(Coupon coupon) {
+        return couponUsageRepository.countByCoupon(coupon);
     }
 }

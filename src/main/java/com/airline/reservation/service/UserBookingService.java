@@ -183,7 +183,11 @@ public class UserBookingService {
         else cabinClass = "Economy"; // default
 
         // Compute total fare
-        double totalFare = flight.getFare() * multiplier * requestedSeats.size();
+        Double baseFare = flight.getFare() * multiplier * requestedSeats.size();
+        Double taxes = baseFare * 0.18;
+        Double convenienceFee = 200.0;
+        Double totalFare = baseFare + taxes + convenienceFee;
+
         String seatNumbersStr = String.join(", ", requestedSeats);
 
         // Apply coupon if provided

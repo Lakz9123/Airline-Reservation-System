@@ -27,6 +27,9 @@ public class Coupon {
     @Column(name = "max_discount_amount")
     private BigDecimal maxDiscountAmount;
 
+    @Column(name = "valid_from")
+    private LocalDate validFrom = LocalDate.now();
+
     @Column(name = "expiry_date", nullable = false)
     private LocalDate expiryDate;
 
@@ -96,6 +99,14 @@ public class Coupon {
 
     public void setMaxDiscountAmount(BigDecimal maxDiscountAmount) {
         this.maxDiscountAmount = maxDiscountAmount;
+    }
+
+    public LocalDate getValidFrom() {
+        return validFrom;
+    }
+
+    public void setValidFrom(LocalDate validFrom) {
+        this.validFrom = validFrom;
     }
 
     public LocalDate getExpiryDate() {

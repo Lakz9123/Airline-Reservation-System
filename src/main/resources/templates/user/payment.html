@@ -6,80 +6,103 @@
 
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-lg-6">
+        <div class="col-lg-8">
             <div class="card shadow border-0">
                 <div class="card-header bg-primary text-white py-3">
                     <h5 class="mb-0 fw-bold"><i class="bi bi-credit-card"></i> Payment Details</h5>
                 </div>
                 <div class="card-body p-4">
-                    <!-- Flight & Fare Summary -->
-                    <div class="bg-light p-3 rounded mb-4">
-                        <div class="d-flex justify-content-between mb-2">
-                            <span class="text-muted">Flight:</span>
-                            <span class="fw-bold" th:text="${flight.flightNumber} + ' (' + ${flight.originAirport.airportCode} + ' to ' + ${flight.destinationAirport.airportCode} + ')'">FL-101 (MAA to DEL)</span>
+                    <!-- Flight Summary -->
+                    <h6 class="fw-bold mb-3 border-bottom pb-2">Flight Summary</h6>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <p class="mb-1"><span class="text-muted">Flight:</span> <span class="fw-bold" th:text="${flight.flightNumber} + ' (' + ${flight.airline.airlineName} + ')'"></span></p>
+                            <p class="mb-1"><span class="text-muted">Route:</span> <span class="fw-bold" th:text="${flight.originAirport.airportCode} + ' → ' + ${flight.destinationAirport.airportCode}"></span></p>
+                            <p class="mb-1"><span class="text-muted">Passenger:</span> <span class="fw-bold" th:text="${#authentication.principal.username}"></span></p>
                         </div>
-                        <div class="d-flex justify-content-between mb-2">
-                            <span class="text-muted">Seats:</span>
-                            <span class="fw-bold" th:text="${#strings.listJoin(selectedSeats, ', ')}">A1, A2</span>
+                        <div class="col-md-6">
+                            <p class="mb-1"><span class="text-muted">Departure:</span> <span class="fw-bold" th:text="${#temporals.format(flight.departureDateTime, 'dd MMM yyyy HH:mm')}"></span></p>
+                            <p class="mb-1"><span class="text-muted">Cabin & Seats:</span> <span class="fw-bold" th:text="${cabinClass} + ' | ' + ${#strings.listJoin(selectedSeats, ', ')}"></span></p>
                         </div>
+                    </div>
+
+                    <!-- Fare Breakdown -->
+                    <h6 class="fw-bold mb-3 border-bottom pb-2">Fare Breakdown</h6>
+                    <div class="bg-light p-3 rounded mb-4" id="fareBreakdown">
                         <div class="d-flex justify-content-between mb-2">
-                            <span class="text-muted">Cabin Class:</span>
-                            <span class="fw-bold text-primary" th:text="${cabinClass}">Economy</span>
-                        </div>
-                        <hr>
-                        <!-- Fare Breakdown -->
-                        <div class="d-flex justify-content-between mb-1" th:if="${discountAmount > 0}">
-                            <span class="text-muted">Original Fare:</span>
+                            <span class="text-muted">Base Fare:</span>
                             <span>₹<span th:text="${#numbers.formatDecimal(originalFare, 1, 2)}">0.00</span></span>
                         </div>
-                        <div class="d-flex justify-content-between mb-2" th:if="${discountAmount > 0}">
-                            <span class="text-muted">Discount Applied:</span>
-                            <span class="text-success">-₹<span th:text="${#numbers.formatDecimal(discountAmount, 1, 2)}">0.00</span></span>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Taxes (18%):</span>
+                            <span>₹<span th:text="${#numbers.formatDecimal(taxes, 1, 2)}">0.00</span></span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Convenience Fee:</span>
+                            <span>₹<span th:text="${#numbers.formatDecimal(convenienceFee, 1, 2)}">0.00</span></span>
                         </div>
                         
+                        <div id="couponDiscountRow" class="d-none justify-content-between mb-2">
+                            <span class="text-muted">Coupon Discount:</span>
+                            <span class="text-success fw-bold">-₹<span id="discountAmountDisplay">0.00</span></span>
+                        </div>
+                        
+                        <hr>
                         <div class="d-flex justify-content-between">
-                            <span class="text-muted fs-5">Final Fare:</span>
+                            <span class="text-muted fs-5">Final Amount:</span>
                             <span class="fw-bold text-success fs-5">
-                                ₹<span th:text="${#numbers.formatDecimal(totalFare, 1, 2)}">0.00</span>
+                                ₹<span id="finalFareDisplay" th:text="${#numbers.formatDecimal(totalFare, 1, 2)}">0.00</span>
                             </span>
                         </div>
-                    </div>
-
-                    <!-- Coupon Application Form -->
-                    <div th:if="${appliedCouponDiscount == null || appliedCouponDiscount == 0.0}">
-                        <div th:if="${couponError}" class="alert alert-danger p-2 small mb-3">
-                            <i class="bi bi-exclamation-triangle-fill"></i> <span th:text="${couponError}"></span>
+                        <div id="savingsRow" class="d-none text-end mt-1">
+                            <span class="badge bg-success">You Saved ₹<span id="savingsAmountDisplay">0.00</span></span>
                         </div>
-                        <form th:action="@{/user/payment/{id}/apply-coupon(id=${flight.id})}" method="post" class="mb-4">
-                            <th:block th:each="seat : ${selectedSeats}">
-                                <input type="hidden" name="selectedSeats" th:value="${seat}">
-                            </th:block>
-                            <input type="hidden" name="cabinClass" th:value="${cabinClass}">
-                            <input type="hidden" name="originalFare" th:value="${originalFare}">
-                            
-                            <label class="form-label text-muted small fw-bold">APPLY COUPON CODE</label>
-                            <div class="input-group">
-                                <input type="text" name="couponCode" class="form-control text-uppercase" placeholder="Enter promo code" required>
-                                <button class="btn btn-outline-primary" type="submit">Apply</button>
-                            </div>
-                        </form>
                     </div>
 
-                    <!-- Coupon Success Message -->
-                    <div th:if="${couponSuccess}" class="alert alert-success p-2 small mb-4">
-                        <i class="bi bi-check-circle-fill"></i> <span th:text="${couponSuccess}"></span>
-                        <div class="mt-1 fw-bold">Code Applied: <span th:text="${appliedCouponCode}"></span></div>
+                    <!-- Coupon Section -->
+                    <h6 class="fw-bold mb-3 border-bottom pb-2">Apply Coupon</h6>
+                    
+                    <div id="couponMessageArea" class="d-none alert p-2 small mb-3"></div>
+
+                    <div class="input-group mb-4">
+                        <input type="text" id="couponCodeInput" class="form-control text-uppercase" placeholder="Enter promo code">
+                        <button class="btn btn-outline-primary" type="button" id="applyCouponBtn" onclick="applyCouponCode()">Apply</button>
+                        <button class="btn btn-outline-danger d-none" type="button" id="removeCouponBtn" onclick="removeCoupon()">Remove</button>
+                    </div>
+
+                    <!-- Available Coupons -->
+                    <div th:if="${availableCoupons != null && !availableCoupons.isEmpty()}" class="mb-4">
+                        <p class="text-muted small fw-bold mb-2">AVAILABLE COUPONS</p>
+                        <div class="row">
+                            <div th:each="coupon : ${availableCoupons}" class="col-md-6 mb-3">
+                                <div class="card h-100 border-primary shadow-sm" style="border-style: dashed !important; border-width: 2px !important;">
+                                    <div class="card-body p-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="badge bg-primary fs-6" th:text="${coupon.code}">CODE</span>
+                                            <button type="button" class="btn btn-sm btn-primary" th:attr="onclick=|document.getElementById('couponCodeInput').value='${coupon.code}'; applyCouponCode();|">Apply</button>
+                                        </div>
+                                        <p class="mb-1 text-dark fw-bold">
+                                            <span th:if="${coupon.discountType.name() == 'FLAT'}">Flat ₹<span th:text="${coupon.discountValue}"></span> Off</span>
+                                            <span th:if="${coupon.discountType.name() == 'PERCENTAGE'}"><span th:text="${coupon.discountValue}"></span>% Off</span>
+                                        </p>
+                                        <p class="mb-0 text-muted small">
+                                            Valid until <span th:text="${#temporals.format(coupon.expiryDate, 'dd MMM yyyy')}"></span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Mock Payment Form -->
-                    <form th:action="@{/user/payment/{id}(id=${flight.id})}" method="post">
-                        <!-- Hidden inputs for seats -->
+                    <h6 class="fw-bold mb-3 border-bottom pb-2 mt-4">Payment Information</h6>
+                    <form th:action="@{/user/payment/{id}(id=${flight.id})}" method="post" id="paymentForm">
                         <th:block th:each="seat : ${selectedSeats}">
                             <input type="hidden" name="selectedSeats" th:value="${seat}">
                         </th:block>
                         <input type="hidden" name="cabinClass" th:value="${cabinClass}">
-                        <input type="hidden" name="appliedCouponCode" th:value="${appliedCouponCode}">
-
+                        <input type="hidden" name="appliedCouponCode" id="appliedCouponCode" value="">
+                        
                         <div class="mb-3">
                             <label class="form-label text-muted small fw-bold">CARD NUMBER</label>
                             <input type="text" class="form-control" placeholder="0000 0000 0000 0000" required>
@@ -96,14 +119,14 @@
                             </div>
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-4">
                             <label class="form-label text-muted small fw-bold">CARDHOLDER NAME</label>
                             <input type="text" class="form-control" placeholder="John Doe" required>
                         </div>
 
                         <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                Pay ₹<span th:text="${#numbers.formatDecimal(totalFare, 1, 2)}">0.00</span> & Confirm
+                            <button type="submit" class="btn btn-success btn-lg shadow-sm">
+                                Pay ₹<span id="payButtonAmount" th:text="${#numbers.formatDecimal(totalFare, 1, 2)}">0.00</span> & Confirm
                             </button>
                             <a th:href="@{/user/book/{id}(id=${flight.id})}" class="btn btn-outline-secondary">
                                 Cancel & Back to Seats
@@ -115,6 +138,88 @@
         </div>
     </div>
 </div>
+
+<script th:inline="javascript">
+    const baseTotalFare = /*[[${totalFare}]]*/ 0.0;
+    
+    function applyCouponCode() {
+        const code = document.getElementById('couponCodeInput').value.trim();
+        if (!code) return;
+        
+        const csrfToken = document.querySelector('meta[name="_csrf"]')?.content || '';
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content || '';
+
+        const headers = {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        };
+        if (csrfToken && csrfHeader) {
+            headers[csrfHeader] = csrfToken;
+        }
+
+        fetch('/api/coupons/validate', {
+            method: 'POST',
+            headers: headers,
+            body: new URLSearchParams({
+                'code': code,
+                'originalFare': baseTotalFare
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            const msgArea = document.getElementById('couponMessageArea');
+            msgArea.classList.remove('d-none', 'alert-success', 'alert-danger');
+            
+            if (data.valid) {
+                msgArea.classList.add('alert-success');
+                msgArea.innerHTML = `<strong>${data.message}</strong>`;
+                
+                // Update Fare Breakdown
+                document.getElementById('couponDiscountRow').classList.remove('d-none');
+                document.getElementById('couponDiscountRow').classList.add('d-flex');
+                document.getElementById('discountAmountDisplay').innerText = data.discountAmount.toFixed(2);
+                
+                const finalFare = baseTotalFare - data.discountAmount;
+                document.getElementById('finalFareDisplay').innerText = finalFare.toFixed(2);
+                document.getElementById('payButtonAmount').innerText = finalFare.toFixed(2);
+                
+                document.getElementById('savingsRow').classList.remove('d-none');
+                document.getElementById('savingsAmountDisplay').innerText = data.discountAmount.toFixed(2);
+                
+                document.getElementById('appliedCouponCode').value = data.code;
+                
+                document.getElementById('applyCouponBtn').classList.add('d-none');
+                document.getElementById('removeCouponBtn').classList.remove('d-none');
+                document.getElementById('couponCodeInput').readOnly = true;
+                
+            } else {
+                msgArea.classList.add('alert-danger');
+                msgArea.innerText = data.message;
+            }
+        })
+        .catch(err => {
+            console.error('Error:', err);
+        });
+    }
+    
+    function removeCoupon() {
+        document.getElementById('couponCodeInput').value = '';
+        document.getElementById('couponCodeInput').readOnly = false;
+        document.getElementById('appliedCouponCode').value = '';
+        
+        document.getElementById('applyCouponBtn').classList.remove('d-none');
+        document.getElementById('removeCouponBtn').classList.add('d-none');
+        
+        document.getElementById('couponMessageArea').classList.add('d-none');
+        
+        document.getElementById('couponDiscountRow').classList.add('d-none');
+        document.getElementById('couponDiscountRow').classList.remove('d-flex');
+        
+        document.getElementById('savingsRow').classList.add('d-none');
+        
+        document.getElementById('finalFareDisplay').innerText = baseTotalFare.toFixed(2);
+        document.getElementById('payButtonAmount').innerText = baseTotalFare.toFixed(2);
+    }
+</script>
 
 <div th:replace="~{layout :: footer}"></div>
 <div th:replace="~{layout :: html_scripts}"></div>

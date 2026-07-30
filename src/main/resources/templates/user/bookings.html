@@ -52,11 +52,16 @@
           <small class="badge bg-secondary mt-1" th:text="${b.cabinClass}">Economy</small>
         </div>
         <div class="col-6 col-md-2">
-          <div class="text-muted small">Total Fare</div>
-          <div class="fw-bold text-primary">₹<span th:text="${#numbers.formatDecimal(b.totalFare,1,2)}">0</span></div>
-          <small th:if="${b.discountAmount != null and b.discountAmount > 0}" class="text-success fw-bold d-block">
-            Save ₹<span th:text="${#numbers.formatDecimal(b.discountAmount,1,2)}"></span>
-          </small>
+          <div class="text-muted small">Fare</div>
+          <div th:if="${b.discountAmount != null and b.discountAmount > 0}">
+            <small class="text-muted d-block">Original: <s>₹<span th:text="${#numbers.formatDecimal(b.totalFare + b.discountAmount, 1, 2)}"></span></s></small>
+            <span class="badge bg-primary mb-1" th:text="${b.couponCode}"></span>
+            <div class="fw-bold text-success">₹<span th:text="${#numbers.formatDecimal(b.totalFare, 1, 2)}"></span></div>
+            <small class="text-success fw-bold">You Saved ₹<span th:text="${#numbers.formatDecimal(b.discountAmount, 1, 2)}"></span></small>
+          </div>
+          <div th:if="${b.discountAmount == null or b.discountAmount == 0.0}">
+            <div class="fw-bold text-primary">₹<span th:text="${#numbers.formatDecimal(b.totalFare, 1, 2)}"></span></div>
+          </div>
         </div>
         <div class="col-6 col-md-1 d-flex flex-column gap-1">
           <span class="badge rounded-pill bg-success px-3 py-2" th:if="${b.status=='CONFIRMED'}">CONFIRMED</span>

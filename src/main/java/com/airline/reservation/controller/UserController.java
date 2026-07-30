@@ -15,6 +15,7 @@ import com.airline.reservation.service.UserBookingService;
 import com.airline.reservation.service.UserService;
 import com.airline.reservation.service.AirportService;
 import com.airline.reservation.service.AirlineService;
+import com.airline.reservation.service.CouponService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -47,7 +48,7 @@ public class UserController {
     private final AirlineService airlineService;
     private final BarcodeService barcodeService;
     private final BoardingPassPdfService boardingPassPdfService;
-    private final com.airline.reservation.service.CouponService couponService;
+    private final CouponService couponService;
 
     public UserController(UserService userService,
                           FlightRepository flightRepository,
@@ -61,7 +62,7 @@ public class UserController {
                           AirlineService airlineService,
                           BarcodeService barcodeService,
                           BoardingPassPdfService boardingPassPdfService,
-                          com.airline.reservation.service.CouponService couponService) {
+                          CouponService couponService) {
         this.userService = userService;
         this.flightRepository = flightRepository;
         this.userBookingService = userBookingService;
@@ -192,17 +193,25 @@ public class UserController {
         else if ("First Class".equalsIgnoreCase(cabinClass)) multiplier = 4.0;
         
         Double originalFare = flight.getFare() * multiplier * selectedSeats.size();
+        Double taxes = originalFare * 0.18;
+        Double convenienceFee = 200.0;
+        Double totalFare = originalFare + taxes + convenienceFee;
+
         model.addAttribute("originalFare", originalFare);
+        model.addAttribute("taxes", taxes);
+        model.addAttribute("convenienceFee", convenienceFee);
+        model.addAttribute("totalFare", totalFare);
         
-        Double discountAmount = 0.0;
-        if (model.containsAttribute("appliedCouponDiscount")) {
-             discountAmount = (Double) model.getAttribute("appliedCouponDiscount");
-        }
+        List<com.airline.reservation.entity.Coupon> activeCoupons = couponService.getAllCoupons().stream()
+                .filter(c -> c.isActive() && !c.getExpiryDate().isBefore(LocalDate.now()) && (c.getValidFrom() == null || !c.getValidFrom().isAfter(LocalDate.now())))
+                .toList();
+        model.addAttribute("availableCoupons", activeCoupons);
         
-        model.addAttribute("discountAmount", discountAmount);
-        model.addAttribute("totalFare", originalFare - discountAmount);
         return "user/payment";
     }
+
+    // The old /payment/{flightId}/apply-coupon is now handled via AJAX in CouponRestController
+    // so we can safely leave it or remove it. We'll leave it as fallback.
 
     @PostMapping("/payment/{flightId}/apply-coupon")
     public String applyCoupon(@PathVariable Long flightId,
@@ -237,15 +246,52 @@ public class UserController {
                                  RedirectAttributes redirectAttributes) {
         User user = getCurrentUser(principal);
         try {
-            // Mock payment processing happens here
+            // Recompute original base fare + taxes + convenience before sending to service
+            Flight flight = flightRepository.findById(flightId)
+                    .orElseThrow(() -> new IllegalArgumentException("Flight not found."));
+            
+            double multiplier = 1.0;
+            if ("Premium Economy".equalsIgnoreCase(cabinClass)) multiplier = 1.5;
+            else if ("Business Class".equalsIgnoreCase(cabinClass)) multiplier = 2.5;
+            else if ("First Class".equalsIgnoreCase(cabinClass)) multiplier = 4.0;
+            
+            Double originalFare = flight.getFare() * multiplier * selectedSeats.size();
+            Double taxes = originalFare * 0.18;
+            Double convenienceFee = 200.0;
+            Double totalBeforeDiscount = originalFare + taxes + convenienceFee;
+
+            // Notice we pass totalBeforeDiscount to UserBookingService, which will apply the coupon on it.
+            // But we need to update UserBookingService to understand we are passing the base+taxes+fees
+            // Wait, we can just pass totalBeforeDiscount directly to bookSeats.
+            // Let's rely on UserBookingService's internal calculation. 
+            // Wait, UserBookingService computes its own `totalFare = flight.getFare() * multiplier * requestedSeats.size()`.
+            // Let's just update `UserBookingService` later, or pass the precomputed value.
+            // The cleanest way is to modify `UserBookingService` to add taxes and fees.
+            
             Booking booking = userBookingService.bookSeats(user, flightId, selectedSeats, cabinClass, appliedCouponCode);
             emailService.sendBookingConfirmation(booking);
             redirectAttributes.addFlashAttribute("bookingSuccess", true);
-            return "redirect:/user/bookings";
-        } catch (IllegalArgumentException | IllegalStateException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/user/book/" + flightId;
+            return "redirect:/user/booking-success/" + booking.getId();
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Payment failed: " + e.getMessage());
+            return "redirect:/user/payment/" + flightId;
         }
+    }
+
+    @GetMapping("/booking-success/{bookingId}")
+    public String showBookingSuccess(@PathVariable Long bookingId,
+                                     @AuthenticationPrincipal UserDetails principal,
+                                     Model model) {
+        User user = getCurrentUser(principal);
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid booking ID"));
+                
+        if (!booking.getUser().getId().equals(user.getId())) {
+            throw new SecurityException("Access denied");
+        }
+        
+        model.addAttribute("booking", booking);
+        return "user/booking-success";
     }
 
     // ============================
