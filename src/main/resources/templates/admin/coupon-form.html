@@ -1,15 +1,18 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(${coupon.id == null ? 'Add Coupon' : 'Edit Coupon'}, ~{::section})}">
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: html_head('Manage Coupon')}"></head>
 <body>
-<section>
+<div th:replace="~{layout :: navbar}"></div>
+
+<main class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 th:text="${coupon.id == null ? 'Add New Coupon' : 'Edit Coupon'}"></h2>
+        <h2 class="fw-bold" th:text="${coupon.id == null ? 'Add New Coupon' : 'Edit Coupon'}">Coupon</h2>
         <a th:href="@{/admin/coupons}" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left"></i> Back to List
         </a>
     </div>
 
-    <div class="card shadow-sm max-w-md mx-auto" style="max-width: 600px;">
+    <div class="card shadow-sm border-0 mx-auto" style="max-width: 640px;">
         <div class="card-body p-4">
             <form th:action="@{/admin/coupons/save}" th:object="${coupon}" method="post">
                 <input type="hidden" th:field="*{id}" />
@@ -74,13 +77,16 @@
                 </div>
 
                 <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-primary btn-lg">
                         <i class="bi bi-save"></i> Save Coupon
                     </button>
                 </div>
             </form>
         </div>
     </div>
-</section>
+</main>
+
+<div th:replace="~{layout :: footer}"></div>
+<div th:replace="~{layout :: html_scripts}"></div>
 </body>
 </html>
