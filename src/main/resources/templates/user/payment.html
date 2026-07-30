@@ -57,6 +57,18 @@
                         <div id="savingsRow" class="d-none text-end mt-1">
                             <span class="badge bg-success">You Saved ₹<span id="savingsAmountDisplay">0.00</span></span>
                         </div>
+                        
+                        <hr id="walletDivider" class="d-none">
+                        <div id="walletDiscountRow" class="d-none justify-content-between mb-2">
+                            <span class="text-muted"><i class="bi bi-wallet2 text-primary"></i> Wallet Applied:</span>
+                            <span class="text-primary fw-bold">-₹<span id="walletAppliedDisplay">0.00</span></span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-dark fs-5 fw-bold">Amount to Pay:</span>
+                            <span class="fw-bold text-dark fs-5">
+                                ₹<span id="amountToPayDisplay" th:text="${#numbers.formatDecimal(totalFare, 1, 2)}">0.00</span>
+                            </span>
+                        </div>
                     </div>
 
                     <!-- Coupon Section -->
@@ -103,6 +115,19 @@
                         <input type="hidden" name="cabinClass" th:value="${cabinClass}">
                         <input type="hidden" name="appliedCouponCode" id="appliedCouponCode" value="">
                         
+                        <!-- Wallet Checkbox -->
+                        <div class="card bg-light border-0 mb-4" th:if="${walletBalance != null && walletBalance > 0}">
+                            <div class="card-body py-3 px-4">
+                                <div class="form-check form-switch d-flex align-items-center mb-0">
+                                    <input class="form-check-input fs-4 mt-0 me-3" type="checkbox" role="switch" id="useWalletBalance" name="useWalletBalance" value="true" onchange="recalculateFare()">
+                                    <label class="form-check-label d-flex flex-column" for="useWalletBalance" style="cursor:pointer;">
+                                        <span class="fw-bold text-dark">Use Wallet Balance</span>
+                                        <span class="text-muted small">Available: ₹<span id="walletAvailableText" th:text="${#numbers.formatDecimal(walletBalance, 1, 2)}"></span></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <div class="mb-3">
                             <label class="form-label text-muted small fw-bold">CARD NUMBER</label>
                             <input type="text" class="form-control" placeholder="0000 0000 0000 0000" required>
@@ -141,6 +166,32 @@
 
 <script th:inline="javascript">
     const baseTotalFare = /*[[${totalFare}]]*/ 0.0;
+    const walletBalance = /*[[${walletBalance != null ? walletBalance : 0.0}]]*/ 0.0;
+    let currentCouponDiscount = 0.0;
+    
+    function recalculateFare() {
+        let finalFare = baseTotalFare - currentCouponDiscount;
+        
+        const useWalletCheckbox = document.getElementById('useWalletBalance');
+        let walletApplied = 0.0;
+        
+        if (useWalletCheckbox && useWalletCheckbox.checked) {
+            walletApplied = Math.min(finalFare, walletBalance);
+            finalFare -= walletApplied;
+            
+            document.getElementById('walletDivider').classList.remove('d-none');
+            document.getElementById('walletDiscountRow').classList.remove('d-none');
+            document.getElementById('walletDiscountRow').classList.add('d-flex');
+            document.getElementById('walletAppliedDisplay').innerText = walletApplied.toFixed(2);
+        } else {
+            document.getElementById('walletDivider').classList.add('d-none');
+            document.getElementById('walletDiscountRow').classList.add('d-none');
+            document.getElementById('walletDiscountRow').classList.remove('d-flex');
+        }
+        
+        document.getElementById('amountToPayDisplay').innerText = finalFare.toFixed(2);
+        document.getElementById('payButtonAmount').innerText = finalFare.toFixed(2);
+    }
     
     function applyCouponCode() {
         const code = document.getElementById('couponCodeInput').value.trim();
@@ -178,9 +229,9 @@
                 document.getElementById('couponDiscountRow').classList.add('d-flex');
                 document.getElementById('discountAmountDisplay').innerText = data.discountAmount.toFixed(2);
                 
-                const finalFare = baseTotalFare - data.discountAmount;
-                document.getElementById('finalFareDisplay').innerText = finalFare.toFixed(2);
-                document.getElementById('payButtonAmount').innerText = finalFare.toFixed(2);
+                currentCouponDiscount = data.discountAmount;
+                const finalBeforeWallet = baseTotalFare - currentCouponDiscount;
+                document.getElementById('finalFareDisplay').innerText = finalBeforeWallet.toFixed(2);
                 
                 document.getElementById('savingsRow').classList.remove('d-none');
                 document.getElementById('savingsAmountDisplay').innerText = data.discountAmount.toFixed(2);
@@ -190,6 +241,8 @@
                 document.getElementById('applyCouponBtn').classList.add('d-none');
                 document.getElementById('removeCouponBtn').classList.remove('d-none');
                 document.getElementById('couponCodeInput').readOnly = true;
+                
+                recalculateFare();
                 
             } else {
                 msgArea.classList.add('alert-danger');
@@ -216,8 +269,9 @@
         
         document.getElementById('savingsRow').classList.add('d-none');
         
+        currentCouponDiscount = 0.0;
         document.getElementById('finalFareDisplay').innerText = baseTotalFare.toFixed(2);
-        document.getElementById('payButtonAmount').innerText = baseTotalFare.toFixed(2);
+        recalculateFare();
     }
 </script>
 

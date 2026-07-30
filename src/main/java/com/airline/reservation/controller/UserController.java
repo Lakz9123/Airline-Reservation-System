@@ -16,6 +16,8 @@ import com.airline.reservation.service.UserService;
 import com.airline.reservation.service.AirportService;
 import com.airline.reservation.service.AirlineService;
 import com.airline.reservation.service.CouponService;
+import com.airline.reservation.service.CouponService;
+import com.airline.reservation.service.WalletService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -49,6 +51,7 @@ public class UserController {
     private final BarcodeService barcodeService;
     private final BoardingPassPdfService boardingPassPdfService;
     private final CouponService couponService;
+    private final WalletService walletService;
 
     public UserController(UserService userService,
                           FlightRepository flightRepository,
@@ -62,7 +65,8 @@ public class UserController {
                           AirlineService airlineService,
                           BarcodeService barcodeService,
                           BoardingPassPdfService boardingPassPdfService,
-                          CouponService couponService) {
+                          CouponService couponService,
+                          WalletService walletService) {
         this.userService = userService;
         this.flightRepository = flightRepository;
         this.userBookingService = userBookingService;
@@ -76,6 +80,7 @@ public class UserController {
         this.barcodeService = barcodeService;
         this.boardingPassPdfService = boardingPassPdfService;
         this.couponService = couponService;
+        this.walletService = walletService;
     }
 
     // ----- Helper: resolve current User entity -----
@@ -176,6 +181,7 @@ public class UserController {
     @GetMapping("/payment/{flightId}")
     public String showPaymentPage(@PathVariable Long flightId,
                                   Model model,
+                                  @AuthenticationPrincipal UserDetails principal,
                                   @ModelAttribute("selectedSeats") List<String> selectedSeats,
                                   @ModelAttribute("cabinClass") String cabinClass) {
         if (selectedSeats == null || selectedSeats.isEmpty()) {
@@ -206,7 +212,12 @@ public class UserController {
                 .filter(c -> c.isActive() && !c.getExpiryDate().isBefore(LocalDate.now()) && (c.getValidFrom() == null || !c.getValidFrom().isAfter(LocalDate.now())))
                 .toList();
         model.addAttribute("availableCoupons", activeCoupons);
-        
+
+        // Wallet balance
+        User currentUser = getCurrentUser(principal);
+        com.airline.reservation.entity.Wallet wallet = walletService.getOrCreateWallet(currentUser);
+        model.addAttribute("walletBalance", wallet.getBalance());
+
         return "user/payment";
     }
 
@@ -242,33 +253,26 @@ public class UserController {
                                  @RequestParam("selectedSeats") List<String> selectedSeats,
                                  @RequestParam("cabinClass") String cabinClass,
                                  @RequestParam(value = "appliedCouponCode", required = false) String appliedCouponCode,
+                                 @RequestParam(value = "useWalletBalance", required = false) Boolean useWalletBalance,
                                  @AuthenticationPrincipal UserDetails principal,
                                  RedirectAttributes redirectAttributes) {
         User user = getCurrentUser(principal);
         try {
-            // Recompute original base fare + taxes + convenience before sending to service
-            Flight flight = flightRepository.findById(flightId)
-                    .orElseThrow(() -> new IllegalArgumentException("Flight not found."));
-            
-            double multiplier = 1.0;
-            if ("Premium Economy".equalsIgnoreCase(cabinClass)) multiplier = 1.5;
-            else if ("Business Class".equalsIgnoreCase(cabinClass)) multiplier = 2.5;
-            else if ("First Class".equalsIgnoreCase(cabinClass)) multiplier = 4.0;
-            
-            Double originalFare = flight.getFare() * multiplier * selectedSeats.size();
-            Double taxes = originalFare * 0.18;
-            Double convenienceFee = 200.0;
-            Double totalBeforeDiscount = originalFare + taxes + convenienceFee;
-
-            // Notice we pass totalBeforeDiscount to UserBookingService, which will apply the coupon on it.
-            // But we need to update UserBookingService to understand we are passing the base+taxes+fees
-            // Wait, we can just pass totalBeforeDiscount directly to bookSeats.
-            // Let's rely on UserBookingService's internal calculation. 
-            // Wait, UserBookingService computes its own `totalFare = flight.getFare() * multiplier * requestedSeats.size()`.
-            // Let's just update `UserBookingService` later, or pass the precomputed value.
-            // The cleanest way is to modify `UserBookingService` to add taxes and fees.
-            
             Booking booking = userBookingService.bookSeats(user, flightId, selectedSeats, cabinClass, appliedCouponCode);
+
+            // Wallet debit if user opted to use wallet balance
+            if (Boolean.TRUE.equals(useWalletBalance)) {
+                com.airline.reservation.entity.Wallet wallet = walletService.getOrCreateWallet(user);
+                java.math.BigDecimal totalFareBD = java.math.BigDecimal.valueOf(booking.getTotalFare());
+                java.math.BigDecimal walletBalance = wallet.getBalance();
+                java.math.BigDecimal walletUsed = walletBalance.min(totalFareBD);
+                if (walletUsed.compareTo(java.math.BigDecimal.ZERO) > 0) {
+                    walletService.debitWallet(user, walletUsed,
+                            com.airline.reservation.entity.TransactionCategory.BOOKING_PAYMENT,
+                            "Wallet payment for booking SKY-" + String.format("%05d", booking.getId()), booking);
+                }
+            }
+
             emailService.sendBookingConfirmation(booking);
             redirectAttributes.addFlashAttribute("bookingSuccess", true);
             return "redirect:/user/booking-success/" + booking.getId();
@@ -568,5 +572,17 @@ public class UserController {
             redirectAttributes.addFlashAttribute("passwordSuccess", "Password changed successfully.");
         }
         return "redirect:/user/profile";
+    }
+
+    // ============================
+    // Wallet Page
+    // ============================
+    @GetMapping("/wallet")
+    public String walletPage(@AuthenticationPrincipal UserDetails principal, Model model) {
+        User user = getCurrentUser(principal);
+        com.airline.reservation.entity.Wallet wallet = walletService.getOrCreateWallet(user);
+        model.addAttribute("wallet", wallet);
+        model.addAttribute("transactions", walletService.getTransactions(wallet));
+        return "user/wallet";
     }
 }

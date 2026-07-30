@@ -3,6 +3,7 @@ package com.airline.reservation.service;
 import com.airline.reservation.entity.Booking;
 import com.airline.reservation.entity.Flight;
 import com.airline.reservation.entity.FlightStatus;
+import com.airline.reservation.entity.TransactionCategory;
 import com.airline.reservation.entity.User;
 import com.airline.reservation.repository.BookingRepository;
 import com.airline.reservation.repository.FlightRepository;
@@ -19,11 +20,13 @@ public class UserBookingService {
     private final BookingRepository bookingRepository;
     private final FlightRepository flightRepository;
     private final CouponService couponService;
+    private final WalletService walletService;
 
-    public UserBookingService(BookingRepository bookingRepository, FlightRepository flightRepository, CouponService couponService) {
+    public UserBookingService(BookingRepository bookingRepository, FlightRepository flightRepository, CouponService couponService, WalletService walletService) {
         this.bookingRepository = bookingRepository;
         this.flightRepository = flightRepository;
         this.couponService = couponService;
+        this.walletService = walletService;
     }
 
     /** Returns all bookings for the given user, newest first. */
@@ -209,7 +212,14 @@ public class UserBookingService {
         if (coupon != null) {
             couponService.recordCouponUsage(coupon, user, booking);
         }
-        
+
+        // Award reward points: 2% of final fare, rounded down
+        int rewardPoints = walletService.calculateRewardPoints(totalFare);
+        if (rewardPoints > 0) {
+            walletService.addRewardPoints(user, rewardPoints,
+                    "Reward points for booking SKY-" + String.format("%05d", booking.getId()), booking);
+        }
+
         return booking;
     }
 
@@ -241,6 +251,12 @@ public class UserBookingService {
 
         booking.setStatus("CANCELLED");
         bookingRepository.save(booking);
+
+        // Refund to wallet
+        java.math.BigDecimal refundAmount = java.math.BigDecimal.valueOf(booking.getTotalFare());
+        walletService.creditWallet(booking.getUser(), refundAmount,
+                TransactionCategory.REFUND,
+                "Refund for cancelled booking SKY-" + String.format("%05d", booking.getId()), booking);
     }
 
     /**

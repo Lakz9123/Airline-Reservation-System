@@ -1,7 +1,9 @@
 package com.airline.reservation.service;
 
 import com.airline.reservation.entity.User;
+import com.airline.reservation.entity.Wallet;
 import com.airline.reservation.repository.UserRepository;
+import com.airline.reservation.repository.WalletRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,10 +17,12 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final WalletRepository walletRepository;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, WalletRepository walletRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.walletRepository = walletRepository;
     }
 
     public List<User> getAllUsers() {
@@ -36,7 +40,12 @@ public class UserService {
         if (user.getRole() == null || user.getRole().isBlank()) {
             user.setRole("ROLE_USER");
         }
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        // Auto-create wallet for every new user
+        if (walletRepository.findByUserId(savedUser.getId()).isEmpty()) {
+            walletRepository.save(new Wallet(savedUser));
+        }
+        return savedUser;
     }
 
     public Optional<User> findByEmail(String email) {
