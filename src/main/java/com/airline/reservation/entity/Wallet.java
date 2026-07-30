@@ -24,13 +24,13 @@ public class Wallet {
     private Integer rewardPoints = 0;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "varchar(255) default 'SILVER'")
     private LoyaltyTier tier = LoyaltyTier.SILVER;
 
-    @Column(name = "total_miles", nullable = false)
+    @Column(name = "total_miles", nullable = false, columnDefinition = "integer default 0")
     private Integer totalMiles = 0;
 
-    @Column(name = "miles_this_year", nullable = false)
+    @Column(name = "miles_this_year", nullable = false, columnDefinition = "integer default 0")
     private Integer milesThisYear = 0;
 
     @Column(name = "tier_valid_until")
