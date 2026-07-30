@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{layout :: html_head('Loyalty Program')}"></head>
+<body>
+<div th:replace="~{layout :: user_navbar}"></div>
+
+<div class="container py-5">
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-8">
+            <h2 class="fw-bold mb-1"><i class="bi bi-star"></i> Loyalty Program</h2>
+            <p class="text-muted mb-0">View your tier, track your progress, and see your miles.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Loyalty Status Card -->
+        <div class="col-md-8 mb-4">
+            <div class="card shadow-sm border-0 h-100 overflow-hidden" 
+                 th:classappend="${wallet.tier.name() == 'PLATINUM' ? 'bg-dark text-white' : (wallet.tier.name() == 'GOLD' ? 'bg-warning text-dark' : 'bg-light text-dark')}">
+                
+                <div class="card-body p-4 p-md-5">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h5 class="mb-1 opacity-75" th:classappend="${wallet.tier.name() == 'PLATINUM' ? 'text-white' : 'text-dark'}">Current Tier</h5>
+                            <h2 class="display-5 fw-bold mb-0">
+                                <i class="bi bi-award-fill"></i> <span th:text="${wallet.tier}"></span>
+                            </h2>
+                            <p class="small mt-2 mb-0" th:if="${wallet.tierValidUntil != null}">
+                                Valid until <span class="fw-bold" th:text="${#temporals.format(wallet.tierValidUntil, 'dd MMM yyyy')}"></span>
+                            </p>
+                        </div>
+                        <div class="text-end">
+                            <h5 class="mb-1 opacity-75" th:classappend="${wallet.tier.name() == 'PLATINUM' ? 'text-white' : 'text-dark'}">Total Miles</h5>
+                            <h2 class="display-6 fw-bold mb-0"><span th:text="${#numbers.formatInteger(wallet.totalMiles, 1, 'COMMA')}"></span></h2>
+                        </div>
+                    </div>
+
+                    <!-- Progress to Next Tier -->
+                    <div class="mt-5 p-3 rounded" style="background-color: rgba(255,255,255,0.2);">
+                        <div th:if="${wallet.tier.name() == 'SILVER'}">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Progress to <strong>GOLD</strong></span>
+                                <span><span th:text="${#numbers.formatInteger(wallet.milesThisYear, 1, 'COMMA')}"></span> / 20,000 miles</span>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-primary" role="progressbar" 
+                                     th:style="'width: ' + (${wallet.milesThisYear} * 100 / 20000) + '%'" 
+                                     th:attr="aria-valuenow=${wallet.milesThisYear}, aria-valuemin=0, aria-valuemax=20000"></div>
+                            </div>
+                            <p class="small mt-2 mb-0 opacity-75">Earn <span th:text="${#numbers.formatInteger(20000 - wallet.milesThisYear, 1, 'COMMA')}"></span> more miles this year to reach Gold tier!</p>
+                        </div>
+                        
+                        <div th:if="${wallet.tier.name() == 'GOLD'}">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Progress to <strong>PLATINUM</strong></span>
+                                <span><span th:text="${#numbers.formatInteger(wallet.milesThisYear, 1, 'COMMA')}"></span> / 50,000 miles</span>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-dark" role="progressbar" 
+                                     th:style="'width: ' + (${wallet.milesThisYear} * 100 / 50000) + '%'" 
+                                     th:attr="aria-valuenow=${wallet.milesThisYear}, aria-valuemin=0, aria-valuemax=50000"></div>
+                            </div>
+                            <p class="small mt-2 mb-0 opacity-75">Earn <span th:text="${#numbers.formatInteger(50000 - wallet.milesThisYear, 1, 'COMMA')}"></span> more miles this year to reach Platinum tier!</p>
+                        </div>
+
+                        <div th:if="${wallet.tier.name() == 'PLATINUM'}">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span><strong>PLATINUM</strong> Status</span>
+                                <span><span th:text="${#numbers.formatInteger(wallet.milesThisYear, 1, 'COMMA')}"></span> miles this year</span>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <p class="small mt-2 mb-0 opacity-75">You have reached the highest tier! Enjoy your exclusive benefits.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Secondary Info Cards -->
+        <div class="col-md-4 mb-4">
+            <!-- Reward Points Card -->
+            <div class="card shadow-sm border-0 mb-4 h-50">
+                <div class="card-body">
+                    <h6 class="text-muted fw-bold mb-3"><i class="bi bi-gift"></i> REWARD POINTS</h6>
+                    <h2 class="text-primary fw-bold mb-1"><span th:text="${#numbers.formatInteger(wallet.rewardPoints, 1, 'COMMA')}"></span> pts</h2>
+                    <p class="small text-muted mb-0">Use your points for discounts on your next booking.</p>
+                    <a th:href="@{/user/wallet}" class="btn btn-sm btn-outline-primary mt-3">Go to Wallet <i class="bi bi-arrow-right"></i></a>
+                </div>
+            </div>
+            
+            <!-- Tier Benefits Summary -->
+            <div class="card shadow-sm border-0 h-50">
+                <div class="card-body">
+                    <h6 class="text-muted fw-bold mb-3"><i class="bi bi-info-circle"></i> TIER BENEFITS</h6>
+                    <ul class="list-unstyled small mb-0">
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> <strong>Silver:</strong> Base miles earning.</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> <strong>Gold:</strong> 5% bonus miles on bookings.</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> <strong>Platinum:</strong> 10% bonus miles + Priority boarding.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{layout :: footer}"></div>
+<div th:replace="~{layout :: html_scripts}"></div>
+</body>
+</html>

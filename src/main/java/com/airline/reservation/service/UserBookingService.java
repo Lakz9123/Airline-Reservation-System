@@ -21,12 +21,14 @@ public class UserBookingService {
     private final FlightRepository flightRepository;
     private final CouponService couponService;
     private final WalletService walletService;
+    private final LoyaltyService loyaltyService;
 
-    public UserBookingService(BookingRepository bookingRepository, FlightRepository flightRepository, CouponService couponService, WalletService walletService) {
+    public UserBookingService(BookingRepository bookingRepository, FlightRepository flightRepository, CouponService couponService, WalletService walletService, LoyaltyService loyaltyService) {
         this.bookingRepository = bookingRepository;
         this.flightRepository = flightRepository;
         this.couponService = couponService;
         this.walletService = walletService;
+        this.loyaltyService = loyaltyService;
     }
 
     /** Returns all bookings for the given user, newest first. */
@@ -219,6 +221,9 @@ public class UserBookingService {
             walletService.addRewardPoints(user, rewardPoints,
                     "Reward points for booking SKY-" + String.format("%05d", booking.getId()), booking);
         }
+
+        // Award loyalty miles
+        loyaltyService.addMilesForBooking(user, totalFare);
 
         return booking;
     }

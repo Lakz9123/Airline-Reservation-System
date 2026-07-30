@@ -305,7 +305,9 @@ public class UserController {
     public String myBookings(@AuthenticationPrincipal UserDetails principal, Model model) {
         User user = getCurrentUser(principal);
         List<Booking> bookings = userBookingService.getBookingsForUser(user);
+        com.airline.reservation.entity.Wallet wallet = walletService.getOrCreateWallet(user);
         model.addAttribute("bookings", bookings);
+        model.addAttribute("wallet", wallet);
         return "user/bookings";
     }
 
@@ -534,7 +536,9 @@ public class UserController {
     @GetMapping("/profile")
     public String viewProfile(@AuthenticationPrincipal UserDetails principal, Model model) {
         User user = getCurrentUser(principal);
+        com.airline.reservation.entity.Wallet wallet = walletService.getOrCreateWallet(user);
         model.addAttribute("currentUser", user);
+        model.addAttribute("wallet", wallet);
         return "user/profile";
     }
 
@@ -584,5 +588,16 @@ public class UserController {
         model.addAttribute("wallet", wallet);
         model.addAttribute("transactions", walletService.getTransactions(wallet));
         return "user/wallet";
+    }
+
+    // ============================
+    // Loyalty Page
+    // ============================
+    @GetMapping("/loyalty")
+    public String loyaltyPage(@AuthenticationPrincipal UserDetails principal, Model model) {
+        User user = getCurrentUser(principal);
+        com.airline.reservation.entity.Wallet wallet = walletService.getOrCreateWallet(user);
+        model.addAttribute("wallet", wallet);
+        return "user/loyalty";
     }
 }

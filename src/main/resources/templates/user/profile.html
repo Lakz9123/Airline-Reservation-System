@@ -22,6 +22,13 @@
           </div>
           <p class="mb-1 text-muted small">Email Address</p>
           <p class="fw-semibold mb-3" th:text="${currentUser.email}">email@example.com</p>
+          <div class="mb-3 d-flex align-items-center">
+              <span class="text-muted small me-2">Loyalty Status:</span>
+              <span class="badge bg-secondary" th:if="${wallet.tier.name() == 'SILVER'}">SILVER</span>
+              <span class="badge bg-warning text-dark" th:if="${wallet.tier.name() == 'GOLD'}">GOLD</span>
+              <span class="badge bg-dark" th:if="${wallet.tier.name() == 'PLATINUM'}">PLATINUM</span>
+              <a th:href="@{/user/loyalty}" class="ms-2 small">View Details</a>
+          </div>
           <form th:action="@{/user/profile/update-name}" method="post">
             <div class="mb-3">
               <label for="name" class="form-label">Full Name</label>

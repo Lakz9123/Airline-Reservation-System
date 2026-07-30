@@ -22,15 +22,18 @@ public class ScheduledTasks {
     private final EmailService emailService;
     private final NotificationService notificationService;
     private final com.airline.reservation.repository.NotificationRepository notificationRepository;
+    private final LoyaltyService loyaltyService;
 
     public ScheduledTasks(BookingRepository bookingRepository,
                           EmailService emailService,
                           NotificationService notificationService,
-                          com.airline.reservation.repository.NotificationRepository notificationRepository) {
+                          com.airline.reservation.repository.NotificationRepository notificationRepository,
+                          LoyaltyService loyaltyService) {
         this.bookingRepository = bookingRepository;
         this.emailService = emailService;
         this.notificationService = notificationService;
         this.notificationRepository = notificationRepository;
+        this.loyaltyService = loyaltyService;
     }
 
     /**
@@ -110,6 +113,20 @@ public class ScheduledTasks {
             } catch (Exception e) {
                 logger.error("Failed to send departure reminder for booking ID {}", booking.getId(), e);
             }
+        }
+    }
+
+    /**
+     * Runs daily at midnight to check for any loyalty tier downgrades.
+     */
+    @Scheduled(cron = "0 0 0 * * ?")
+    public void processLoyaltyTierDowngrades() {
+        logger.info("Running daily loyalty tier downgrade check.");
+        try {
+            loyaltyService.processTierDowngrades();
+            logger.info("Completed daily loyalty tier downgrade check.");
+        } catch (Exception e) {
+            logger.error("Failed to process loyalty tier downgrades.", e);
         }
     }
 }

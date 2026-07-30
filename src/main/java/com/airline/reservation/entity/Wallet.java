@@ -2,6 +2,7 @@ package com.airline.reservation.entity;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -22,6 +23,19 @@ public class Wallet {
     @Column(name = "reward_points", nullable = false)
     private Integer rewardPoints = 0;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private LoyaltyTier tier = LoyaltyTier.SILVER;
+
+    @Column(name = "total_miles", nullable = false)
+    private Integer totalMiles = 0;
+
+    @Column(name = "miles_this_year", nullable = false)
+    private Integer milesThisYear = 0;
+
+    @Column(name = "tier_valid_until")
+    private LocalDate tierValidUntil;
+
     @Column(name = "updated_at")
     private LocalDateTime updatedAt = LocalDateTime.now();
 
@@ -31,6 +45,9 @@ public class Wallet {
         this.user = user;
         this.balance = BigDecimal.ZERO;
         this.rewardPoints = 0;
+        this.tier = LoyaltyTier.SILVER;
+        this.totalMiles = 0;
+        this.milesThisYear = 0;
         this.updatedAt = LocalDateTime.now();
     }
 
@@ -46,6 +63,18 @@ public class Wallet {
 
     public Integer getRewardPoints() { return rewardPoints; }
     public void setRewardPoints(Integer rewardPoints) { this.rewardPoints = rewardPoints; }
+
+    public LoyaltyTier getTier() { return tier; }
+    public void setTier(LoyaltyTier tier) { this.tier = tier; }
+
+    public Integer getTotalMiles() { return totalMiles; }
+    public void setTotalMiles(Integer totalMiles) { this.totalMiles = totalMiles; }
+
+    public Integer getMilesThisYear() { return milesThisYear; }
+    public void setMilesThisYear(Integer milesThisYear) { this.milesThisYear = milesThisYear; }
+
+    public LocalDate getTierValidUntil() { return tierValidUntil; }
+    public void setTierValidUntil(LocalDate tierValidUntil) { this.tierValidUntil = tierValidUntil; }
 
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }

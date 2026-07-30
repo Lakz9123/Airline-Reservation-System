@@ -4,7 +4,14 @@
 <body>
 <div th:replace="~{layout :: user_navbar}"></div>
 <main class="container">
-  <h2 class="fw-bold mb-4"><i class="bi bi-journal-check text-primary"></i> My Bookings</h2>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="fw-bold mb-0"><i class="bi bi-journal-check text-primary"></i> My Bookings</h2>
+      <div>
+          <span class="badge bg-secondary" th:if="${wallet.tier.name() == 'SILVER'}">SILVER</span>
+          <span class="badge bg-warning text-dark" th:if="${wallet.tier.name() == 'GOLD'}">GOLD</span>
+          <span class="badge bg-dark" th:if="${wallet.tier.name() == 'PLATINUM'}">PLATINUM</span>
+      </div>
+  </div>
 
   <div th:if="${success}" class="alert alert-success alert-dismissible fade show" th:text="${success}">
     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>

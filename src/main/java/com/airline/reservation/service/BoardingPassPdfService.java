@@ -13,9 +13,11 @@ import java.time.format.DateTimeFormatter;
 public class BoardingPassPdfService {
 
     private final BarcodeService barcodeService;
+    private final WalletService walletService;
 
-    public BoardingPassPdfService(BarcodeService barcodeService) {
+    public BoardingPassPdfService(BarcodeService barcodeService, WalletService walletService) {
         this.barcodeService = barcodeService;
+        this.walletService = walletService;
     }
 
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd MMM yyyy");
@@ -29,6 +31,10 @@ public class BoardingPassPdfService {
     private static final Color TEXT_MUTED = new Color(100, 116, 139);
     private static final Color WHITE      = Color.WHITE;
     private static final Color AMBER      = new Color(255, 193, 7);
+    
+    // Loyalty tier colors
+    private static final Color TIER_GOLD     = new Color(255, 215, 0); // Gold
+    private static final Color TIER_PLATINUM = new Color(229, 228, 226); // Platinum
 
     public void generate(Booking booking, OutputStream out) throws Exception {
         Document doc = new Document(PageSize.A4.rotate(), 30, 30, 30, 30);
@@ -179,6 +185,31 @@ public class BoardingPassPdfService {
 
         drawDetailBlock(canvas, bf, bfBold, col1, detailTop, "PASSENGER",
                 booking.getUser().getName().toUpperCase());
+
+        // Draw Tier Badge if applicable
+        com.airline.reservation.entity.LoyaltyTier tier = walletService.findByUser(booking.getUser())
+                .map(com.airline.reservation.entity.Wallet::getTier)
+                .orElse(com.airline.reservation.entity.LoyaltyTier.SILVER);
+                
+        if (tier == com.airline.reservation.entity.LoyaltyTier.GOLD || tier == com.airline.reservation.entity.LoyaltyTier.PLATINUM) {
+            float badgeY = detailTop - 18;
+            float badgeX = col1 + bfBold.getWidthPoint(booking.getUser().getName().toUpperCase(), 13) + 10;
+            
+            String tierText = tier == com.airline.reservation.entity.LoyaltyTier.GOLD ? "GOLD" : "PLATINUM";
+            Color tierColor = tier == com.airline.reservation.entity.LoyaltyTier.GOLD ? TIER_GOLD : TIER_PLATINUM;
+            Color textColor = tier == com.airline.reservation.entity.LoyaltyTier.GOLD ? DARK_BG : DARK_BG;
+            
+            canvas.setColorFill(tierColor);
+            canvas.roundRectangle(badgeX, badgeY - 2, bfBold.getWidthPoint(tierText, 8) + 10, 12, 4);
+            canvas.fill();
+            
+            canvas.beginText();
+            canvas.setFontAndSize(bfBold, 8);
+            canvas.setColorFill(textColor);
+            canvas.setTextMatrix(badgeX + 5, badgeY);
+            canvas.showText(tierText);
+            canvas.endText();
+        }
         drawDetailBlock(canvas, bf, bfBold, col2, detailTop, "FLIGHT",
                 booking.getFlight().getFlightNumber());
         drawDetailBlock(canvas, bf, bfBold, col3, detailTop, "DATE",

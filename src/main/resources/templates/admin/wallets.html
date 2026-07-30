@@ -21,6 +21,8 @@
                                     <th>User ID</th>
                                     <th>Name</th>
                                     <th>Email</th>
+                                    <th>Tier</th>
+                                    <th>Total Miles</th>
                                     <th>Wallet Balance</th>
                                     <th>Reward Points</th>
                                     <th>Last Updated</th>
@@ -32,6 +34,12 @@
                                     <td th:text="${wallet.user.id}"></td>
                                     <td th:text="${wallet.user.name}"></td>
                                     <td th:text="${wallet.user.email}"></td>
+                                    <td>
+                                        <span class="badge bg-secondary" th:if="${wallet.tier.name() == 'SILVER'}">SILVER</span>
+                                        <span class="badge bg-warning text-dark" th:if="${wallet.tier.name() == 'GOLD'}">GOLD</span>
+                                        <span class="badge bg-dark" th:if="${wallet.tier.name() == 'PLATINUM'}">PLATINUM</span>
+                                    </td>
+                                    <td th:text="${#numbers.formatInteger(wallet.totalMiles, 1, 'COMMA')}"></td>
                                     <td class="fw-bold text-success">₹<span th:text="${#numbers.formatDecimal(wallet.balance, 1, 2)}"></span></td>
                                     <td class="text-warning fw-bold"><i class="bi bi-star-fill"></i> <span th:text="${wallet.rewardPoints}"></span></td>
                                     <td th:text="${#temporals.format(wallet.updatedAt, 'dd MMM yyyy HH:mm')}"></td>
