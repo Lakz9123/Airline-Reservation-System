@@ -33,4 +33,31 @@ public class BookingService {
                 .mapToDouble(Booking::getTotalFare)
                 .sum();
     }
+
+    public List<Object[]> getMonthlyRevenueSince(java.time.LocalDateTime startDate) {
+        return bookingRepository.getMonthlyRevenueSince(startDate);
+    }
+
+    public List<Object[]> getMonthlyBookingsSince(java.time.LocalDateTime startDate) {
+        return bookingRepository.getMonthlyBookingsSince(startDate);
+    }
+
+    public List<Object[]> getTopRoutes() {
+        return bookingRepository.getTopRoutes().stream().limit(5).toList();
+    }
+
+    public List<Object[]> getTopCustomersBySpend() {
+        return bookingRepository.getTopCustomersBySpend().stream().limit(5).toList();
+    }
+
+    public List<Object[]> getTopAirlinesByBookings() {
+        return bookingRepository.getTopAirlinesByBookings().stream().limit(5).toList();
+    }
+
+    public double getCancellationPercentage() {
+        long total = bookingRepository.count();
+        if (total == 0) return 0.0;
+        long cancelled = bookingRepository.countByStatus("CANCELLED");
+        return ((double) cancelled / total) * 100;
+    }
 }

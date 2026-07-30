@@ -25,4 +25,22 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findByStatusAndDepartureReminderSentFalseAndFlight_DepartureDateTimeBetween(
             String status, java.time.LocalDateTime start, java.time.LocalDateTime end);
+
+    // Analytics queries
+    @Query(value = "SELECT FUNCTION('MONTH', b.bookingDate) as month, SUM(b.totalFare) as revenue FROM Booking b WHERE b.status = 'CONFIRMED' AND b.bookingDate >= :startDate GROUP BY FUNCTION('MONTH', b.bookingDate)")
+    List<Object[]> getMonthlyRevenueSince(@Param("startDate") java.time.LocalDateTime startDate);
+
+    @Query(value = "SELECT FUNCTION('MONTH', b.bookingDate) as month, COUNT(b) as bookings FROM Booking b WHERE b.status = 'CONFIRMED' AND b.bookingDate >= :startDate GROUP BY FUNCTION('MONTH', b.bookingDate)")
+    List<Object[]> getMonthlyBookingsSince(@Param("startDate") java.time.LocalDateTime startDate);
+
+    @Query(value = "SELECT b.flight.originAirport.city, b.flight.destinationAirport.city, COUNT(b) FROM Booking b GROUP BY b.flight.originAirport.city, b.flight.destinationAirport.city ORDER BY COUNT(b) DESC")
+    List<Object[]> getTopRoutes();
+
+    @Query(value = "SELECT b.user, SUM(b.totalFare) FROM Booking b WHERE b.status = 'CONFIRMED' GROUP BY b.user ORDER BY SUM(b.totalFare) DESC")
+    List<Object[]> getTopCustomersBySpend();
+
+    @Query(value = "SELECT b.flight.airline.airlineName, COUNT(b) FROM Booking b GROUP BY b.flight.airline.airlineName ORDER BY COUNT(b) DESC")
+    List<Object[]> getTopAirlinesByBookings();
+
+    long countByStatus(String status);
 }

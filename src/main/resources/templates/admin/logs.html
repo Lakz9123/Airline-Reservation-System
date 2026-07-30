@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: html_head('System Logs')}"></head>
+<body>
+<div th:replace="~{layout :: navbar}"></div>
+
+<main class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark"><i class="bi bi-card-text text-secondary"></i> System Logs</h2>
+        <a th:href="@{/admin/dashboard}" class="btn btn-outline-primary"><i class="bi bi-arrow-left"></i> Back to Dashboard</a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Timestamp</th>
+                        <th>Event Type</th>
+                        <th>User</th>
+                        <th>Description</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="log : ${logs}">
+                        <td th:text="${log.id}">1</td>
+                        <td th:text="${#temporals.format(log.timestamp, 'yyyy-MM-dd HH:mm:ss')}">Date</td>
+                        <td><span class="badge bg-primary" th:text="${log.eventType}">EVENT</span></td>
+                        <td th:text="${log.userEmail}">user@example.com</td>
+                        <td th:text="${log.description}">Action details</td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(logs)}">
+                        <td colspan="5" class="text-center text-muted py-4">No system logs found</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{layout :: footer}"></div>
+<div th:replace="~{layout :: html_scripts}"></div>
+</body>
+</html>

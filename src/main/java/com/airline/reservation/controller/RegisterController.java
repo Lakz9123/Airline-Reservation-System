@@ -18,9 +18,11 @@ public class RegisterController {
 
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@(.+)$");
     private final UserService userService;
+    private final com.airline.reservation.service.SystemLogService systemLogService;
 
-    public RegisterController(UserService userService) {
+    public RegisterController(UserService userService, com.airline.reservation.service.SystemLogService systemLogService) {
         this.userService = userService;
+        this.systemLogService = systemLogService;
     }
 
     @GetMapping("/register")
@@ -74,6 +76,7 @@ public class RegisterController {
         try {
             User newUser = new User(cleanName, cleanEmail, password, "ROLE_USER", true);
             userService.registerUser(newUser);
+            systemLogService.logEvent("USER_REGISTERED", cleanEmail, "New user registered: " + cleanName);
             redirectAttributes.addFlashAttribute("success", "Registration successful! Please log in.");
             return "redirect:/login";
         } catch (IllegalArgumentException e) {

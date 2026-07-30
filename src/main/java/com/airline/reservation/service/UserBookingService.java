@@ -23,14 +23,16 @@ public class UserBookingService {
     private final WalletService walletService;
     private final LoyaltyService loyaltyService;
     private final BaggageService baggageService;
+    private final SystemLogService systemLogService;
 
-    public UserBookingService(BookingRepository bookingRepository, FlightRepository flightRepository, CouponService couponService, WalletService walletService, LoyaltyService loyaltyService, BaggageService baggageService) {
+    public UserBookingService(BookingRepository bookingRepository, FlightRepository flightRepository, CouponService couponService, WalletService walletService, LoyaltyService loyaltyService, BaggageService baggageService, SystemLogService systemLogService) {
         this.bookingRepository = bookingRepository;
         this.flightRepository = flightRepository;
         this.couponService = couponService;
         this.walletService = walletService;
         this.loyaltyService = loyaltyService;
         this.baggageService = baggageService;
+        this.systemLogService = systemLogService;
     }
 
     /** Returns all bookings for the given user, newest first. */
@@ -243,6 +245,8 @@ public class UserBookingService {
         // Award loyalty miles
         loyaltyService.addMilesForBooking(user, totalFare);
 
+        systemLogService.logEvent("BOOKING_CREATED", user.getEmail(), "New booking created: SKY-" + String.format("%05d", booking.getId()) + " on flight " + flight.getFlightNumber());
+
         return booking;
     }
 
@@ -280,6 +284,8 @@ public class UserBookingService {
         walletService.creditWallet(booking.getUser(), refundAmount,
                 TransactionCategory.REFUND,
                 "Refund for cancelled booking SKY-" + String.format("%05d", booking.getId()), booking);
+
+        systemLogService.logEvent("BOOKING_CANCELLED", booking.getUser().getEmail(), "Booking cancelled: SKY-" + String.format("%05d", booking.getId()));
     }
 
     /**

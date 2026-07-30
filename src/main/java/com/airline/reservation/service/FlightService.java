@@ -57,4 +57,37 @@ public class FlightService {
     public long getCount() {
         return flightRepository.count();
     }
+
+    public double getOverallOccupancyPercentage() {
+        List<Flight> flights = flightRepository.findAll();
+        if (flights.isEmpty()) return 0.0;
+        
+        long totalCapacity = 0;
+        long totalBooked = 0;
+        
+        for (Flight f : flights) {
+            int capacity = f.getAircraft() != null ? (f.getAircraft().getEconomySeats() + f.getAircraft().getBusinessSeats()) : f.getTotalSeats();
+            totalCapacity += capacity;
+            totalBooked += (capacity - f.getAvailableSeats());
+        }
+        
+        if (totalCapacity == 0) return 0.0;
+        return ((double) totalBooked / totalCapacity) * 100;
+    }
+
+    public List<java.util.Map<String, Object>> getFlightUtilization() {
+        return flightRepository.findAll().stream().map(f -> {
+            int capacity = f.getAircraft() != null ? (f.getAircraft().getEconomySeats() + f.getAircraft().getBusinessSeats()) : f.getTotalSeats();
+            int booked = capacity - f.getAvailableSeats();
+            double utilization = capacity == 0 ? 0 : ((double) booked / capacity) * 100;
+            
+            java.util.Map<String, Object> map = new java.util.HashMap<>();
+            map.put("flightNumber", f.getFlightNumber());
+            map.put("departure", f.getDepartureDateTime());
+            map.put("booked", booked);
+            map.put("capacity", capacity);
+            map.put("utilization", utilization);
+            return map;
+        }).sorted((m1, m2) -> Double.compare((Double) m2.get("utilization"), (Double) m1.get("utilization"))).toList();
+    }
 }

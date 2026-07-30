@@ -26,8 +26,9 @@ public class AdminController {
     private final AirlineService airlineService;
     private final AircraftService aircraftService;
     private final NotificationService notificationService;
+    private final com.airline.reservation.service.SystemLogService systemLogService;
 
-    public AdminController(FlightService flightService, UserService userService, BookingService bookingService, AirportService airportService, AirlineService airlineService, AircraftService aircraftService, NotificationService notificationService) {
+    public AdminController(FlightService flightService, UserService userService, BookingService bookingService, AirportService airportService, AirlineService airlineService, AircraftService aircraftService, NotificationService notificationService, com.airline.reservation.service.SystemLogService systemLogService) {
         this.flightService = flightService;
         this.userService = userService;
         this.bookingService = bookingService;
@@ -35,16 +36,40 @@ public class AdminController {
         this.airlineService = airlineService;
         this.aircraftService = aircraftService;
         this.notificationService = notificationService;
+        this.systemLogService = systemLogService;
     }
 
     // 1. Dashboard
     @GetMapping({"", "/", "/dashboard"})
-    public String dashboard(Model model) {
+    public String dashboard(Model model) throws Exception {
         model.addAttribute("totalFlights", flightService.getCount());
         model.addAttribute("totalUsers", userService.getAllUsers().size());
         model.addAttribute("totalBookings", bookingService.getBookingCount());
         model.addAttribute("totalRevenue", bookingService.getTotalRevenue());
+        
+        // Analytics
+        java.time.LocalDateTime oneYearAgo = java.time.LocalDateTime.now().minusMonths(12);
+        
+        // Format for Chart.js
+        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+        model.addAttribute("monthlyRevenueJson", mapper.writeValueAsString(bookingService.getMonthlyRevenueSince(oneYearAgo)));
+        model.addAttribute("monthlyBookingsJson", mapper.writeValueAsString(bookingService.getMonthlyBookingsSince(oneYearAgo)));
+        
+        model.addAttribute("topRoutes", bookingService.getTopRoutes());
+        model.addAttribute("occupancyPercentage", flightService.getOverallOccupancyPercentage());
+        model.addAttribute("cancellationPercentage", bookingService.getCancellationPercentage());
+        model.addAttribute("flightUtilization", flightService.getFlightUtilization());
+        model.addAttribute("topCustomers", bookingService.getTopCustomersBySpend());
+        model.addAttribute("topAirlines", bookingService.getTopAirlinesByBookings());
+        model.addAttribute("recentLogs", systemLogService.getRecentLogs());
+        
         return "admin/dashboard";
+    }
+    
+    @GetMapping("/logs")
+    public String systemLogs(Model model) {
+        model.addAttribute("logs", systemLogService.getAllLogs());
+        return "admin/logs";
     }
 
     // 2. Flight Management (CRUD)

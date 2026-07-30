@@ -10,8 +10,8 @@
         <span class="badge bg-secondary p-2">Phase 1: Admin Module</span>
     </div>
 
-    <!-- Stat Cards Row -->
-    <div class="row g-4 mb-5">
+    <!-- Stat Cards Row 1 -->
+    <div class="row g-4 mb-4">
         <div class="col-md-3">
             <div class="card shadow-sm border-0 border-start border-4 border-primary h-100">
                 <div class="card-body">
@@ -77,33 +77,179 @@
         </div>
     </div>
 
-    <!-- Quick Navigation Cards -->
-    <h4 class="fw-bold text-dark mb-3">Quick Actions</h4>
-    <div class="row g-4">
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0 text-center p-4">
-                <i class="bi bi-airplane-engines fs-1 text-primary mb-3"></i>
-                <h5 class="fw-bold">Manage Flights</h5>
-                <p class="text-muted">Create, edit, or remove flight schedules, routes, and fares.</p>
-                <a th:href="@{/admin/flights}" class="btn btn-outline-primary">Go to Flights</a>
+    <!-- Stat Cards Row 2 (Analytics) -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 border-start border-4 border-danger h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <h6 class="text-muted fw-semibold mb-1">Cancellation Rate</h6>
+                            <h2 class="fw-bold text-dark mb-0"><span th:text="${#numbers.formatDecimal(cancellationPercentage, 1, 2)}">0.00</span>%</h2>
+                        </div>
+                        <div class="bg-danger text-white rounded-circle p-3">
+                            <i class="bi bi-x-circle fs-3"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0 text-center p-4">
-                <i class="bi bi-journal-check fs-1 text-warning mb-3"></i>
-                <h5 class="fw-bold">View Bookings</h5>
-                <p class="text-muted">Browse through all customer flight reservations and booking statuses.</p>
-                <a th:href="@{/admin/bookings}" class="btn btn-outline-warning text-dark">Go to Bookings</a>
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 border-start border-4 border-secondary h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <h6 class="text-muted fw-semibold mb-1">Overall Occupancy</h6>
+                            <h2 class="fw-bold text-dark mb-0"><span th:text="${#numbers.formatDecimal(occupancyPercentage, 1, 2)}">0.00</span>%</h2>
+                        </div>
+                        <div class="bg-secondary text-white rounded-circle p-3">
+                            <i class="bi bi-person-check fs-3"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+    </div>
 
+    <!-- Charts Row -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
+                    <h5 class="fw-bold"><i class="bi bi-graph-up-arrow text-primary"></i> Revenue (Last 12 Months)</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
+                    <h5 class="fw-bold"><i class="bi bi-bar-chart text-success"></i> Bookings (Last 12 Months)</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="bookingsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Lists Row -->
+    <div class="row g-4 mb-5">
         <div class="col-md-4">
-            <div class="card shadow-sm border-0 text-center p-4">
-                <i class="bi bi-person-gear fs-1 text-success mb-3"></i>
-                <h5 class="fw-bold">User Directory</h5>
-                <p class="text-muted">Inspect user accounts, assign roles, and toggle enable/disable access.</p>
-                <a th:href="@{/admin/users}" class="btn btn-outline-success">Go to Users</a>
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white pt-3 pb-2">
+                    <h6 class="fw-bold mb-0"><i class="bi bi-geo-alt text-warning"></i> Popular Routes</h6>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center" th:each="route : ${topRoutes}">
+                        <span><span th:text="${route[0]}"></span> <i class="bi bi-arrow-right mx-1 text-muted"></i> <span th:text="${route[1]}"></span></span>
+                        <span class="badge bg-primary rounded-pill" th:text="${route[2]}">0</span>
+                    </li>
+                    <li class="list-group-item text-muted text-center" th:if="${#lists.isEmpty(topRoutes)}">No routes data</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white pt-3 pb-2">
+                    <h6 class="fw-bold mb-0"><i class="bi bi-star text-warning"></i> Top Customers</h6>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center" th:each="cust : ${topCustomers}">
+                        <span th:text="${cust[0].name}">User Name</span>
+                        <span class="text-success fw-bold">₹<span th:text="${#numbers.formatDecimal(cust[1], 1, 2)}">0.00</span></span>
+                    </li>
+                    <li class="list-group-item text-muted text-center" th:if="${#lists.isEmpty(topCustomers)}">No customer data</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white pt-3 pb-2">
+                    <h6 class="fw-bold mb-0"><i class="bi bi-building text-warning"></i> Top Airlines</h6>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center" th:each="al : ${topAirlines}">
+                        <span th:text="${al[0]}">Airline Name</span>
+                        <span class="badge bg-success rounded-pill" th:text="${al[1]}">0</span>
+                    </li>
+                    <li class="list-group-item text-muted text-center" th:if="${#lists.isEmpty(topAirlines)}">No airline data</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Flight Utilization & Recent Activity Row -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white pt-4 pb-2 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-table text-primary"></i> Flight Utilization</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light sticky-top">
+                            <tr>
+                                <th>Flight</th>
+                                <th>Departure</th>
+                                <th>Seats Booked</th>
+                                <th>Capacity</th>
+                                <th>Utilization</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="fu : ${flightUtilization}">
+                                <td class="fw-bold" th:text="${fu.flightNumber}">FL-123</td>
+                                <td th:text="${#temporals.format(fu.departure, 'dd MMM yy HH:mm')}">Date</td>
+                                <td th:text="${fu.booked}">0</td>
+                                <td th:text="${fu.capacity}">0</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <span class="me-2" th:text="${#numbers.formatDecimal(fu.utilization, 1, 1)} + '%'">0%</span>
+                                        <div class="progress flex-grow-1" style="height: 6px;">
+                                            <div class="progress-bar" 
+                                                 th:classappend="${fu.utilization > 80 ? 'bg-success' : (fu.utilization < 30 ? 'bg-danger' : 'bg-primary')}"
+                                                 role="progressbar" 
+                                                 th:style="'width: ' + ${fu.utilization} + '%'" 
+                                                 th:aria-valuenow="${fu.utilization}" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(flightUtilization)}">
+                                <td colspan="5" class="text-center text-muted py-3">No flights found</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white pt-4 pb-2 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-activity text-danger"></i> Recent Activity</h5>
+                    <a th:href="@{/admin/logs}" class="btn btn-sm btn-outline-secondary">All Logs</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush" style="max-height: 400px; overflow-y: auto;">
+                        <div class="list-group-item py-3" th:each="log : ${recentLogs}">
+                            <div class="d-flex w-100 justify-content-between mb-1">
+                                <small class="text-primary fw-bold" th:text="${log.eventType}">EVENT</small>
+                                <small class="text-muted" th:text="${#temporals.format(log.timestamp, 'dd MMM HH:mm')}">Time</small>
+                            </div>
+                            <p class="mb-1 text-dark small" th:text="${log.description}">Description</p>
+                            <small class="text-muted"><i class="bi bi-person"></i> <span th:text="${log.userEmail}">user@example.com</span></small>
+                        </div>
+                        <div class="list-group-item text-center text-muted py-4" th:if="${#lists.isEmpty(recentLogs)}">
+                            No recent activity
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -111,5 +257,86 @@
 
 <div th:replace="~{layout :: footer}"></div>
 <div th:replace="~{layout :: html_scripts}"></div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        /*<![CDATA[*/
+        const rawRev = /*[[${monthlyRevenueJson}]]*/ '[]';
+        const rawBook = /*[[${monthlyBookingsJson}]]*/ '[]';
+        /*]]>*/
+        
+        const revData = JSON.parse(rawRev || '[]');
+        const bookData = JSON.parse(rawBook || '[]');
+
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        
+        // Helper to format chart data
+        function formatData(dataList) {
+            let labels = [];
+            let values = [];
+            // Map month index (1-12) to names, and extract value
+            dataList.forEach(item => {
+                let m = item[0] - 1; // JS months are 0-11 for array index
+                labels.push(monthNames[m]);
+                values.push(item[1]);
+            });
+            return { labels, values };
+        }
+
+        const formattedRev = formatData(revData);
+        const formattedBook = formatData(bookData);
+
+        // Revenue Chart
+        if (document.getElementById('revenueChart')) {
+            const ctx1 = document.getElementById('revenueChart').getContext('2d');
+            new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: formattedRev.labels,
+                    datasets: [{
+                        label: 'Revenue (₹)',
+                        data: formattedRev.values,
+                        borderColor: '#0d6efd',
+                        backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        // Bookings Chart
+        if (document.getElementById('bookingsChart')) {
+            const ctx2 = document.getElementById('bookingsChart').getContext('2d');
+            new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: formattedBook.labels,
+                    datasets: [{
+                        label: 'Bookings',
+                        data: formattedBook.values,
+                        backgroundColor: '#198754',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+    });
+</script>
 </body>
 </html>
