@@ -8,7 +8,7 @@
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -52,12 +52,43 @@
         }
         .navbar-main.scrolled { box-shadow: var(--shadow-md); }
         .navbar-brand {
-            font-weight: 800;
-            font-size: 1.45rem;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 1.4rem;
             color: var(--text) !important;
-            letter-spacing: -.5px;
+            letter-spacing: -1px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
         }
-        .brand-dot { color: var(--sky); }
+        .brand-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            background: linear-gradient(135deg, var(--sky-dark), var(--sky-light));
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            box-shadow: 0 2px 8px rgba(25,118,210,.35);
+        }
+        .brand-sky  { color: var(--sky-dark); }
+        .brand-fly  { color: var(--sky); }
+        .brand-elite {
+            font-size: .65rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--sky);
+            background: rgba(25,118,210,.1);
+            border: 1px solid rgba(25,118,210,.25);
+            border-radius: 4px;
+            padding: .1rem .4rem;
+            vertical-align: middle;
+            margin-left: .1rem;
+        }
         .nav-link-item {
             color: var(--text-muted) !important;
             font-weight: 500;
@@ -99,7 +130,7 @@
             min-height: 92vh;
             display: flex;
             align-items: center;
-            background: url('/images/hero-bg-light.png') center center / cover no-repeat;
+            background: url('/images/hero-skyfly-elite.png') center center / cover no-repeat;
             padding-top: 80px;
         }
         .hero-overlay {
@@ -463,7 +494,10 @@
 <!-- ─── NAVBAR ───────────────────────────────────────────── -->
 <nav class="navbar navbar-expand-lg navbar-main fixed-top" id="mainNav">
     <div class="container">
-        <a class="navbar-brand" href="/">SkyFly<span class="brand-dot">.</span>Elite</a>
+        <a class="navbar-brand" href="/">
+            <span class="brand-icon"><i class="bi bi-airplane-fill"></i></span>
+            <span><span class="brand-sky">Sky</span><span class="brand-fly">Fly</span></span><span class="brand-elite">ELITE</span>
+        </a>
         <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -755,7 +789,10 @@
         <div class="row g-5">
             <!-- Brand -->
             <div class="col-lg-4">
-                <div class="footer-brand mb-3">SkyFly<span style="color:var(--sky-light);">.</span>Elite</div>
+                <div class="footer-brand mb-3" style="display:flex; align-items:center; gap:.5rem;">
+                    <span class="brand-icon"><i class="bi bi-airplane-fill"></i></span>
+                    <span><span style="color:#fff;">Sky</span><span style="color:var(--sky-light);">Fly</span></span><span class="brand-elite" style="color:var(--sky-light); background:rgba(255,255,255,.1); border-color:rgba(255,255,255,.2);">ELITE</span>
+                </div>
                 <p class="footer-desc mb-4">Elevating travel to an art form through precision engineering and unparalleled customer service since 2020.</p>
                 <div>
                     <a href="#" class="social-btn"><i class="bi bi-twitter-x"></i></a>
