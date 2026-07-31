@@ -8,13 +8,24 @@ import org.springframework.security.core.GrantedAuthority;
 
 @Controller
 public class AuthController {
+    private final com.airline.reservation.service.AirportService airportService;
+    private final com.airline.reservation.service.BookingService bookingService;
+
+    public AuthController(com.airline.reservation.service.AirportService airportService, com.airline.reservation.service.BookingService bookingService) {
+        this.airportService = airportService;
+        this.bookingService = bookingService;
+    }
 
     @GetMapping("/")
-    public String index(Authentication authentication) {
+    public String index(Authentication authentication, org.springframework.ui.Model model) {
         if (authentication != null && authentication.isAuthenticated()) {
             return getDashboardRedirect(authentication);
         }
-        return "redirect:/login";
+        
+        model.addAttribute("airports", airportService.getAllAirports());
+        model.addAttribute("topRoutes", bookingService.getTopRoutes());
+        
+        return "landing";
     }
 
     @GetMapping("/login")
