@@ -1,20 +1,19 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SkyFly Elite – Fly Beyond Ordinary</title>
-    <meta name="description" content="SkyFly Elite – Premium airline reservations. Best fares, seamless booking, 24/7 support and loyalty rewards. Book your flight today.">
+file_path = r'e:\Desktop\Airline\src\main\resources\templates\landing.html'
 
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=Montserrat:wght@800;900&display=swap" rel="stylesheet">
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+with open(file_path, 'r', encoding='utf-8') as f:
+    content = f.read()
 
-    <style>
+start_tag = "<style>"
+end_tag = "</style>"
+
+start_idx = content.find(start_tag)
+end_idx = content.find(end_tag)
+
+if start_idx == -1 or end_idx == -1:
+    print("Error: style tags not found")
+    exit(1)
+
+new_style = """
         /* ─── Design Tokens ─────────────────────────────── */
         :root {
             --sky:        #0284c7;
@@ -654,31 +653,15 @@
             .partner-tag { margin: .4rem .9rem; }
             .footer-bottom { text-align: center; }
             .footer-bottom a { margin: 0 .7rem; display: inline-block; }
-        }</style>
-</head>
-<body>
+        }"""
 
-<!-- Ambient Orbs on Body -->
-<div class="glowing-orb" style="top: 10%; left: -10%;"></div>
-<div class="glowing-orb" style="top: 40%; right: -10%; background: radial-gradient(circle, rgba(34, 211, 238, 0.08) 0%, transparent 70%);"></div>
-<div class="glowing-orb" style="top: 75%; left: 15%; background: radial-gradient(circle, rgba(14, 165, 233, 0.08) 0%, transparent 70%);"></div>   border-top: 1px solid rgba(255, 255, 255, 0.05);
-            margin-top: 4rem;
-            padding-top: 2rem;
-            font-size: .82rem;
-            color: #475569;
-        }
-        .footer-bottom a { color: #475569; text-decoration: none; margin-left: 1.5rem; transition: color 0.2s; }
-        .footer-bottom a:hover { color: #94a3b8; }
+parts = content.split(start_tag)
+head = parts[0] + start_tag
+body = parts[1].split(end_tag)[1]
 
-        /* ─── Responsive Tweaks ──────────────────────────── */
-        @media (max-width: 767.98px) {
-            .hero { min-height: 100svh; padding-top: 70px; }
-            .hero-title { font-size: 2rem; }
-            .search-card { padding: 1.1rem; }
-            .route-card { flex: 0 0 220px; width: 220px; height: 300px; }
-            .stat-number { font-size: 1.7rem; }
-            .partner-tag { margin: .3rem .7rem; }
-            .footer-bottom { text-align: center; }
-            .footer-bottom a { margin: 0 .5rem; display: inline-block; }
-        }
-    
+content_updated = head + new_style + end_tag + body
+
+with open(file_path, 'w', encoding='utf-8') as f:
+    f.write(content_updated)
+
+print("Landing page style successfully updated to Light Theme!")
