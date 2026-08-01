@@ -654,7 +654,8 @@
             .partner-tag { margin: .4rem .9rem; }
             .footer-bottom { text-align: center; }
             .footer-bottom a { margin: 0 .7rem; display: inline-block; }
-        }</style>
+        }
+</style>
 </head>
 <body>
 
@@ -681,4 +682,385 @@
             .footer-bottom { text-align: center; }
             .footer-bottom a { margin: 0 .5rem; display: inline-block; }
         }
-    
+    </style>
+</head>
+<body>
+
+<!-- ─── NAVBAR ───────────────────────────────────────────── -->
+<nav class="navbar navbar-expand-lg navbar-main fixed-top" id="mainNav">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            <span class="brand-icon"><i class="bi bi-airplane-fill"></i></span>
+            <span><span class="brand-sky">Sky</span><span class="brand-fly">Fly</span></span><span class="brand-elite">ELITE</span>
+        </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="nav">
+            <ul class="navbar-nav ms-auto me-4">
+                <li class="nav-item"><a class="nav-link-item nav-link" href="#features">Features</a></li>
+                <li class="nav-item"><a class="nav-link-item nav-link" href="#routes">Destinations</a></li>
+                <li class="nav-item"><a class="nav-link-item nav-link" href="#cta">About</a></li>
+            </ul>
+            <div class="d-flex align-items-center gap-2">
+                <a th:href="@{/login}" class="btn-login">Login</a>
+                <a th:href="@{/register}" class="btn-signup">Sign Up</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- ─── HERO ─────────────────────────────────────────────── -->
+<section class="hero" id="home">
+    <div class="hero-overlay"></div>
+    <div class="container hero-content py-5">
+        <div class="row align-items-center">
+            <div class="col-12">
+                <div class="hero-badge"><i class="bi bi-award-fill"></i> India's Most Trusted Airline Platform</div>
+                <h1 class="hero-title">
+                    Fly Beyond<br>
+                    <span class="hero-title-highlight">Ordinary</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Discover premium flight experiences with unbeatable fares and seamless bookings. Your journey starts here.
+                </p>
+
+                <!-- Search Card -->
+                <div class="search-card">
+                    <form th:action="@{/user/search/results}" method="get">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-12 col-sm-6 col-lg-3">
+                                <label class="form-label"><i class="bi bi-geo-alt-fill me-1"></i>From</label>
+                                <select name="originId" class="form-select" required>
+                                    <option value="" disabled selected>Select Origin</option>
+                                    <option th:each="ap : ${airports}"
+                                            th:value="${ap.id}"
+                                            th:text="${ap.city + ' — ' + ap.airportCode}"></option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-sm-6 col-lg-3">
+                                <label class="form-label"><i class="bi bi-geo-fill me-1"></i>To</label>
+                                <select name="destinationId" class="form-select" required>
+                                    <option value="" disabled selected>Select Destination</option>
+                                    <option th:each="ap : ${airports}"
+                                            th:value="${ap.id}"
+                                            th:text="${ap.city + ' — ' + ap.airportCode}"></option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-sm-6 col-lg-2">
+                                <label class="form-label"><i class="bi bi-calendar3 me-1"></i>Date</label>
+                                <input type="date" name="date" class="form-control" required>
+                            </div>
+                            <div class="col-12 col-sm-6 col-lg-2">
+                                <label class="form-label"><i class="bi bi-person-badge me-1"></i>Class</label>
+                                <select class="form-select">
+                                    <option>Economy</option>
+                                    <option>Business</option>
+                                    <option>First Class</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-lg-2">
+                                <button type="submit" class="btn-search">
+                                    <i class="bi bi-search me-1"></i> SEARCH
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ─── PARTNERS STRIP ───────────────────────────────────── -->
+<div class="partners-strip">
+    <div class="container">
+        <div class="text-center mb-2" style="font-size:.68rem;font-weight:700;letter-spacing:2px;color:#9CA3AF;">TRUSTED GLOBAL PARTNERS</div>
+        <div class="d-flex justify-content-center align-items-center flex-wrap">
+            <span class="partner-tag">IndiGo</span>
+            <span class="partner-tag">Air India</span>
+            <span class="partner-tag">SpiceJet</span>
+            <span class="partner-tag">Vistara</span>
+            <span class="partner-tag">Akasa Air</span>
+            <span class="partner-tag">Air India Express</span>
+            <span class="partner-tag">Alliance Air</span>
+            <span class="partner-tag">Star Air</span>
+            <span class="partner-tag">FlyBig</span>
+        </div>
+    </div>
+</div>
+
+<!-- ─── FEATURES ─────────────────────────────────────────── -->
+<section class="py-6 py-md-5 my-5" id="features">
+    <div class="container">
+        <div class="text-center">
+            <p class="section-label">Why Choose Us</p>
+            <h2 class="section-title">Precision in Every Mile</h2>
+            <div class="section-divider mx-auto"></div>
+        </div>
+        <div class="row g-4">
+            <!-- Best Fares -->
+            <div class="col-sm-6 col-lg-3">
+                <div class="feature-card">
+                    <div class="feature-icon-wrap"><i class="bi bi-currency-dollar"></i></div>
+                    <h4 class="feature-title">Best Fares</h4>
+                    <p class="feature-text">Unmatched price-to-experience ratio across hundreds of domestic and international routes.</p>
+                </div>
+            </div>
+            <!-- Seamless Booking -->
+            <div class="col-sm-6 col-lg-3">
+                <div class="feature-card">
+                    <div class="feature-icon-wrap"><i class="bi bi-lightning-charge-fill"></i></div>
+                    <h4 class="feature-title">Seamless Booking</h4>
+                    <p class="feature-text">Book, modify, and manage your entire itinerary in just a few clicks — no hassle.</p>
+                </div>
+            </div>
+            <!-- 24/7 Support -->
+            <div class="col-sm-6 col-lg-3">
+                <div class="feature-card">
+                    <div class="feature-icon-wrap"><i class="bi bi-headset"></i></div>
+                    <h4 class="feature-title">24/7 Support</h4>
+                    <p class="feature-text">Our expert travel team is always available whenever you need assistance, around the clock.</p>
+                </div>
+            </div>
+            <!-- Loyalty Rewards -->
+            <div class="col-sm-6 col-lg-3">
+                <a th:href="@{/user/loyalty}" class="text-decoration-none">
+                    <div class="feature-card h-100">
+                        <div class="feature-icon-wrap"><i class="bi bi-award-fill"></i></div>
+                        <h4 class="feature-title text-dark">Loyalty Rewards</h4>
+                        <p class="feature-text">Earn miles on every flight and redeem them for exclusive lounges, upgrades, and more.</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ─── POPULAR ROUTES ────────────────────────────────────── -->
+<section class="py-5 bg-white" id="routes">
+    <div class="container">
+        <div class="d-flex flex-wrap align-items-end justify-content-between mb-4 gap-3">
+            <div>
+                <p class="section-label mb-1">Explore India & Beyond</p>
+                <h2 class="section-title mb-0">Popular Routes</h2>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="scroll-btn" id="scrollLeft" aria-label="Scroll left"><i class="bi bi-chevron-left"></i></button>
+                <button class="scroll-btn" id="scrollRight" aria-label="Scroll right"><i class="bi bi-chevron-right"></i></button>
+            </div>
+        </div>
+
+        <div class="routes-scroll-wrap" id="routesContainer">
+            <div class="routes-track" id="routesTrack">
+
+                <!-- Mumbai -->
+                <div class="route-card">
+                    <img src="/images/route-mumbai.png" alt="Mumbai" class="route-img">
+                    <div class="route-overlay"></div>
+                    <div class="route-body">
+                        <span class="price-badge">From ₹3,499</span>
+                        <p class="route-city">Mumbai</p>
+                        <div class="route-sub">Delhi → Mumbai</div>
+                    </div>
+                </div>
+
+                <!-- Delhi -->
+                <div class="route-card">
+                    <img src="/images/route-delhi.png" alt="Delhi" class="route-img">
+                    <div class="route-overlay"></div>
+                    <div class="route-body">
+                        <span class="price-badge">From ₹2,999</span>
+                        <p class="route-city">New Delhi</p>
+                        <div class="route-sub">Mumbai → Delhi</div>
+                    </div>
+                </div>
+
+                <!-- Bangalore -->
+                <div class="route-card">
+                    <img src="/images/route-bangalore.png" alt="Bangalore" class="route-img">
+                    <div class="route-overlay"></div>
+                    <div class="route-body">
+                        <span class="price-badge">From ₹3,199</span>
+                        <p class="route-city">Bangalore</p>
+                        <div class="route-sub">Chennai → Bangalore</div>
+                    </div>
+                </div>
+
+                <!-- Goa -->
+                <div class="route-card">
+                    <img src="/images/route-goa.png" alt="Goa" class="route-img">
+                    <div class="route-overlay"></div>
+                    <div class="route-body">
+                        <span class="price-badge">From ₹2,799</span>
+                        <p class="route-city">Goa</p>
+                        <div class="route-sub">Delhi → Goa</div>
+                    </div>
+                </div>
+
+                <!-- Kolkata -->
+                <div class="route-card">
+                    <img src="/images/route-kolkata.png" alt="Kolkata" class="route-img">
+                    <div class="route-overlay"></div>
+                    <div class="route-body">
+                        <span class="price-badge">From ₹3,899</span>
+                        <p class="route-city">Kolkata</p>
+                        <div class="route-sub">Hyderabad → Kolkata</div>
+                    </div>
+                </div>
+
+                <!-- Dynamic routes from backend -->
+                <th:block th:each="route, stat : ${topRoutes}">
+                    <div class="route-card" th:if="${stat.index lt 3}">
+                        <img th:src="@{'/images/route-bangalore.png'}" alt="Route" class="route-img">
+                        <div class="route-overlay"></div>
+                        <div class="route-body">
+                            <span class="price-badge">Top Pick</span>
+                            <p class="route-city" th:text="${route[1]}">City</p>
+                            <div class="route-sub">
+                                <span th:text="${route[0]}">Origin</span>
+                                <i class="bi bi-arrow-right mx-1"></i>
+                                <span th:text="${route[1]}">Destination</span>
+                            </div>
+                        </div>
+                    </div>
+                </th:block>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ─── STATS STRIP ───────────────────────────────────────── -->
+<div class="stats-strip">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-6 col-md-3">
+                <div class="stat-card-wrap">
+                    <div class="stat-number">2M+</div>
+                    <div class="stat-label">Happy Travellers</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card-wrap">
+                    <div class="stat-number">500+</div>
+                    <div class="stat-label">Routes Covered</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card-wrap">
+                    <div class="stat-number">50+</div>
+                    <div class="stat-label">Partner Airlines</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card-wrap">
+                    <div class="stat-number">99.2%</div>
+                    <div class="stat-label">On-Time Arrival</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ─── CTA SECTION ───────────────────────────────────────── -->
+<section class="cta-section" id="cta">
+    <div class="container text-center">
+        <span class="section-label">Ready When You Are</span>
+        <h2 class="section-title mt-2">Ready for Takeoff?</h2>
+        <p class="text-muted mb-4 mx-auto" style="max-width:520px;line-height:1.7;">
+            Join millions of travellers who trust SkyFly Elite for every journey. Secure your next destination in minutes.
+        </p>
+        <div class="d-flex flex-wrap gap-3 justify-content-center">
+            <a th:href="@{/login}" class="btn-cta-primary">
+                <i class="bi bi-airplane-fill me-2"></i>BOOK YOUR FLIGHT
+            </a>
+            <a href="#routes" class="btn-cta-outline">
+                <i class="bi bi-map me-2"></i>VIEW ROUTES
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ─── FOOTER ────────────────────────────────────────────── -->
+<footer class="footer-main">
+    <div class="container">
+        <div class="row g-5">
+            <!-- Brand -->
+            <div class="col-lg-4">
+                <div class="footer-brand mb-3" style="display:flex; align-items:center; gap:.5rem;">
+                    <span class="brand-icon"><i class="bi bi-airplane-fill"></i></span>
+                    <span><span style="color:#fff;">Sky</span><span style="color:var(--sky-light);">Fly</span></span><span class="brand-elite" style="color:var(--sky-light); background:rgba(255,255,255,.1); border-color:rgba(255,255,255,.2);">ELITE</span>
+                </div>
+                <p class="footer-desc mb-4">Elevating travel to an art form through precision engineering and unparalleled customer service since 2020.</p>
+                <div>
+                    <a href="#" class="social-btn"><i class="bi bi-twitter-x"></i></a>
+                    <a href="#" class="social-btn"><i class="bi bi-instagram"></i></a>
+                    <a href="#" class="social-btn"><i class="bi bi-linkedin"></i></a>
+                    <a href="#" class="social-btn"><i class="bi bi-facebook"></i></a>
+                </div>
+            </div>
+            <!-- Experience -->
+            <div class="col-6 col-md-3 col-lg-2">
+                <div class="footer-heading">Experience</div>
+                <a href="#" class="footer-link">First Class</a>
+                <a href="#" class="footer-link">Business Class</a>
+                <a href="#" class="footer-link">Global Lounges</a>
+                <a href="#" class="footer-link">Elite Status</a>
+            </div>
+            <!-- Company -->
+            <div class="col-6 col-md-3 col-lg-2">
+                <div class="footer-heading">Company</div>
+                <a href="#" class="footer-link">Our Story</a>
+                <a href="#" class="footer-link">Press Room</a>
+                <a href="#" class="footer-link">Careers</a>
+                <a href="#" class="footer-link">Contact</a>
+            </div>
+            <!-- Newsletter -->
+            <div class="col-md-6 col-lg-4">
+                <div class="footer-heading">Newsletter</div>
+                <p class="footer-desc mb-3">Get the latest deals and travel tips delivered to your inbox.</p>
+                <div class="input-group newsletter-wrap">
+                    <input type="email" class="form-control" placeholder="your@email.com">
+                    <button class="btn">Subscribe <i class="bi bi-arrow-right ms-1"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom bar -->
+        <div class="footer-bottom d-flex flex-column flex-md-row justify-content-between align-items-center">
+            <span>&copy; 2026 SkyFly Elite. All rights reserved.</span>
+            <div class="mt-2 mt-md-0">
+                <a href="#">Sitemap</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Cookie Settings</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Navbar shadow on scroll
+    const nav = document.getElementById('mainNav');
+    window.addEventListener('scroll', () => {
+        nav.classList.toggle('scrolled', window.scrollY > 40);
+    });
+
+    // Route carousel scroll
+    const container = document.getElementById('routesContainer');
+    document.getElementById('scrollLeft').addEventListener('click',  () => container.scrollBy({ left: -280, behavior: 'smooth' }));
+    document.getElementById('scrollRight').addEventListener('click', () => container.scrollBy({ left:  280, behavior: 'smooth' }));
+
+    // Set today as min date for departure
+    const dateInput = document.querySelector('input[type="date"]');
+    if (dateInput) {
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.min = today;
+        dateInput.value = today;
+    }
+</script>
+</body>
+</html>
