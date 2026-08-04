@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${title} + ' — SkyFly Elite'"></title>
-    <!-- Fonts (Matches landing page exactly) -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
@@ -16,49 +16,69 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     
     <style>
-        /* ─── Premium Design Tokens (Matches landing page exactly) ─── */
+        /* ─── Premium Design Tokens (Matches landing page & auth exactly) ─── */
         :root {
             --sky:        #0284c7;
             --sky-light:  #0ea5e9;
             --sky-glow:   rgba(14, 165, 233, 0.08);
             --sky-dark:   #0369a1;
             --accent:     #f97316;
-            --bg:         #f8fafc; /* Premium light slate background */
-            --surface:    rgba(255, 255, 255, 0.85);
-            --text:       #0f172a; /* Slate 900 */
-            --text-muted: #475569; /* Slate 600 */
+            --bg:         #f8fafc;
+            --surface:    rgba(255, 255, 255, 0.75);
+            --text:       #0f172a;
+            --text-muted: #475569;
             --border:     rgba(15, 23, 24, 0.08);
             --shadow-sm:  0 1px 3px rgba(15,23,42,0.05);
             --shadow-md:  0 12px 30px -10px rgba(15, 23, 42, 0.08);
             --shadow-lg:  0 20px 40px -15px rgba(15, 23, 42, 0.12), 0 0 50px rgba(14, 165, 233, 0.04);
-            --radius:     20px;
-            --card-bg:    #ffffff;
-            --input-bg:   #ffffff;
+            --radius:     24px;
+            --card-bg:    rgba(255, 255, 255, 0.75);
+            --input-bg:   rgba(255, 255, 255, 0.85);
             --input-border: rgba(15, 23, 42, 0.08);
             --input-text:  #0f172a;
         }
 
         body.dark-mode {
-            --bg:         #0f172a; /* Slate 900 */
-            --surface:    rgba(30, 41, 59, 0.85); /* Slate 800 */
+            --bg:         #0f172a;
+            --surface:    rgba(30, 41, 59, 0.75);
             --text:       #f8fafc;
-            --text-muted: #94a3b8; /* Slate 400 */
+            --text-muted: #94a3b8;
             --border:     rgba(255, 255, 255, 0.08);
-            --card-bg:    #1e293b;
-            --input-bg:   #1e293b;
+            --card-bg:    rgba(30, 41, 59, 0.75);
+            --input-bg:   rgba(30, 41, 59, 0.85);
             --input-border: rgba(255, 255, 255, 0.1);
             --input-text:  #f8fafc;
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg) !important;
+            background: url('/images/hero-skyfly-elite.png') center center / cover no-repeat fixed !important;
             color: var(--text) !important;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             letter-spacing: -0.01em;
             transition: background-color 0.3s, color 0.3s;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg,
+                rgba(248, 250, 252, 0.95) 0%,
+                rgba(248, 250, 252, 0.88) 50%,
+                rgba(14, 165, 233, 0.05) 100%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        body.dark-mode::before {
+            background: linear-gradient(135deg,
+                rgba(15, 23, 42, 0.96) 0%,
+                rgba(15, 23, 42, 0.90) 50%,
+                rgba(14, 165, 233, 0.05) 100%) !important;
         }
 
         main {
@@ -69,15 +89,22 @@
             z-index: 2;
         }
 
-        /* ─── Premium Cards & Layouts ─── */
+        /* ─── Premium Glassmorphic Cards & Layouts ─── */
         .card {
-            background-color: var(--card-bg) !important;
-            border: 1px solid var(--border) !important;
+            background: var(--card-bg) !important;
+            backdrop-filter: blur(20px) !important;
+            -webkit-backdrop-filter: blur(20px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.4) !important;
             border-radius: var(--radius) !important;
             box-shadow: var(--shadow-md) !important;
             color: var(--text) !important;
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             overflow: hidden;
+            position: relative;
+            z-index: 2;
+        }
+        body.dark-mode .card {
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
         }
         .card:hover {
             transform: translateY(-2px);
@@ -94,6 +121,9 @@
             color: var(--sky-dark);
             margin-bottom: 0.4rem;
             display: block;
+        }
+        body.dark-mode .eyebrow-label {
+            color: var(--sky-light);
         }
         
         .section-title {
@@ -154,6 +184,10 @@
             align-items: center;
             justify-content: center;
             gap: 0.4rem;
+        }
+        body.dark-mode .btn-outline-theme {
+            color: var(--sky-light) !important;
+            border-color: rgba(14, 165, 233, 0.4);
         }
         .btn-outline-theme:hover {
             border-color: var(--sky-light);
@@ -324,8 +358,8 @@
     </div>
 </nav>
 
-<!-- FOOTER (Premium dark footer) -->
-<footer th:fragment="footer" class="footer-main mt-auto" style="background: #0f172a; color: #94a3b8; padding: 3rem 0 2rem; border-top: 1px solid var(--border); position: relative; z-index: 10;">
+<!-- FOOTER -->
+<footer th:fragment="footer" class="footer-main mt-auto" style="background: rgba(15, 23, 42, 0.95); color: #94a3b8; padding: 3rem 0 2rem; border-top: 1px solid var(--border); position: relative; z-index: 10;">
     <div class="container text-center text-md-start">
         <div class="row">
             <div class="col-md-6 mb-4 mb-md-0">
