@@ -4,117 +4,133 @@
 <body>
 <div th:replace="~{layout :: user_navbar}"></div>
 <main class="container">
-  <h2 class="fw-bold mb-4"><i class="bi bi-search text-primary"></i> Search Flights</h2>
-
-  <!-- Search Form -->
-  <div class="card shadow-sm border-0 mb-4">
-    <div class="card-body p-4">
-      <form th:action="@{/user/search/results}" method="get" class="row g-3 align-items-end">
-        <div class="col-md-3">
-          <label class="form-label fw-semibold">From (Origin)</label>
-          <select class="form-select" name="originId" required>
-            <option value="" disabled th:selected="${originId == null}">Select Origin</option>
-            <option th:each="ap : ${airports}" th:value="${ap.id}" th:text="${ap.airportCode} + ' - ' + ${ap.city}" th:selected="${ap.id == originId}"></option>
-          </select>
+    <div class="row mb-4">
+        <div class="col-12">
+            <span class="eyebrow-label">Book Your Next Destination</span>
+            <h1 class="section-title mb-1">Search Flights</h1>
+            <p class="text-muted small">Explore and compare prices, flight timings, and find the perfect journey.</p>
         </div>
-        <div class="col-md-3">
-          <label class="form-label fw-semibold">To (Destination)</label>
-          <select class="form-select" name="destinationId" required>
-            <option value="" disabled th:selected="${destinationId == null}">Select Destination</option>
-            <option th:each="ap : ${airports}" th:value="${ap.id}" th:text="${ap.airportCode} + ' - ' + ${ap.city}" th:selected="${ap.id == destinationId}"></option>
-          </select>
-        </div>
-        <div class="col-md-2">
-          <label class="form-label fw-semibold">Departure Date</label>
-          <input type="date" class="form-control" name="date" th:value="${date}" required>
-        </div>
-        <div class="col-md-2">
-          <label class="form-label fw-semibold">Airline</label>
-          <select class="form-select" name="airline">
-            <option value="" th:selected="${airline == null || airline == ''}">Any Airline</option>
-            <option th:each="al : ${airlines}" th:value="${al.airlineName}" th:text="${al.airlineName}" th:selected="${al.airlineName == airline}"></option>
-          </select>
-        </div>
-        <div class="col-md-2 mt-4">
-          <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i> Search</button>
-        </div>
-      </form>
     </div>
-  </div>
 
-  <!-- Results -->
-  <div th:if="${flights != null}">
-    <div th:if="${#lists.isEmpty(flights)}" class="alert alert-info">
-      No flights found for that route and date. Try different search criteria.
-    </div>
-    <div th:if="${!#lists.isEmpty(flights)}">
-      <h5 class="fw-bold mb-3">Available Flights (<span th:text="${#lists.size(flights)}">0</span> found)</h5>
-      <div class="row g-3">
-        <div class="col-12" th:each="f : ${flights}">
-          <div class="card border-0 shadow-sm">
-            <div class="card-body">
-              <div class="row align-items-center">
+    <!-- Search Form -->
+    <div class="card border-0 mb-5">
+        <div class="card-body p-4 p-md-5">
+            <form th:action="@{/user/search/results}" method="get" class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold text-uppercase small text-muted">From (Origin)</label>
+                    <select class="form-select" name="originId" required>
+                        <option value="" disabled th:selected="${originId == null}">Select Origin</option>
+                        <option th:each="ap : ${airports}" th:value="${ap.id}" th:text="${ap.airportCode} + ' - ' + ${ap.city}" th:selected="${ap.id == originId}"></option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold text-uppercase small text-muted">To (Destination)</label>
+                    <select class="form-select" name="destinationId" required>
+                        <option value="" disabled th:selected="${destinationId == null}">Select Destination</option>
+                        <option th:each="ap : ${airports}" th:value="${ap.id}" th:text="${ap.airportCode} + ' - ' + ${ap.city}" th:selected="${ap.id == destinationId}"></option>
+                    </select>
+                </div>
                 <div class="col-md-2">
-                  <div class="d-flex align-items-center gap-2 mb-1">
-                    <img th:if="${f.airline.logo != null && !f.airline.logo.isEmpty()}" 
-                         th:src="${f.airline.logo}" 
-                         alt="Logo" 
-                         class="img-thumbnail" 
-                         style="width: 50px; height: auto; max-height: 30px; object-fit: contain;">
-                    <span class="badge bg-primary fs-6" th:text="${f.flightNumber}">FL-101</span>
-                    <span th:with="s=${f.flightStatus ?: T(com.airline.reservation.entity.FlightStatus).SCHEDULED}"
-                          th:class="|badge ${s.badgeClass}|"
-                          th:text="${s.label}"
-                          th:style="${s.name() == 'DEPARTED' ? 'background-color: #6f42c1 !important' : ''}">SCHEDULED</span>
-                  </div>
-                  <small class="text-muted" th:text="${f.airline.airlineName}">Airline</small>
+                    <label class="form-label fw-bold text-uppercase small text-muted">Departure Date</label>
+                    <input type="date" class="form-control" name="date" th:value="${date}" required>
                 </div>
-                <div class="col-md-3 text-center">
-                  <div class="d-flex align-items-center justify-content-center gap-2">
-                    <div>
-                      <div class="fs-5 fw-bold" th:text="${#temporals.format(f.departureDateTime,'HH:mm')}">00:00</div>
-                      <div class="text-muted small" th:text="${f.originAirport.airportCode} + ' (' + ${f.originAirport.city} + ')'">Origin</div>
-                    </div>
-                    <div class="text-muted px-2">
-                      <i class="bi bi-arrow-right fs-4"></i><br>
-                      <small th:text="${f.durationMinutes + ' min'}">0 min</small>
-                    </div>
-                    <div>
-                      <div class="fs-5 fw-bold" th:text="${#temporals.format(f.arrivalDateTime,'HH:mm')}">00:00</div>
-                      <div class="text-muted small" th:text="${f.destinationAirport.airportCode} + ' (' + ${f.destinationAirport.city} + ')'">Destination</div>
-                    </div>
-                  </div>
-                  <small class="text-muted" th:text="${#temporals.format(f.departureDateTime,'dd MMM yyyy')}">Date</small>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold text-uppercase small text-muted">Airline</label>
+                    <select class="form-select" name="airline">
+                        <option value="" th:selected="${airline == null || airline == ''}">Any Airline</option>
+                        <option th:each="al : ${airlines}" th:value="${al.airlineName}" th:text="${al.airlineName}" th:selected="${al.airlineName == airline}"></option>
+                    </select>
                 </div>
-                <div class="col-md-2 text-center">
-                  <div class="text-muted small">Aircraft</div>
-                  <div class="fw-bold text-dark" th:text="${f.aircraft != null ? f.aircraft.model : 'Unknown'}">Model</div>
+                <div class="col-md-2 mt-4">
+                    <button type="submit" class="btn-primary-theme w-100 py-3"><i class="bi bi-search"></i> Search</button>
                 </div>
-                <div class="col-md-2 text-center">
-                  <div class="text-muted small">Available Seats</div>
-                  <div class="fw-bold" th:classappend="${f.availableSeats < 10} ? 'text-danger' : 'text-success'"
-                       th:text="${f.availableSeats}">0</div>
-                </div>
-                <div class="col-md-1 text-center">
-                  <div class="text-muted small">Fare</div>
-                  <div class="fs-5 fw-bold text-primary">₹<span th:text="${#numbers.formatDecimal(f.fare,1,2)}">0</span></div>
-                </div>
-                <div class="col-md-2 text-end">
-                  <th:block th:with="isCancelled=${f.flightStatus != null && f.flightStatus.name() == 'CANCELLED'}">
-                      <a th:if="${f.availableSeats > 0 && !isCancelled}" th:href="@{/user/book/{id}(id=${f.id})}" class="btn btn-success">
-                        <i class="bi bi-cursor-fill"></i> Select Seats
-                      </a>
-                      <span th:if="${f.availableSeats == 0 && !isCancelled}" class="badge bg-danger p-2">Sold Out</span>
-                      <span th:if="${isCancelled}" class="badge bg-danger p-2">Flight Cancelled</span>
-                  </th:block>
-                </div>
-              </div>
-            </div>
-          </div>
+            </form>
         </div>
-      </div>
     </div>
-  </div>
+
+    <!-- Results -->
+    <div th:if="${flights != null}">
+        <div th:if="${#lists.isEmpty(flights)}" class="alert alert-warning border-0 rounded-4 p-4 text-center">
+            <i class="bi bi-info-circle fs-3 mb-2 d-block"></i>
+            No flights found for that route and date. Try selecting different criteria.
+        </div>
+        <div th:if="${!#lists.isEmpty(flights)}">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-bold section-title mb-0">Available Flights (<span th:text="${#lists.size(flights)}">0</span> found)</h5>
+            </div>
+            <div class="row g-4">
+                <div class="col-12" th:each="f : ${flights}">
+                    <div class="card border-0">
+                        <div class="card-body p-4">
+                            <div class="row align-items-center g-3">
+                                <!-- Flight Brand -->
+                                <div class="col-md-3">
+                                    <div class="d-flex align-items-center gap-3 mb-2">
+                                        <img th:if="${f.airline.logo != null && !f.airline.logo.isEmpty()}" 
+                                             th:src="${f.airline.logo}" 
+                                             alt="Logo" 
+                                             class="img-fluid rounded border p-1 bg-white" 
+                                             style="width: 50px; height: 35px; object-fit: contain;">
+                                        <div>
+                                            <span class="badge bg-secondary-subtle text-secondary border px-2 py-1" th:text="${f.flightNumber}">FL-101</span>
+                                        </div>
+                                    </div>
+                                    <div class="fw-bold text-dark dark:text-white" th:text="${f.airline.airlineName}">Airline</div>
+                                    <div class="small text-muted" th:text="${f.aircraft != null ? f.aircraft.model : 'Unknown'}">Model</div>
+                                </div>
+                                
+                                <!-- Route and Timings -->
+                                <div class="col-md-4">
+                                    <div class="d-flex align-items-center justify-content-between gap-2">
+                                        <div class="text-start">
+                                            <div class="fs-5 fw-bold text-primary" th:text="${#temporals.format(f.departureDateTime,'HH:mm')}">00:00</div>
+                                            <div class="text-muted small fw-semibold" th:text="${f.originAirport.airportCode} + ' — ' + ${f.originAirport.city}">Origin</div>
+                                        </div>
+                                        <div class="text-center px-3 position-relative flex-grow-1">
+                                            <small class="text-muted d-block mb-1 font-monospace" th:text="${f.durationMinutes + ' min'}">0 min</small>
+                                            <div style="border-top: 2px dashed rgba(14, 165, 233, 0.2); position: relative;">
+                                                <i class="bi bi-airplane-fill text-primary" style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%) rotate(90deg); font-size: 0.9rem;"></i>
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="fs-5 fw-bold text-primary" th:text="${#temporals.format(f.arrivalDateTime,'HH:mm')}">00:00</div>
+                                            <div class="text-muted small fw-semibold" th:text="${f.destinationAirport.airportCode} + ' — ' + ${f.destinationAirport.city}">Destination</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-center mt-2 small text-muted font-monospace" th:text="${#temporals.format(f.departureDateTime,'dd MMM yyyy')}">Date</div>
+                                </div>
+
+                                <!-- Seat Info & Fare -->
+                                <div class="col-md-3 text-center">
+                                    <div class="row align-items-center">
+                                        <div class="col-6">
+                                            <div class="text-muted small">Available</div>
+                                            <div class="fw-bold fs-5" th:classappend="${f.availableSeats < 10} ? 'text-danger' : 'text-success'" th:text="${f.availableSeats}">0</div>
+                                        </div>
+                                        <div class="col-6 border-start" style="border-color: var(--border) !important;">
+                                            <div class="text-muted small">Base Fare</div>
+                                            <div class="fs-5 fw-bold text-primary">₹<span th:text="${#numbers.formatDecimal(f.fare,1,2)}">0</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Action Button -->
+                                <div class="col-md-2 text-end">
+                                    <th:block th:with="isCancelled=${f.flightStatus != null && f.flightStatus.name() == 'CANCELLED'}">
+                                        <a th:if="${f.availableSeats > 0 && !isCancelled}" th:href="@{/user/book/{id}(id=${f.id})}" class="btn-primary-theme w-100 py-2.5">
+                                            Select Seats
+                                        </a>
+                                        <span th:if="${f.availableSeats == 0 && !isCancelled}" class="badge badge-cancelled w-100 py-2">Sold Out</span>
+                                        <span th:if="${isCancelled}" class="badge badge-cancelled w-100 py-2">Cancelled</span>
+                                    </th:block>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </main>
 <div th:replace="~{layout :: footer}"></div>
 <div th:replace="~{layout :: html_scripts}"></div>

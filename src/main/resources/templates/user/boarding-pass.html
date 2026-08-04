@@ -2,227 +2,234 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{layout :: html_head('Boarding Pass')}"></head>
 <style>
-  body { background: #0f172a; }
-  .bp-page { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
+    body { background-color: #0f172a !important; }
+    .bp-page { min-height: 80vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem 1rem; }
 
-  .bp-card {
-    background: #fff;
-    border-radius: 20px;
-    max-width: 860px;
-    width: 100%;
-    box-shadow: 0 32px 80px rgba(0,0,0,.6);
-    overflow: hidden;
-    position: relative;
-  }
-  .bp-card::before {
-    content: '';
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 10px;
-    background: linear-gradient(180deg, #10b981, #059669);
-    border-radius: 20px 0 0 20px;
-  }
+    .bp-card {
+        background: #fff;
+        border-radius: var(--radius);
+        max-width: 860px;
+        width: 100%;
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+        position: relative;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .bp-card::before {
+        content: '';
+        position: absolute;
+        left: 0; top: 0; bottom: 0;
+        width: 10px;
+        background: linear-gradient(180deg, var(--sky-light), var(--sky-dark));
+    }
 
-  .bp-header {
-    background: linear-gradient(135deg, #0f172a 0%, #064e3b 100%);
-    padding: 1.5rem 2rem;
-    color: #fff;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .bp-header h3 { margin: 0; font-weight: 700; }
-  .bp-header .bp-label { font-size: .75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 2px; }
-  .bp-header .bp-ref { font-size: 1.3rem; color: #fbbf24; font-weight: 700; }
+    .bp-header {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        padding: 2rem;
+        color: #fff;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+    }
+    .bp-header h3 { margin: 0; font-weight: 700; font-family: 'Space Grotesk', sans-serif; }
+    .bp-header .bp-label { font-size: .7rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 2px; }
+    .bp-header .bp-ref { font-size: 1.3rem; color: var(--sky-light); font-weight: 700; }
 
-  .bp-route {
-    padding: 2rem 2rem 1rem;
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-  }
-  .bp-airport-code { font-size: 3rem; font-weight: 800; color: #0f172a; line-height: 1; }
-  .bp-airport-city { font-size: .85rem; color: #64748b; }
-  .bp-arrow { font-size: 1.5rem; color: #10b981; flex: 1; text-align: center; }
+    .bp-route {
+        padding: 2.5rem 2rem 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+    }
+    .bp-airport-code { font-size: 3rem; font-weight: 800; color: #0f172a; line-height: 1; font-family: 'Space Grotesk', sans-serif; }
+    .bp-airport-city { font-size: .85rem; color: #64748b; font-weight: 600; }
+    .bp-arrow { font-size: 1.5rem; color: var(--sky-light); flex: 1; text-align: center; }
 
-  .bp-divider {
-    border: none;
-    border-top: 2px dashed #e2e8f0;
-    margin: 0 2rem;
-  }
+    .bp-divider {
+        border: none;
+        border-top: 2px dashed #e2e8f0;
+        margin: 0 2rem;
+    }
 
-  .bp-details {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
-    padding: 1.5rem 2rem;
-  }
-  .bp-detail-block .bp-detail-label {
-    font-size: .7rem;
-    color: #94a3b8;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: .25rem;
-  }
-  .bp-detail-block .bp-detail-value {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #0f172a;
-  }
+    .bp-details {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem 1rem;
+        padding: 2rem;
+    }
+    .bp-detail-block .bp-detail-label {
+        font-size: .7rem;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: .25rem;
+        font-weight: 700;
+    }
+    .bp-detail-block .bp-detail-value {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #0f172a;
+    }
 
-  .bp-barcode {
-    padding: 1rem 2rem 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-  }
-  .bp-barcode img { height: 50px; }
-  .bp-barcode-text { font-size: .75rem; color: #94a3b8; }
-  .bp-footer-note { font-size: .7rem; color: #94a3b8; font-style: italic; }
+    .bp-barcode {
+        padding: 1.5rem 2rem;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        background: #f8fafc;
+        border-top: 1px solid rgba(15, 23, 24, 0.05);
+    }
+    .bp-barcode img { height: 60px; }
+    .bp-barcode-text { font-size: .75rem; color: #94a3b8; font-weight: 700; }
+    .bp-footer-note { font-size: .7rem; color: #94a3b8; font-style: italic; }
 
-  .bp-actions {
-    display: flex;
-    gap: .75rem;
-    justify-content: center;
-    margin-top: 1.5rem;
-  }
+    .bp-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+    }
 
-  @media (max-width: 768px) {
-    .bp-details { grid-template-columns: repeat(2, 1fr); }
-    .bp-route { flex-direction: column; text-align: center; }
-  }
-  @media print {
-    .bp-actions, nav, footer { display: none !important; }
-  }
+    @media (max-width: 768px) {
+        .bp-details { grid-template-columns: repeat(2, 1fr); }
+        .bp-route { flex-direction: column; text-align: center; }
+    }
+    @media print {
+        .bp-actions, nav, footer { display: none !important; }
+        body { background: #fff !important; }
+        .bp-page { padding: 0; }
+    }
 </style>
 <body>
 <div th:replace="~{layout :: user_navbar}"></div>
 
 <div class="bp-page">
-  <div class="bp-card">
-    <!-- Header -->
-    <div class="bp-header">
-      <div>
-        <h3>
-          ✈ <span th:text="${booking.flight.airline.airlineName}">Airline</span>
-          <span th:with="s=${booking.flight.flightStatus ?: T(com.airline.reservation.entity.FlightStatus).SCHEDULED}"
-                th:class="|badge ms-2 fs-6 align-middle ${s.badgeClass}|"
-                th:text="${s.label}"
-                th:style="${s.name() == 'DEPARTED' ? 'background-color: #6f42c1 !important' : ''}">SCHEDULED</span>
-        </h3>
-        <div style="font-size:.85rem; color:#10b981; font-weight:600; letter-spacing:2px;">BOARDING PASS</div>
-      </div>
-      <div class="text-end">
-        <div class="bp-label">Booking Reference</div>
-        <div class="bp-ref" th:text="${bookingRef}">SKY-00001</div>
-      </div>
-    </div>
-
-    <!-- Route -->
-    <div class="bp-route">
-      <div>
-        <div class="bp-airport-code" th:text="${originCode}">DEL</div>
-        <div class="bp-airport-city" th:text="${originFull}">Indira Gandhi Intl, Delhi</div>
-      </div>
-      <div class="bp-arrow">
-        <i class="bi bi-arrow-right-circle-fill" style="font-size:2rem;"></i>
-      </div>
-      <div>
-        <div class="bp-airport-code" th:text="${destCode}">BOM</div>
-        <div class="bp-airport-city" th:text="${destFull}">Chhatrapati Shivaji Intl, Mumbai</div>
-      </div>
-    </div>
-
-    <hr class="bp-divider">
-
-    <!-- Details Row 1 -->
-    <div class="bp-details">
-      <div class="bp-detail-block">
-        <div class="bp-detail-label">Passenger</div>
-        <div class="bp-detail-value" th:text="${booking.user.name}">John Doe</div>
-      </div>
-      <div class="bp-detail-block">
-        <div class="bp-detail-label">Flight</div>
-        <div class="bp-detail-value" th:text="${booking.flight.flightNumber}">FL-101</div>
-      </div>
-      <div class="bp-detail-block">
-        <div class="bp-detail-label">Date</div>
-        <div class="bp-detail-value" th:text="${#temporals.format(booking.flight.departureDateTime, 'dd MMM yyyy')}">01 Jan 2026</div>
-      </div>
-      <div class="bp-detail-block">
-        <div class="bp-detail-label">Cabin Class</div>
-        <div class="bp-detail-value" th:text="${booking.cabinClass}">Economy</div>
-      </div>
-    </div>
-
-    <!-- Details Row 2 -->
-    <div class="bp-details" style="padding-top:0;">
-      <div class="bp-detail-block">
-        <div class="bp-detail-label">Seat(s)</div>
-        <div class="bp-detail-value" th:text="${booking.seatNumbers}">12A</div>
-      </div>
-      <div class="bp-detail-block">
-        <div class="bp-detail-label">Boarding Time</div>
-        <div class="bp-detail-value" th:text="${booking.flight.boardingTime != null ? #temporals.format(booking.flight.boardingTime, 'HH:mm') : 'TBA'}">06:15</div>
-      </div>
-      <div class="bp-detail-block">
-        <div class="bp-detail-label">Gate</div>
-        <div class="bp-detail-value" th:text="${booking.flight.gateNumber != null ? booking.flight.gateNumber : 'TBA'}">G12</div>
-      </div>
-      <div class="bp-detail-block">
-        <div class="bp-detail-label">Terminal</div>
-        <div class="bp-detail-value" th:text="${booking.flight.terminal != null ? booking.flight.terminal : 'TBA'}">T2</div>
-      </div>
-    </div>
-
-    <!-- Details Row 3 -->
-    <div class="bp-details" style="padding-top:0;">
-      <div class="bp-detail-block">
-        <div class="bp-detail-label">Boarding Zone</div>
-        <div class="bp-detail-value" th:text="${booking.flight.boardingZone != null ? booking.flight.boardingZone : 'TBA'}">Zone A</div>
-      </div>
-      <div class="bp-detail-block">
-        <div class="bp-detail-label">Departure</div>
-        <div class="bp-detail-value" th:text="${#temporals.format(booking.flight.departureDateTime, 'HH:mm')}">07:00</div>
-      </div>
-      <div class="bp-detail-block">
-        <div class="bp-detail-label">Arrival</div>
-        <div class="bp-detail-value" th:text="${#temporals.format(booking.flight.arrivalDateTime, 'HH:mm')}">09:15</div>
-      </div>
-      <div class="bp-detail-block">
-        <div class="bp-detail-label">Baggage</div>
-        <div class="bp-detail-value">
-          <span th:if="${booking.baggage != null and (booking.baggage.extraCheckedBagCount > 0 or booking.baggage.extraWeightKg > 0)}"
-                th:text="'+' + ${booking.baggage.extraCheckedBagCount} + ' bag, +' + ${booking.baggage.extraWeightKg} + ' kg'"></span>
-          <span th:if="${booking.baggage == null or (booking.baggage.extraCheckedBagCount == 0 and booking.baggage.extraWeightKg == 0)}">Included</span>
+    <div class="bp-card">
+        <!-- Header -->
+        <div class="bp-header">
+            <div>
+                <h3>
+                    <i class="bi bi-airplane-fill me-2 text-info"></i><span th:text="${booking.flight.airline.airlineName}">Airline</span>
+                    <span th:with="s=${booking.flight.flightStatus ?: T(com.airline.reservation.entity.FlightStatus).SCHEDULED}"
+                          th:class="|badge ms-2 align-middle ${s.badgeClass}|"
+                          th:text="${s.label}">SCHEDULED</span>
+                </h3>
+                <div class="text-uppercase tracking-wider small fw-bold text-info" style="font-size:.75rem; letter-spacing:2px; margin-top:0.25rem;">BOARDING PASS</div>
+            </div>
+            <div class="text-md-end">
+                <div class="bp-label">Booking Reference</div>
+                <div class="bp-ref" th:text="${bookingRef}">SKY-00001</div>
+            </div>
         </div>
-      </div>
+
+        <!-- Route -->
+        <div class="bp-route">
+            <div class="text-start">
+                <div class="bp-airport-code" th:text="${originCode}">DEL</div>
+                <div class="bp-airport-city" th:text="${originFull}">Delhi</div>
+            </div>
+            <div class="bp-arrow">
+                <i class="bi bi-arrow-right-circle-fill" style="font-size:2rem; color: var(--sky-light);"></i>
+            </div>
+            <div class="text-end">
+                <div class="bp-airport-code" th:text="${destCode}">BOM</div>
+                <div class="bp-airport-city" th:text="${destFull}">Mumbai</div>
+            </div>
+        </div>
+
+        <hr class="bp-divider">
+
+        <!-- Details Row 1 -->
+        <div class="bp-details">
+            <div class="bp-detail-block">
+                <div class="bp-detail-label">Passenger</div>
+                <div class="bp-detail-value" th:text="${booking.user.name}">John Doe</div>
+            </div>
+            <div class="bp-detail-block">
+                <div class="bp-detail-label">Flight</div>
+                <div class="bp-detail-value" th:text="${booking.flight.flightNumber}">FL-101</div>
+            </div>
+            <div class="bp-detail-block">
+                <div class="bp-detail-label">Date</div>
+                <div class="bp-detail-value" th:text="${#temporals.format(booking.flight.departureDateTime, 'dd MMM yyyy')}">01 Jan 2026</div>
+            </div>
+            <div class="bp-detail-block">
+                <div class="bp-detail-label">Cabin Class</div>
+                <div class="bp-detail-value" th:text="${booking.cabinClass}">Economy</div>
+            </div>
+        </div>
+
+        <!-- Details Row 2 -->
+        <div class="bp-details" style="padding-top:0;">
+            <div class="bp-detail-block">
+                <div class="bp-detail-label">Seat(s)</div>
+                <div class="bp-detail-value" th:text="${booking.seatNumbers}">12A</div>
+            </div>
+            <div class="bp-detail-block">
+                <div class="bp-detail-label">Boarding Time</div>
+                <div class="bp-detail-value text-danger" th:text="${booking.flight.boardingTime != null ? #temporals.format(booking.flight.boardingTime, 'HH:mm') : 'TBA'}">06:15</div>
+            </div>
+            <div class="bp-detail-block">
+                <div class="bp-detail-label">Gate</div>
+                <div class="bp-detail-value" th:text="${booking.flight.gateNumber != null ? booking.flight.gateNumber : 'TBA'}">G12</div>
+            </div>
+            <div class="bp-detail-block">
+                <div class="bp-detail-label">Terminal</div>
+                <div class="bp-detail-value" th:text="${booking.flight.terminal != null ? booking.flight.terminal : 'TBA'}">T2</div>
+            </div>
+        </div>
+
+        <!-- Details Row 3 -->
+        <div class="bp-details" style="padding-top:0;">
+            <div class="bp-detail-block">
+                <div class="bp-detail-label">Boarding Zone</div>
+                <div class="bp-detail-value" th:text="${booking.flight.boardingZone != null ? booking.flight.boardingZone : 'TBA'}">Zone A</div>
+            </div>
+            <div class="bp-detail-block">
+                <div class="bp-detail-label">Departure</div>
+                <div class="bp-detail-value" th:text="${#temporals.format(booking.flight.departureDateTime, 'HH:mm')}">07:00</div>
+            </div>
+            <div class="bp-detail-block">
+                <div class="bp-detail-label">Arrival</div>
+                <div class="bp-detail-value" th:text="${#temporals.format(booking.flight.arrivalDateTime, 'HH:mm')}">09:15</div>
+            </div>
+            <div class="bp-detail-block">
+                <div class="bp-detail-label">Baggage</div>
+                <div class="bp-detail-value">
+                    <span th:if="${booking.baggage != null and (booking.baggage.extraCheckedBagCount > 0 or booking.baggage.extraWeightKg > 0)}"
+                          th:text="'+' + ${booking.baggage.extraCheckedBagCount} + ' bag, +' + ${booking.baggage.extraWeightKg} + ' kg'"></span>
+                    <span th:if="${booking.baggage == null or (booking.baggage.extraCheckedBagCount == 0 and booking.baggage.extraWeightKg == 0)}">Included</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Barcode -->
+        <div class="bp-barcode">
+            <img th:if="${barcodeBase64 != null}" th:src="${barcodeBase64}" alt="Barcode">
+            <div>
+                <div class="bp-barcode-text" th:text="'ID: ' + ${bookingRef}">ID: SKY-00001</div>
+                <div class="bp-footer-note">Present this boarding pass at the gate. Keep until destination.</div>
+            </div>
+        </div>
     </div>
 
-    <hr class="bp-divider">
-
-    <!-- Barcode -->
-    <div class="bp-barcode">
-      <img th:if="${barcodeBase64 != null}" th:src="${barcodeBase64}" alt="Barcode">
-      <div>
-        <div class="bp-barcode-text" th:text="'ID: ' + ${bookingRef}">ID: SKY-00001</div>
-        <div class="bp-footer-note">Present this boarding pass at the gate. Keep until destination.</div>
-      </div>
+    <!-- Action Buttons -->
+    <div class="bp-actions">
+        <a th:href="@{/user/boarding-pass/{id}/download(id=${booking.id})}" class="btn-primary-theme py-2.5 px-4">
+            <i class="bi bi-download"></i> Download PDF
+        </a>
+        <button onclick="window.print()" class="btn-outline-theme py-2.5 px-4 text-white" style="border-color: rgba(255,255,255,0.3) !important;">
+            <i class="bi bi-printer"></i> Print Pass
+        </button>
+        <a th:href="@{/user/bookings}" class="btn-outline-theme py-2.5 px-4 text-white" style="border-color: rgba(255,255,255,0.3) !important;">
+            Back to Bookings
+        </a>
     </div>
-  </div>
-
-  <!-- Action Buttons -->
-  <div class="bp-actions">
-    <a th:href="@{/user/boarding-pass/{id}/download(id=${booking.id})}" class="btn btn-success btn-lg">
-      <i class="bi bi-download"></i> Download PDF
-    </a>
-    <button onclick="window.print()" class="btn btn-outline-light btn-lg">
-      <i class="bi bi-printer"></i> Print
-    </button>
-    <a th:href="@{/user/bookings}" class="btn btn-outline-light btn-lg">
-      <i class="bi bi-arrow-left"></i> Back
-    </a>
-  </div>
 </div>
 
 <div th:replace="~{layout :: footer}"></div>
