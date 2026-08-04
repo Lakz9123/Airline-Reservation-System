@@ -1,100 +1,232 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{layout :: html_head('Login')}"></head>
-<body class="bg-light">
-<div th:replace="~{layout :: navbar}"></div>
-
-<main class="container py-5">
-  <div class="row justify-content-center">
-    <div class="col-md-6 col-lg-5">
-      <div class="card shadow-lg border-0 rounded-4">
-        <div class="card-body p-4 p-md-5">
-          <div class="text-center mb-4">
-            <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
-              <i class="bi bi-airplane-fill display-6"></i>
-            </div>
-            <h3 class="fw-bold text-dark mb-1">Welcome Back</h3>
-            <p class="text-muted small">Sign in to manage your bookings and flight schedules</p>
-          </div>
-
-          <!-- Alert Notifications -->
-          <!-- Account not found: email doesn't exist in DB -->
-          <div th:if="${param.error == 'notfound'}" class="alert alert-warning alert-dismissible fade show rounded-3 small" role="alert">
-            <i class="bi bi-person-x-fill me-2"></i>
-            <strong>Account not found.</strong> No account is registered with that email.
-            <a th:href="@{/register}" class="alert-link ms-1">Create an account here</a>.
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-          </div>
-          <!-- Wrong password or disabled account -->
-          <div th:if="${param.error == 'badcredentials' or param.error == 'true'}" class="alert alert-danger alert-dismissible fade show rounded-3 small" role="alert">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-            Invalid email or password, or account is disabled.
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-          </div>
-
-          <div th:if="${param.logout}" class="alert alert-success alert-dismissible fade show rounded-3 small" role="alert">
-            <i class="bi bi-check-circle-fill me-2"></i>
-            Logged out successfully.
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-          </div>
-          <div th:if="${success}" class="alert alert-success alert-dismissible fade show rounded-3 small" role="alert" th:text="${success}">
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-          </div>
-
-          <form th:action="@{/login}" method="post" id="loginForm">
-            <div class="mb-3">
-              <label for="email" class="form-label fw-semibold">Email Address</label>
-              <div class="input-group">
-                <span class="input-group-text bg-light text-muted"><i class="bi bi-envelope"></i></span>
-                <input type="email" class="form-control" id="email" name="email" required placeholder="you@example.com" autofocus th:value="${param.email != null ? param.email : ''}">
-              </div>
-            </div>
-
-            <div class="mb-4">
-              <div class="d-flex justify-content-between align-items-center mb-1">
-                <label for="password" class="form-label fw-semibold mb-0">Password</label>
-                <a th:href="@{/forgot-password}" class="small text-decoration-none text-primary fw-semibold">Forgot password?</a>
-              </div>
-              <div class="input-group">
-                <span class="input-group-text bg-light text-muted"><i class="bi bi-lock"></i></span>
-                <input type="password" class="form-control" id="password" name="password" required placeholder="Enter your password">
-                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
-                  <i class="bi bi-eye" id="toggleIcon"></i>
-                </button>
-              </div>
-            </div>
-
-            <div class="d-grid gap-2">
-              <button type="submit" class="btn btn-primary btn-lg rounded-3 fw-bold py-2">
-                <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
-              </button>
-            </div>
-          </form>
-        </div>
-        <div class="card-footer bg-light border-0 text-center py-3 rounded-bottom-4">
-          <span class="text-muted small">Don't have an account?</span>
-          <a th:href="@{/register}" class="ms-1 fw-bold text-primary text-decoration-none">Register here</a>
-        </div>
-      </div>
+<html xmlns:th="http://www.thymeleaf.org" class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>SkyFly Elite - Login</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&amp;family=Inter:wght@400;600&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#e3effb",
+                        "secondary-fixed-dim": "#a5c8ff",
+                        "on-primary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "on-background": "#111d25",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-highest": "#d8e4f0",
+                        "secondary": "#005cab",
+                        "outline": "#74777d",
+                        "on-surface": "#111d25",
+                        "surface": "#f6faff",
+                        "surface-bright": "#f6faff",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "primary": "#000000",
+                        "on-tertiary-container": "#838484",
+                        "tertiary": "#000000",
+                        "error": "#ba1a1a",
+                        "secondary-container": "#0075d6",
+                        "on-secondary-container": "#fefcff",
+                        "on-primary-container": "#778598",
+                        "surface-container-low": "#ebf5ff",
+                        "surface-variant": "#d8e4f0",
+                        "on-secondary": "#ffffff",
+                        "surface-tint": "#525f71",
+                        "inverse-on-surface": "#e6f2fe",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "inverse-primary": "#bac8dc",
+                        "inverse-surface": "#26323b",
+                        "surface-dim": "#cfdce7",
+                        "error-container": "#ffdad6",
+                        "on-surface-variant": "#44474c",
+                        "on-secondary-fixed": "#001c3a",
+                        "outline-variant": "#c4c6cc",
+                        "on-secondary-fixed-variant": "#004786",
+                        "tertiary-container": "#1a1c1c",
+                        "primary-container": "#0f1c2c",
+                        "primary-fixed": "#d6e4f9",
+                        "on-primary-fixed-variant": "#3a4859",
+                        "tertiary-fixed-dim": "#c6c6c6",
+                        "background": "#f6faff",
+                        "secondary-fixed": "#d4e3ff",
+                        "surface-container-high": "#ddeaf5",
+                        "primary-fixed-dim": "#bac8dc",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed": "#e2e2e2",
+                        "on-primary-fixed": "#0f1c2c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "20px",
+                        "container-max": "1280px",
+                        "margin-desktop": "64px",
+                        "gutter": "24px",
+                        "unit": "8px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Montserrat"],
+                        "label-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Montserrat"],
+                        "display-lg-mobile": ["Montserrat"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-sm": ["13px", { "lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        .input-focus-ring:focus {
+            outline: none;
+            border-color: #1E90FF;
+            box-shadow: 0 0 0 4px rgba(30, 144, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md h-screen flex flex-col overflow-hidden">
+<!-- TopNavBar (Modified for Transactional Intent) -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 shadow-sm h-20 flex justify-between items-center px-margin-mobile md:px-margin-desktop">
+    <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-secondary text-3xl" style="font-variation-settings: 'FILL' 1;">flight</span>
+        <span class="text-headline-md font-headline-md text-secondary tracking-tight">SkyFly <span class="bg-primary-container text-on-primary-container text-xs px-2 py-1 rounded-sm ml-1 align-middle">ELITE</span></span>
     </div>
-  </div>
+    <nav class="hidden md:flex gap-8">
+    </nav>
+    <a class="text-secondary font-label-sm hover:bg-surface-container-high/50 transition-all duration-300 px-4 py-2 rounded-lg flex items-center gap-2" th:href="@{/}">
+        <span class="material-symbols-outlined text-sm">arrow_back</span>
+        Back to Home
+    </a>
+</header>
+<!-- Main Split Layout -->
+<main class="flex-grow flex pt-20 h-full">
+    <!-- Left Panel: Image -->
+    <div class="hidden md:block md:w-1/2 relative bg-surface-container-highest">
+        <div class="absolute inset-0 bg-gradient-to-t from-secondary-container/40 to-transparent z-10 mix-blend-overlay"></div>
+        <img alt="" class="absolute inset-0 w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLsxDSbbfxugjQSIu5kEmf7lyKYvTSBuQxTCPSgWP_BYwqbb7tojGx0tJngT8MRhXDVPBZQdOXLmTC3XHK9m7d4uX6cBqnmeBxZbx3oplHVS3SXjlQ9qY8VLTsPaK3RksNrhp6HayClWp78uVboSfDWim_GZLZvkWjajI-3wNdxGSzInZZZzY9P1sv9Q1Gs9BWFV-nOXq5eF6_fXW6xbWMJ5RT05YntW0wxwzjIsOKO0LHISKpRmGCFnOkCx"/>
+    </div>
+    <!-- Right Panel: Login Form -->
+    <div class="w-full md:w-1/2 flex items-center justify-center p-6 md:p-12 lg:p-24 bg-surface-container-lowest overflow-y-auto">
+        <div class="w-full max-w-md space-y-8 glass-panel p-8 rounded-[16px] shadow-[0px_4px_20px_rgba(0,0,0,0.05)]">
+            <!-- Header -->
+            <div class="text-center space-y-2">
+                <span class="font-label-sm text-label-sm text-[#1e90ff] uppercase tracking-wider block">Welcome Back</span>
+                <h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-primary-container">Sign in to SkyFly Elite</h1>
+            </div>
+
+            <!-- Alert Notifications -->
+            <!-- Account not found info banner -->
+            <div th:if="${param.error == 'notfound'}" class="bg-surface-container-low border border-[#a5c8ff] rounded-lg p-4 flex items-start gap-3">
+                <span class="material-symbols-outlined text-[#0075d6] mt-0.5">info</span>
+                <div class="text-sm text-on-surface-variant flex-1">
+                    Account not found. Please register first. 
+                    <a class="text-[#0075d6] font-semibold hover:underline block mt-1" th:href="@{/register}">Create Account →</a>
+                </div>
+            </div>
+
+            <!-- Wrong password/credentials error banner -->
+            <div th:if="${param.error == 'badcredentials' or param.error == 'true'}" class="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+                <span class="material-symbols-outlined text-red-500 mt-0.5">error</span>
+                <div class="text-sm text-red-700 flex-1">
+                    Invalid email or password, or account is disabled.
+                </div>
+            </div>
+
+            <!-- Logout notification banner -->
+            <div th:if="${param.logout}" class="bg-green-50 border border-green-200 rounded-lg p-4 flex items-start gap-3">
+                <span class="material-symbols-outlined text-green-500 mt-0.5">check_circle</span>
+                <div class="text-sm text-green-700 flex-1">
+                    Logged out successfully.
+                </div>
+            </div>
+
+            <!-- Success notification banner -->
+            <div th:if="${success}" class="bg-green-50 border border-green-200 rounded-lg p-4 flex items-start gap-3">
+                <span class="material-symbols-outlined text-green-500 mt-0.5">check_circle</span>
+                <div class="text-sm text-green-700 flex-1" th:text="${success}">
+                    Success message
+                </div>
+            </div>
+
+            <!-- Form -->
+            <form class="space-y-6" th:action="@{/login}" method="post" id="loginForm">
+                <div class="space-y-2">
+                    <label class="block font-label-sm text-label-sm text-on-surface-variant" for="email">Email</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <span class="material-symbols-outlined text-outline">mail</span>
+                        </span>
+                        <input class="w-full pl-10 pr-4 py-3 rounded-lg border border-outline-variant bg-surface-bright text-on-surface input-focus-ring transition-all" id="email" name="email" placeholder="e.g. pilot@skyfly.com" required="" type="email" th:value="${param.email != null ? param.email : ''}" autofocus/>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="block font-label-sm text-label-sm text-on-surface-variant" for="password">Password</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <span class="material-symbols-outlined text-outline">lock</span>
+                        </span>
+                        <input class="w-full pl-10 pr-12 py-3 rounded-lg border border-outline-variant bg-surface-bright text-on-surface input-focus-ring transition-all" id="password" name="password" placeholder="••••••••" required="" type="password"/>
+                        <button class="absolute inset-y-0 right-0 pr-3 flex items-center text-outline hover:text-secondary transition-colors" type="button" id="togglePassword">
+                            <span class="material-symbols-outlined" id="toggleIcon">visibility</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input class="rounded border-outline-variant text-[#1e90ff] focus:ring-[#1e90ff] w-4 h-4" type="checkbox" name="remember-me" id="remember-me"/>
+                        <span class="text-sm text-on-surface-variant">Remember me</span>
+                    </label>
+                    <a class="text-sm text-[#1e90ff] hover:underline font-medium" th:href="@{/forgot-password}">Forgot password?</a>
+                </div>
+                <button class="w-full bg-[#1e90ff] hover:bg-secondary-container text-on-primary font-label-sm text-label-sm py-4 rounded-[10px] transition-colors shadow-sm flex items-center justify-center gap-2" type="submit">
+                    Sign In
+                    <span class="material-symbols-outlined text-sm">login</span>
+                </button>
+            </form>
+            <!-- Footer -->
+            <div class="text-center pt-4 border-t border-outline-variant/30">
+                <p class="text-sm text-on-surface-variant">
+                    Don't have an account? <a class="text-[#1e90ff] font-semibold hover:underline" th:href="@{/register}">Sign Up</a>
+                </p>
+            </div>
+        </div>
+    </div>
 </main>
 
 <script>
-  document.getElementById('togglePassword')?.addEventListener('click', function () {
-    const passwordInput = document.getElementById('password');
-    const toggleIcon = document.getElementById('toggleIcon');
-    if (passwordInput.type === 'password') {
-      passwordInput.type = 'text';
-      toggleIcon.classList.replace('bi-eye', 'bi-eye-slash');
-    } else {
-      passwordInput.type = 'password';
-      toggleIcon.classList.replace('bi-eye-slash', 'bi-eye');
-    }
-  });
+    document.getElementById('togglePassword')?.addEventListener('click', function () {
+        const passwordInput = document.getElementById('password');
+        const toggleIcon = document.getElementById('toggleIcon');
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggleIcon.textContent = 'visibility_off';
+        } else {
+            passwordInput.type = 'password';
+            toggleIcon.textContent = 'visibility';
+        }
+    });
 </script>
-
-<div th:replace="~{layout :: footer}"></div>
-<div th:replace="~{layout :: html_scripts}"></div>
 </body>
 </html>
