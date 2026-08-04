@@ -1,221 +1,352 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" class="light" lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Register - SkyFly Elite</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Montserrat:wght@600;700&amp;display=swap" rel="stylesheet"/>
-    <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    "colors": {
-                        "surface-container": "#e3effb",
-                        "secondary-fixed-dim": "#a5c8ff",
-                        "on-primary": "#ffffff",
-                        "on-error": "#ffffff",
-                        "on-background": "#111d25",
-                        "on-tertiary": "#ffffff",
-                        "surface-container-highest": "#d8e4f0",
-                        "secondary": "#005cab",
-                        "outline": "#74777d",
-                        "on-surface": "#111d25",
-                        "surface": "#f6faff",
-                        "surface-bright": "#f6faff",
-                        "on-tertiary-fixed": "#1a1c1c",
-                        "primary": "#000000",
-                        "on-tertiary-container": "#838484",
-                        "tertiary": "#000000",
-                        "error": "#ba1a1a",
-                        "secondary-container": "#0075d6",
-                        "on-secondary-container": "#fefcff",
-                        "on-primary-container": "#778598",
-                        "surface-container-low": "#ebf5ff",
-                        "surface-variant": "#d8e4f0",
-                        "on-secondary": "#ffffff",
-                        "surface-tint": "#525f71",
-                        "inverse-on-surface": "#e6f2fe",
-                        "surface-container-lowest": "#ffffff",
-                        "on-tertiary-fixed-variant": "#454747",
-                        "inverse-primary": "#bac8dc",
-                        "inverse-surface": "#26323b",
-                        "surface-dim": "#cfdce7",
-                        "error-container": "#ffdad6",
-                        "on-surface-variant": "#44474c",
-                        "on-secondary-fixed": "#001c3a",
-                        "outline-variant": "#c4c6cc",
-                        "on-secondary-fixed-variant": "#004786",
-                        "tertiary-container": "#1a1c1c",
-                        "primary-container": "#0f1c2c",
-                        "primary-fixed": "#d6e4f9",
-                        "on-primary-fixed-variant": "#3a4859",
-                        "tertiary-fixed-dim": "#c6c6c6",
-                        "background": "#f6faff",
-                        "secondary-fixed": "#d4e3ff",
-                        "surface-container-high": "#ddeaf5",
-                        "primary-fixed-dim": "#bac8dc",
-                        "on-error-container": "#93000a",
-                        "tertiary-fixed": "#e2e2e2",
-                        "on-primary-fixed": "#0f1c2c"
-                    },
-                    "borderRadius": {
-                        "DEFAULT": "0.25rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "full": "9999px"
-                    },
-                    "spacing": {
-                        "margin-mobile": "20px",
-                        "container-max": "1280px",
-                        "margin-desktop": "64px",
-                        "gutter": "24px",
-                        "unit": "8px"
-                    },
-                    "fontFamily": {
-                        "display-lg": ["Montserrat"],
-                        "label-sm": ["Inter"],
-                        "body-lg": ["Inter"],
-                        "headline-md": ["Montserrat"],
-                        "display-lg-mobile": ["Montserrat"],
-                        "body-md": ["Inter"]
-                    },
-                    "fontSize": {
-                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
-                        "label-sm": ["13px", { "lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600" }],
-                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
-                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
-                        "display-lg-mobile": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
-                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }]
-                    }
-                }
-            }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account — SkyFly Elite</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        /* ─── Design Tokens (Matches landing page exactly) ─── */
+        :root {
+            --sky:        #0284c7;
+            --sky-light:  #0ea5e9;
+            --sky-glow:   rgba(14, 165, 233, 0.08);
+            --sky-dark:   #0369a1;
+            --accent:     #f97316;
+            --bg:         #f8fafc;
+            --surface:    rgba(255, 255, 255, 0.75);
+            --text:       #0f172a;
+            --text-muted: #475569;
+            --border:     rgba(15, 23, 24, 0.08);
+            --shadow-sm:  0 1px 3px rgba(15,23,42,0.05);
+            --shadow-md:  0 12px 30px -10px rgba(15, 23, 42, 0.08);
+            --shadow-lg:  0 20px 40px -15px rgba(15, 23, 42, 0.12), 0 0 50px rgba(14, 165, 233, 0.04);
+            --radius:     24px;
         }
-    </script>
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            letter-spacing: -0.01em;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Ambient Glow Orbs */
+        .glowing-orb {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(14, 165, 233, 0.06) 0%, transparent 70%);
+            filter: blur(40px);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* ─── Navbar ────────────────────────────────────── */
+        .navbar-main {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 1.1rem 0;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .navbar-brand {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 1.45rem;
+            color: var(--text) !important;
+            letter-spacing: -1.2px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+        }
+        .brand-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--sky-light), var(--sky-dark));
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.2);
+        }
+        .brand-sky  { color: var(--text); }
+        .brand-fly  { color: var(--sky-light); }
+        .nav-link-item {
+            color: var(--text-muted) !important;
+            font-weight: 600;
+            font-size: .88rem;
+            padding: .4rem .9rem !important;
+            border-radius: 10px;
+            transition: all .3s ease;
+        }
+        .nav-link-item:hover {
+            color: var(--sky-dark) !important;
+            background: rgba(14, 165, 233, 0.05);
+        }
+        .btn-login-nav {
+            color: var(--sky-dark);
+            font-weight: 600;
+            font-size: .88rem;
+            background: transparent;
+            border: 1.5px solid rgba(14, 165, 233, 0.3);
+            border-radius: 12px;
+            padding: .5rem 1.3rem;
+            transition: all .3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-login-nav:hover {
+            border-color: var(--sky-light);
+            background: rgba(14, 165, 233, 0.05);
+        }
+        .btn-signup-nav {
+            background: linear-gradient(135deg, var(--sky-light), var(--sky-dark));
+            color: #fff;
+            font-weight: 700;
+            font-size: .88rem;
+            border: none;
+            border-radius: 12px;
+            padding: .55rem 1.5rem;
+            transition: all .3s ease;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 4px 20px rgba(14, 165, 233, 0.25);
+        }
+        .btn-signup-nav:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(14, 165, 233, 0.4);
+            color: #fff;
+        }
+
+        /* ─── Auth Card Layout ───────────────────────────── */
+        .auth-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 100px 1rem 40px;
+            position: relative;
+            z-index: 2;
+        }
+        .auth-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            padding: 3rem 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            max-width: 520px;
+            width: 100%;
+            position: relative;
+            z-index: 5;
+        }
+        .auth-card .form-label {
+            font-size: .78rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--sky-dark);
+            margin-bottom: .4rem;
+        }
+        .auth-card .form-control {
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            border-radius: 14px;
+            font-size: .92rem;
+            padding: .75rem 1.1rem;
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.6);
+            transition: all .3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .auth-card .form-control:focus {
+            border-color: var(--sky-light);
+            box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.15);
+            background: #fff;
+        }
+        .btn-auth-primary {
+            background: linear-gradient(135deg, var(--sky-light), var(--sky-dark));
+            color: #fff;
+            font-weight: 800;
+            font-size: .95rem;
+            letter-spacing: 1px;
+            border: none;
+            border-radius: 14px;
+            padding: .85rem 1.5rem;
+            width: 100%;
+            transition: all .3s ease;
+            box-shadow: 0 4px 20px rgba(14, 165, 233, 0.25);
+        }
+        .btn-auth-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(14, 165, 233, 0.45);
+            color: #fff;
+        }
+        .section-label {
+            font-size: .75rem;
+            font-weight: 800;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--sky-dark);
+            margin-bottom: .5rem;
+        }
+        .section-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+            color: var(--text);
+            margin-bottom: 1.5rem;
+        }
+
+        /* ─── Footer ─────────────────────────────────────── */
+        .footer-main {
+            background: #0f172a;
+            color: #94a3b8;
+            padding: 4rem 0 2rem;
+            border-top: 1px solid var(--border);
+            margin-top: auto;
+        }
+        .footer-brand { font-size: 1.5rem; font-weight: 800; color: #fff; }
+        .footer-desc { font-size: .92rem; color: #475569; line-height: 1.8; }
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: 3rem;
+            padding-top: 1.8rem;
+            font-size: .85rem;
+            color: #334155;
+        }
+    </style>
 </head>
-<body class="bg-background min-h-screen flex flex-col font-body-md text-on-background">
-<!-- TopNavBar -->
-<nav class="bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md fixed top-0 w-full z-50 border-b border-outline-variant/30 shadow-sm transition-all duration-300">
-    <div class="flex justify-between items-center max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop h-20">
-        <!-- Brand -->
-        <a class="flex items-center gap-2 text-headline-md font-headline-md text-secondary dark:text-secondary-fixed-dim tracking-tight cursor-pointer active:scale-95 transition-transform hover:opacity-80" th:href="@{/}">
-            <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">flight</span>
-            SkyFly <span class="bg-primary-container text-on-primary-container text-xs px-2 py-1 rounded-sm ml-1 align-middle">ELITE</span>
+<body>
+
+<!-- Ambient Glow Orbs -->
+<div class="glowing-orb" style="top: 20%; left: 10%;"></div>
+<div class="glowing-orb" style="top: 60%; right: 10%; background: radial-gradient(circle, rgba(34, 211, 238, 0.06) 0%, transparent 70%);"></div>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-main fixed-top" id="mainNav">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}">
+            <div class="brand-icon">
+                <i class="bi bi-airplane-fill"></i>
+            </div>
+            <span class="brand-sky">SkyFly</span><span class="brand-fly">Elite</span>
         </a>
-        <!-- Desktop Links -->
-        <div class="hidden md:flex items-center gap-8">
-            <a class="text-on-surface-variant dark:text-on-surface hover:text-secondary transition-colors font-body-md text-body-md" th:href="@{/#features}">Features</a>
-            <a class="text-on-surface-variant dark:text-on-surface hover:text-secondary transition-colors font-body-md text-body-md" th:href="@{/#destinations}">Destinations</a>
-            <a class="text-on-surface-variant dark:text-on-surface hover:text-secondary transition-colors font-body-md text-body-md" th:href="@{/#about}">About</a>
-        </div>
-        <!-- Actions -->
-        <div class="flex items-center gap-4">
-            <a class="hidden md:inline-flex items-center justify-center h-10 px-6 rounded-lg border border-secondary text-secondary hover:bg-surface-container-high/50 transition-all duration-300 font-label-sm text-label-sm cursor-pointer active:scale-95 transition-transform" th:href="@{/}">Back to Home</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center gap-2">
+                <li class="nav-item"><a class="nav-link nav-link-item" th:href="@{/#features}">Features</a></li>
+                <li class="nav-item"><a class="nav-link nav-link-item" th:href="@{/#destinations}">Destinations</a></li>
+                <li class="nav-item"><a class="nav-link nav-link-item" th:href="@{/#about}">About</a></li>
+                <li class="nav-item"><a class="btn-login-nav ms-2" th:href="@{/login}">Login</a></li>
+                <li class="nav-item"><a class="btn-signup-nav ms-2" th:href="@{/register}">Sign Up</a></li>
+            </ul>
         </div>
     </div>
 </nav>
-<!-- Main Content - Split Screen -->
-<main class="flex-grow flex pt-20">
-    <!-- Left Panel: Image -->
-    <div class="hidden lg:flex w-1/2 relative bg-surface-dim">
-        <div class="absolute inset-0 bg-secondary/30 mix-blend-multiply z-10"></div>
-        <img class="w-full h-full object-cover object-center z-0" src="https://lh3.googleusercontent.com/aida/AP1WRLsxDSbbfxugjQSIu5kEmf7lyKYvTSBuQxTCPSgWP_BYwqbb7tojGx0tJngT8MRhXDVPBZQdOXLmTC3XHK9m7d4uX6cBqnmeBxZbx3oplHVS3SXjlQ9qY8VLTsPaK3RksNrhp6HayClWp78uVboSfDWim_GZLZvkWjajI-3wNdxGSzInZZZzY9P1sv9Q1Gs9BWFV-nOXq5eF6_fXW6xbWMJ5RT05YntW0wxwzjIsOKO0LHISKpRmGCFnOkCx"/>
-        <div class="absolute bottom-margin-desktop left-margin-desktop right-margin-desktop z-20 text-on-primary">
-            <h2 class="font-display-lg text-display-lg mb-4 text-white drop-shadow-md">Your Journey Starts Here.</h2>
-            <p class="font-body-lg text-body-lg text-white/90 drop-shadow-md max-w-md">Join millions of travelers who trust SkyFly Elite for every journey. Secure your next destination in minutes.</p>
+
+<!-- MAIN CONTENT -->
+<main class="auth-container">
+    <div class="auth-card">
+        <div class="text-center">
+            <span class="section-label">Join SkyFly Elite</span>
+            <h2 class="section-title">Create your account</h2>
         </div>
-    </div>
-    <!-- Right Panel: Form -->
-    <div class="w-full lg:w-1/2 flex items-center justify-center p-margin-mobile md:p-margin-desktop bg-surface-container-lowest overflow-y-auto">
-        <div class="w-full max-w-md my-8">
-            <div class="mb-8 text-center lg:text-left">
-                <span class="inline-block text-secondary font-label-sm text-label-sm uppercase tracking-wider mb-2">JOIN SKYFLY ELITE</span>
-                <h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-primary-container">Create your account</h1>
-                <p class="font-body-md text-body-md text-on-surface-variant mt-2">Enter your details below to get started.</p>
+
+        <!-- Alert Notification -->
+        <div th:if="${error}" class="alert alert-danger border-0 rounded-3 mb-4 py-3 small" role="alert" style="background: rgba(239, 68, 68, 0.08); color: #dc2626;">
+            <i class="bi bi-exclamation-circle-fill me-2"></i>
+            <span th:text="${error}">An error occurred</span>
+        </div>
+
+        <form th:action="@{/register}" method="post" id="registerForm">
+            <div class="mb-3">
+                <label for="name" class="form-label">Full Name</label>
+                <input type="text" class="form-control" id="name" name="name" required placeholder="John Doe" th:value="${name != null ? name : ''}" autofocus>
             </div>
 
-            <!-- Error Banner -->
-            <div th:if="${error}" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 flex items-start gap-3">
-                <span class="material-symbols-outlined text-red-500 mt-0.5">error</span>
-                <div class="text-sm text-red-700 flex-1" th:text="${error}">
-                    An error occurred
+            <div class="mb-3">
+                <label for="email" class="form-label">Email Address</label>
+                <input type="email" class="form-control" id="email" name="email" required placeholder="you@example.com" th:value="${email != null ? email : ''}">
+            </div>
+
+            <div class="mb-3">
+                <label for="password" class="form-label">Password <span class="text-muted text-lowercase font-monospace small">(min 6 chars)</span></label>
+                <div class="input-group">
+                    <input type="password" class="form-control" id="password" name="password" required minlength="6" placeholder="Choose a password">
+                    <button class="btn btn-outline-secondary" type="button" id="togglePassword" style="border-color: rgba(15, 23, 42, 0.08); border-top-right-radius: 14px; border-bottom-right-radius: 14px;">
+                        <i class="bi bi-eye" id="toggleIcon"></i>
+                    </button>
                 </div>
             </div>
 
-            <form class="space-y-6" th:action="@{/register}" method="post" id="registerForm">
-                <!-- Full Name -->
-                <div>
-                    <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1" for="name">Full Name</label>
-                    <div class="relative">
-                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-outline material-symbols-outlined">person</span>
-                        <input class="w-full pl-10 pr-4 py-3 rounded-lg border border-outline-variant bg-surface focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-all font-body-md text-body-md" id="name" name="name" placeholder="John Doe" required="" type="text" th:value="${name != null ? name : ''}" autofocus/>
-                    </div>
+            <div class="mb-4">
+                <label for="confirmPassword" class="form-label">Confirm Password</label>
+                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required placeholder="Repeat password">
+                <div id="passwordMismatch" class="text-danger small mt-2 d-none">
+                    <i class="bi bi-x-circle me-1"></i> Passwords do not match.
                 </div>
-                <!-- Email -->
-                <div>
-                    <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1" for="email">Email Address</label>
-                    <div class="relative">
-                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-outline material-symbols-outlined">mail</span>
-                        <input class="w-full pl-10 pr-4 py-3 rounded-lg border border-outline-variant bg-surface focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-all font-body-md text-body-md" id="email" name="email" placeholder="name@example.com" required="" type="email" th:value="${email != null ? email : ''}"/>
-                    </div>
-                </div>
-                <!-- Password -->
-                <div>
-                    <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1" for="password">Password</label>
-                    <div class="relative">
-                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-outline material-symbols-outlined">lock</span>
-                        <input class="w-full pl-10 pr-10 py-3 rounded-lg border border-outline-variant bg-surface focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-all font-body-md text-body-md" id="password" name="password" placeholder="••••••••" required="" minlength="6" type="password"/>
-                        <button class="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-secondary transition-colors" type="button" id="togglePassword">
-                            <span class="material-symbols-outlined" id="toggleIcon">visibility</span>
-                        </button>
-                    </div>
-                    <p class="mt-1 text-xs text-outline font-label-sm">Must be at least 6 characters long.</p>
-                </div>
-                <!-- Confirm Password -->
-                <div>
-                    <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1" for="confirmPassword">Confirm Password</label>
-                    <div class="relative">
-                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-outline material-symbols-outlined">lock_reset</span>
-                        <input class="w-full pl-10 pr-4 py-3 rounded-lg border border-outline-variant bg-surface focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-all font-body-md text-body-md" id="confirmPassword" name="confirmPassword" placeholder="••••••••" required="" type="password"/>
-                    </div>
-                    <div id="passwordMismatch" class="text-red-500 text-xs mt-1 hidden">
-                        Passwords do not match.
-                    </div>
-                </div>
-                <!-- Terms -->
-                <div class="flex items-start gap-2">
-                    <input class="mt-1 rounded border-outline-variant text-secondary focus:ring-secondary" id="terms" name="terms" required="" type="checkbox"/>
-                    <label class="font-body-md text-sm text-on-surface-variant" for="terms">
-                        I agree to the <a class="text-secondary hover:underline" href="#">Terms of Service</a> and <a class="text-secondary hover:underline" href="#">Privacy Policy</a>.
-                    </label>
-                </div>
-                <!-- Submit -->
-                <button class="w-full bg-secondary text-on-primary py-3 rounded-lg font-label-sm text-label-sm hover:bg-secondary-container hover:text-on-secondary-container active:scale-[0.98] transition-all duration-200 shadow-sm flex items-center justify-center gap-2" type="submit" id="submitBtn">
-                    Create Account
-                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
-                </button>
-            </form>
-            <div class="mt-8 text-center">
-                <p class="font-body-md text-body-md text-on-surface-variant">
-                    Already have an account? <a class="text-secondary font-semibold hover:underline" th:href="@{/login}">Sign In</a>
-                </p>
             </div>
+
+            <button type="submit" class="btn-auth-primary" id="submitBtn">
+                Create Account <i class="bi bi-arrow-right-short ms-1"></i>
+            </button>
+        </form>
+
+        <div class="text-center mt-4 pt-3 border-top" style="border-color: var(--border) !important;">
+            <span class="text-muted small">Already have an account?</span>
+            <a th:href="@{/login}" class="ms-1 fw-bold text-decoration-none" style="color: var(--sky);">Sign In</a>
         </div>
     </div>
 </main>
 
+<!-- FOOTER -->
+<footer class="footer-main">
+    <div class="container text-center text-md-start">
+        <div class="row">
+            <div class="col-md-6 mb-4 mb-md-0">
+                <h5 class="footer-brand mb-3"><i class="bi bi-airplane-fill me-2 text-info"></i>SkyFly Elite</h5>
+                <p class="footer-desc max-w-sm">Elevating your travel experience with premium services and seamless booking flows.</p>
+            </div>
+            <div class="col-md-6 text-md-end align-self-center">
+                <p class="mb-0 text-muted">&copy; 2026 SkyFly Elite. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     document.getElementById('togglePassword')?.addEventListener('click', function () {
         const passwordInput = document.getElementById('password');
         const toggleIcon = document.getElementById('toggleIcon');
         if (passwordInput.type === 'password') {
             passwordInput.type = 'text';
-            toggleIcon.textContent = 'visibility_off';
+            toggleIcon.classList.replace('bi-eye', 'bi-eye-slash');
         } else {
             passwordInput.type = 'password';
-            toggleIcon.textContent = 'visibility';
+            toggleIcon.classList.replace('bi-eye-slash', 'bi-eye');
         }
     });
 
@@ -225,9 +356,9 @@
 
     function checkMatch() {
         if (confirmPwd.value && pwd.value !== confirmPwd.value) {
-            mismatchAlert.classList.remove('hidden');
+            mismatchAlert.classList.remove('d-none');
         } else {
-            mismatchAlert.classList.add('hidden');
+            mismatchAlert.classList.add('d-none');
         }
     }
 
