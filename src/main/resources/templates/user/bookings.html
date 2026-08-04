@@ -36,7 +36,7 @@
         <div class="card-body p-4">
             <div class="row align-items-center g-3">
                 <!-- Flight Info & status badge -->
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <div class="d-flex align-items-center gap-2 mb-2">
                         <span class="fw-bold fs-5 text-dark dark:text-white" th:text="${b.flight.flightNumber}">FL-101</span>
                         <span th:with="s=${b.flight.flightStatus ?: T(com.airline.reservation.entity.FlightStatus).SCHEDULED}"
@@ -89,30 +89,30 @@
                 </div>
 
                 <!-- Action Panel -->
-                <div class="col-md-1 text-end"
+                <div class="col-md-2 text-md-end"
                      th:with="now=${#temporals.createNow()}, 
                               dep=${b.flight.departureDateTime}, 
                               isCheckInWindow=${now.isAfter(dep.minusHours(48)) and now.isBefore(dep.minusHours(1))},
                               fStatus=${b.flight.flightStatus != null ? b.flight.flightStatus.name() : 'SCHEDULED'},
                               isActive=${fStatus != 'CANCELLED' and fStatus != 'LANDED'}">
                     
-                    <div class="d-flex flex-column gap-2">
+                    <div class="d-flex flex-row flex-md-column gap-2 justify-content-start justify-content-md-end flex-wrap mt-3 mt-md-0">
                         <!-- Ticket View -->
                         <a th:if="${b.status=='CONFIRMED'}"
                            th:href="@{/user/ticket/{id}(id=${b.id})}"
-                           class="btn-outline-theme btn-sm py-2 px-2.5">
-                            <i class="bi bi-ticket-perforated"></i> View Ticket
+                           class="btn-outline-theme btn-sm py-2 px-2.5 flex-grow-1 text-center">
+                            <i class="bi bi-ticket-perforated"></i> Ticket
                         </a>
 
                         <!-- Check In Action -->
                         <th:block th:if="${b.status=='CONFIRMED' and b.checkInStatus=='NOT_CHECKED_IN' and isActive}">
-                            <a th:if="${isCheckInWindow}"
+                           <a th:if="${isCheckInWindow}"
                                th:href="@{/user/checkin/{id}(id=${b.id})}"
-                               class="btn-primary-theme btn-sm py-2 px-2.5">
+                               class="btn-primary-theme btn-sm py-2 px-2.5 flex-grow-1 text-center">
                                 <i class="bi bi-check2-circle"></i> Check In
                             </a>
                             <button th:if="${!isCheckInWindow}"
-                                    class="btn btn-secondary btn-sm py-2 px-2.5"
+                                    class="btn btn-secondary btn-sm py-2 px-2.5 flex-grow-1"
                                     disabled
                                     data-bs-toggle="tooltip"
                                     data-bs-placement="top"
@@ -124,13 +124,13 @@
                         <!-- Boarding Pass View -->
                         <a th:if="${b.status=='CONFIRMED' and b.checkInStatus=='CHECKED_IN' and isActive}"
                            th:href="@{/user/checkin/{id}/ready(id=${b.id})}"
-                           class="btn-primary-theme btn-sm py-2 px-2.5">
+                           class="btn-primary-theme btn-sm py-2 px-2.5 flex-grow-1 text-center">
                             <i class="bi bi-door-open"></i> Boarding Pass
                         </a>
 
                         <!-- Cancel Option -->
                         <form th:if="${b.status=='CONFIRMED' and isActive}" th:action="@{/user/bookings/cancel/{id}(id=${b.id})}" method="post"
-                              class="m-0"
+                              class="m-0 flex-grow-1"
                               onsubmit="return confirm('Cancel this booking? Your seats will be released.')">
                             <button type="submit" class="btn btn-outline-danger btn-sm w-100 py-1.5">Cancel</button>
                         </form>
