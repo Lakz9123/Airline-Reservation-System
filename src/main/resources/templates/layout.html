@@ -202,10 +202,11 @@
         .badge-departed  { background-color: rgba(168, 85, 247, 0.1) !important; color: #9333ea !important; border: 1px solid rgba(168, 85, 247, 0.2); }
         .badge-landed    { background-color: rgba(100, 116, 139, 0.1) !important; color: #475569 !important; border: 1px solid rgba(100, 116, 139, 0.2); }
 
-        /* CSRF Tokens */
-        <meta th:if="${_csrf != null}" name="_csrf" th:content="${_csrf.token}"/>
-        <meta th:if="${_csrf != null}" name="_csrf_header" th:content="${_csrf.headerName}"/>
     </style>
+
+    <!-- CSRF Tokens (must be outside <style>) -->
+    <meta th:if="${_csrf != null}" name="_csrf" th:content="${_csrf.token}"/>
+    <meta th:if="${_csrf != null}" name="_csrf_header" th:content="${_csrf.headerName}"/>
 
     <!-- Dark Mode Init Script -->
     <script>

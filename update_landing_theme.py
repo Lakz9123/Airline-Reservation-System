@@ -7,7 +7,8 @@ start_tag = "<style>"
 end_tag = "</style>"
 
 start_idx = content.find(start_tag)
-end_idx = content.find(end_tag)
+# Find the end tag AFTER the start tag
+end_idx = content.find(end_tag, start_idx)
 
 if start_idx == -1 or end_idx == -1:
     print("Error: style tags not found")
@@ -653,13 +654,10 @@ new_style = """
             .partner-tag { margin: .4rem .9rem; }
             .footer-bottom { text-align: center; }
             .footer-bottom a { margin: 0 .7rem; display: inline-block; }
-        }"""
+        }
+"""
 
-parts = content.split(start_tag)
-head = parts[0] + start_tag
-body = parts[1].split(end_tag)[1]
-
-content_updated = head + new_style + end_tag + body
+content_updated = content[:start_idx + len(start_tag)] + new_style + content[end_idx:]
 
 with open(file_path, 'w', encoding='utf-8') as f:
     f.write(content_updated)
