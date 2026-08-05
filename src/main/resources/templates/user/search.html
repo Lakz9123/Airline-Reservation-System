@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{layout :: html_head('Search Flights')}"></head>
 <body>
@@ -6,9 +6,9 @@
 
 <main class="container animate-fade-in">
 
-    <!-- ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+    <!-- ══════════════════════════════════════════════
          PAGE HEADER
-    ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ -->
+    ══════════════════════════════════════════════ -->
     <div class="row mb-3 animate-fade-in-up">
         <div class="col-12">
             <span class="eyebrow-label" style="color:var(--sky-dark); font-size:.68rem; letter-spacing:.12em;">Book Your Next Destination</span>
@@ -17,9 +17,9 @@
         </div>
     </div>
 
-    <!-- ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+    <!-- ══════════════════════════════════════════════
          SEARCH FORM CARD  (dark glass)
-    ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ -->
+    ══════════════════════════════════════════════ -->
     <div class="card border-0 mb-4 overflow-hidden animate-fade-in-up delay-1"
          style="background: linear-gradient(135deg,#0f1c2c 0%,#1e293b 100%) !important;
                 border-radius:20px !important;
@@ -52,7 +52,7 @@
                                 <option value="" disabled th:selected="${originId == null}">Select city / airport</option>
                                 <option th:each="ap : ${airports}"
                                         th:value="${ap.id}"
-                                        th:text="${ap.airportCode} + ' ΓÇö ' + ${ap.city}"
+                                        th:text="${ap.airportCode} + ' — ' + ${ap.city}"
                                         th:selected="${ap.id == originId}"></option>
                             </select>
                         </div>
@@ -75,7 +75,7 @@
                                 <option value="" disabled th:selected="${destinationId == null}">Select city / airport</option>
                                 <option th:each="ap : ${airports}"
                                         th:value="${ap.id}"
-                                        th:text="${ap.airportCode} + ' ΓÇö ' + ${ap.city}"
+                                        th:text="${ap.airportCode} + ' — ' + ${ap.city}"
                                         th:selected="${ap.id == destinationId}"></option>
                             </select>
                         </div>
@@ -112,9 +112,9 @@
         </div>
     </div>
 
-    <!-- ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+    <!-- ══════════════════════════════════════════════
          FARE SUMMARY PILLS  (shown only when results exist)
-    ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ -->
+    ══════════════════════════════════════════════ -->
     <div class="row g-3 mb-4 animate-fade-in-up delay-2" th:if="${flights != null and !#lists.isEmpty(flights)}">
         <div class="col-md-4">
             <div class="fare-pill fare-pill--green hover-scale" onclick="sortCheapest()">
@@ -123,7 +123,7 @@
                 </div>
                 <div>
                     <div class="fare-pill__label">Cheapest Fare</div>
-                    <div class="fare-pill__value">From Γé╣5,400</div>
+                    <div class="fare-pill__value">From ₹5,400</div>
                 </div>
                 <i class="bi bi-arrow-right ms-auto text-muted" style="font-size:.8rem;"></i>
             </div>
@@ -154,12 +154,12 @@
         </div>
     </div>
 
-    <!-- ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+    <!-- ══════════════════════════════════════════════
          RESULTS GRID: sidebar + flights
-    ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ -->
+    ══════════════════════════════════════════════ -->
     <div class="row g-4 animate-fade-in-up delay-3" th:if="${flights != null}">
 
-        <!-- ΓöÇΓöÇ SIDEBAR ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ -->
+        <!-- ── SIDEBAR ──────────────────────── -->
         <div class="col-xl-3 col-lg-3">
             <div class="card border-0 shadow-sm p-4 sticky-top" style="top:80px; border-radius:18px !important;">
                 <div class="d-flex align-items-center justify-content-between mb-4">
@@ -175,13 +175,13 @@
                 <div class="mb-4">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <span class="filter-label">Max Budget</span>
-                        <span class="filter-value text-primary fw-bold" id="priceDisplay">Γé╣50,000</span>
+                        <span class="filter-value text-primary fw-bold" id="priceDisplay">₹50,000</span>
                     </div>
                     <input type="range" class="form-range" id="priceRange"
                            min="0" max="50000" step="500" value="50000"
                            oninput="filterResults()">
                     <div class="d-flex justify-content-between" style="font-size:.65rem; color:#94a3b8;">
-                        <span>Γé╣0</span><span>Γé╣50,000+</span>
+                        <span>₹0</span><span>₹50,000+</span>
                     </div>
                 </div>
 
@@ -197,14 +197,14 @@
             </div>
         </div>
 
-        <!-- ΓöÇΓöÇ FLIGHT RESULTS ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ -->
+        <!-- ── FLIGHT RESULTS ─────────────── -->
         <div class="col-xl-9 col-lg-9">
 
             <!-- Empty state -->
             <div th:if="${#lists.isEmpty(flights)}"
                  class="card border-0 shadow-sm text-center p-5" style="border-radius:18px !important;">
                 <div class="py-4">
-                    <div class="mb-3" style="font-size:3rem; opacity:.3;">Γ£ê∩╕Å</div>
+                    <div class="mb-3" style="font-size:3rem; opacity:.3;">✈️</div>
                     <h5 class="fw-bold text-dark mb-2">No flights found</h5>
                     <p class="text-muted small mb-0">Try a different route or date.</p>
                 </div>
@@ -232,7 +232,7 @@
                         <div class="flight-card__body">
                             <div class="row align-items-center g-0">
 
-                                <!-- Γæá Airline brand -->
+                                <!-- ① Airline brand -->
                                 <div class="col-lg-3 col-md-3 flight-col flight-col--brand">
                                     <div class="d-flex align-items-center gap-3">
                                         <div class="airline-logo-box">
@@ -252,7 +252,7 @@
                                     </div>
                                 </div>
 
-                                <!-- Γæí Route timeline -->
+                                <!-- ② Route timeline -->
                                 <div class="col-lg-5 col-md-5 flight-col flight-col--route">
                                     <div class="route-row">
                                         <div class="route-time">
@@ -281,11 +281,11 @@
                                     <div class="text-center mt-2" style="font-size:.72rem; color:#94a3b8;" th:text="${#temporals.format(f.departureDateTime,'EEE, dd MMM yyyy')}">Date</div>
                                 </div>
 
-                                <!-- Γæó Fare -->
+                                <!-- ③ Fare -->
                                 <div class="col-lg-2 col-md-2 flight-col flight-col--fare">
                                     <div class="fare-tag">
                                         <div class="fare-tag__label">Base fare</div>
-                                        <div class="fare-tag__price">Γé╣<span th:text="${#numbers.formatDecimal(f.fare,1,0)}">0</span></div>
+                                        <div class="fare-tag__price">₹<span th:text="${#numbers.formatDecimal(f.fare,1,0)}">0</span></div>
                                         <span class="seats-badge"
                                               th:classappend="${f.availableSeats < 10} ? 'seats-badge--low' : 'seats-badge--ok'">
                                             <i class="bi bi-person-fill me-1"></i>
@@ -294,7 +294,7 @@
                                     </div>
                                 </div>
 
-                                <!-- Γæú CTA -->
+                                <!-- ④ CTA -->
                                 <div class="col-lg-2 col-md-2 flight-col flight-col--cta">
                                     <th:block th:with="isCancelled=${f.flightStatus != null and f.flightStatus.name() == 'CANCELLED'}">
                                         <a th:if="${f.availableSeats > 0 and !isCancelled}"
@@ -371,11 +371,11 @@
 <div th:replace="~{layout :: footer}"></div>
 <div th:replace="~{layout :: html_scripts}"></div>
 
-<!-- ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+<!-- ══════════════════════════════════════════════
      SCOPED STYLES
-ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ -->
+══════════════════════════════════════════════ -->
 <style>
-    /* ΓöÇΓöÇ Trip tabs ΓöÇΓöÇ */
+    /* ── Trip tabs ── */
     .trip-tab {
         background: rgba(255,255,255,.07);
         border: 1px solid rgba(255,255,255,.1);
@@ -393,7 +393,7 @@
         color: #fff;
     }
 
-    /* ΓöÇΓöÇ Search form elements ΓöÇΓöÇ */
+    /* ── Search form elements ── */
     .search-label {
         display: block;
         font-size: .7rem;
@@ -458,7 +458,7 @@
         box-shadow: 0 8px 28px rgba(14,165,233,.45);
     }
 
-    /* ΓöÇΓöÇ Fare pills ΓöÇΓöÇ */
+    /* ── Fare pills ── */
     .fare-pill {
         background: #fff;
         border-radius: 14px;
@@ -482,11 +482,11 @@
     .fare-pill__label { font-size:.7rem; text-transform:uppercase; letter-spacing:.06em; color:#94a3b8; font-weight:700; }
     .fare-pill__value { font-size:.92rem; font-weight:800; color:#0f172a; }
 
-    /* ΓöÇΓöÇ Sidebar labels ΓöÇΓöÇ */
+    /* ── Sidebar labels ── */
     .filter-label { font-size:.68rem; text-transform:uppercase; letter-spacing:.08em; color:#94a3b8; font-weight:700; }
     .filter-value { font-size:.88rem; }
 
-    /* ΓöÇΓöÇ Flight card ΓöÇΓöÇ */
+    /* ── Flight card ── */
     .flight-card {
         background: #fff;
         border-radius: 18px !important;
@@ -682,9 +682,9 @@
     }
 </style>
 
-<!-- ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+<!-- ══════════════════════════════════════════════
      JAVASCRIPT
-ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ -->
+══════════════════════════════════════════════ -->
 <script th:inline="javascript">
     document.addEventListener("DOMContentLoaded", function() {
         populateAirlines();
@@ -750,7 +750,7 @@
         if (!slider) return;
 
         const max = parseFloat(slider.value);
-        if (display) display.textContent = "Γé╣" + max.toLocaleString("en-IN");
+        if (display) display.textContent = "₹" + max.toLocaleString("en-IN");
 
         const checked = new Set();
         document.querySelectorAll(".airline-checkbox:checked").forEach(cb => checked.add(cb.value));
@@ -776,7 +776,7 @@
                           .forEach(c => list.appendChild(c));
     }
     function sortFastest() {
-        // Would sort by duration ΓÇö extend as needed
+        // Would sort by duration — extend as needed
     }
 
     function resetFilters() {
