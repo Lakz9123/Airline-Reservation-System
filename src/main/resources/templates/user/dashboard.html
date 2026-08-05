@@ -5,7 +5,7 @@
 <div th:replace="~{layout :: user_navbar}"></div>
 <main class="container py-5">
     <!-- Welcome Banner with a soft cloud/sky gradient tint & Tier progress indicator -->
-    <div class="card border-0 mb-4 overflow-hidden shadow-sm" 
+    <div class="card border-0 mb-4 overflow-hidden shadow-sm animate-fade-in-up" 
          style="background: linear-gradient(135deg, rgba(224, 242, 254, 0.95) 0%, rgba(243, 244, 246, 0.95) 100%) !important; border: 1px solid var(--border) !important;">
         <div class="card-body p-4 p-md-5" th:with="wallet=${@walletService.getOrCreateWallet(currentUser)}">
             <div class="row align-items-center g-4">
@@ -62,7 +62,7 @@
     </div>
 
     <!-- Quick Actions Bento Grid -->
-    <div class="row g-4 mb-5">
+    <div class="row g-4 mb-5 animate-fade-in-up delay-1">
         <div class="col-6 col-lg-3">
             <a th:href="@{/user/search}" class="text-decoration-none card border-0 p-3 text-center h-100 shadow-sm hover-up">
                 <div class="card-body">
@@ -102,7 +102,7 @@
     </div>
 
     <!-- Travel Stats Row & Spend Analytics Chart Section -->
-    <div class="row g-4 mb-5" th:with="wallet=${@walletService.getOrCreateWallet(currentUser)}">
+    <div class="row g-4 mb-5 animate-fade-in-up delay-2" th:with="wallet=${@walletService.getOrCreateWallet(currentUser)}">
         <!-- Stats summary -->
         <div class="col-lg-4">
             <div class="d-flex flex-column gap-3 h-100 justify-content-between">
@@ -153,7 +153,7 @@
     </div>
 
     <!-- Upcoming Trips Section -->
-    <div class="row mb-5" th:with="upcomingTrips=${recentBookings.?[status == 'CONFIRMED' and flight.departureDateTime.isAfter(T(java.time.LocalDateTime).now())]}">
+    <div class="row mb-5 animate-fade-in-up delay-3" th:with="upcomingTrips=${recentBookings.?[status == 'CONFIRMED' and flight.departureDateTime.isAfter(T(java.time.LocalDateTime).now())]}">
         <div class="col-12">
             <span class="eyebrow-label mb-3 d-block">Upcoming Trip Details</span>
             
@@ -227,7 +227,7 @@
     </div>
 
     <!-- Recent Activity Section -->
-    <div class="row mb-5" th:if="${!#lists.isEmpty(recentBookings)}">
+    <div class="row mb-5 animate-fade-in-up delay-4" th:if="${!#lists.isEmpty(recentBookings)}">
         <div class="col-12">
             <span class="eyebrow-label mb-3 d-block">Recent Activity Ledger</span>
             <div class="card border-0 shadow-sm overflow-hidden">

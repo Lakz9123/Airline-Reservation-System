@@ -81,6 +81,37 @@
         .timeline-gradient {
             background: linear-gradient(90deg, #0f1c2c 0%, #005cab 50%, #0f1c2c 100%);
         }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .animate-fade-in-up {
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        
+        .flight-card {
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+        .flight-card:hover {
+            transform: translateY(-4px) !important;
+            box-shadow: 0 20px 40px -10px rgba(15, 28, 44, 0.12) !important;
+        }
     </style>
 </head>
 <body class="bg-surface text-on-surface font-body-md antialiased min-h-screen flex flex-col w-full">
@@ -108,7 +139,7 @@
 
 <main class="flex-grow pt-32 pb-20 w-full">
     <!-- Condensed Hero Search Bar -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12 w-full">
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12 w-full animate-fade-in-up">
         <form th:action="@{/user/search/results}" method="get" class="bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-outline-variant/30 p-4 md:p-6 flex flex-col md:flex-row items-center gap-4 relative z-10 w-full">
             <!-- Origin -->
             <div class="flex-1 w-full relative">
@@ -146,7 +177,7 @@
     </section>
 
     <!-- Main Content Grid -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-12 gap-6 w-full" th:if="${flights != null}">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-12 gap-6 w-full animate-fade-in-up delay-1" th:if="${flights != null}">
         <!-- Sidebar Filters -->
         <aside class="col-span-1 md:col-span-3 space-y-6 hidden lg:block">
             <div class="bg-surface-container-lowest rounded-xl p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)] border border-outline-variant/20">

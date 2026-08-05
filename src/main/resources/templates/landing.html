@@ -653,8 +653,23 @@
             .stat-number { font-size: 2.2rem; }
             .partner-tag { margin: .4rem .9rem; }
             .footer-bottom { text-align: center; }
-            .footer-bottom a { margin: 0 .7rem; display: inline-block; }
+        /* ─── Premium Animations ─── */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
+        .animate-fade-in-up {
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        .delay-1 { animation-delay: 0.15s; }
+        .delay-2 { animation-delay: 0.3s; }
+        .delay-3 { animation-delay: 0.45s; }
     </style>
 </head>
 <body>
@@ -694,17 +709,17 @@
     <div class="container hero-content py-5">
         <div class="row align-items-center">
             <div class="col-12">
-                <div class="hero-badge"><i class="bi bi-award-fill"></i> India's Most Trusted Airline Platform</div>
-                <h1 class="hero-title">
+                <div class="hero-badge animate-fade-in-up"><i class="bi bi-award-fill"></i> India's Most Trusted Airline Platform</div>
+                <h1 class="hero-title animate-fade-in-up delay-1">
                     Fly Beyond<br>
                     <span class="hero-title-highlight">Ordinary</span>
                 </h1>
-                <p class="hero-subtitle">
+                <p class="hero-subtitle animate-fade-in-up delay-2">
                     Discover premium flight experiences with unbeatable fares and seamless bookings. Your journey starts here.
                 </p>
 
                 <!-- Search Card -->
-                <div class="search-card">
+                <div class="search-card animate-fade-in-up delay-3">
                     <form th:action="@{/user/search/results}" method="get">
                         <div class="row g-3 align-items-end">
                             <div class="col-12 col-sm-6 col-lg-3">
