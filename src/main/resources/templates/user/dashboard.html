@@ -4,113 +4,212 @@
 <body>
 <div th:replace="~{layout :: user_navbar}"></div>
 <main class="container">
-    <div class="row mb-4 align-items-center">
+    <!-- Welcome Banner with a soft sky-blue/indigo gradient tint -->
+    <div class="card border-0 mb-4 overflow-hidden" 
+         style="background: linear-gradient(135deg, rgba(224, 242, 254, 0.9) 0%, rgba(243, 244, 246, 0.9) 100%) !important;">
+        <div class="card-body p-4 p-md-5 d-flex align-items-center justify-content-between">
+            <div>
+                <span class="eyebrow-label text-primary">Welcome Back</span>
+                <h1 class="section-title mb-2 text-dark" style="font-size: 2.2rem; font-family: 'Space Grotesk', sans-serif;">
+                    Hello, <span th:text="${currentUser.name}">Passenger</span>!
+                </h1>
+                <p class="text-muted mb-0 small">Where shall we take you next? Plan, view, and manage your luxury journeys with ease.</p>
+            </div>
+            <div class="d-none d-md-block text-primary" style="font-size: 3.5rem;">
+                <i class="bi bi-clouds-fill opacity-75"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Summary Row -->
+    <div class="row g-4 mb-4">
+        <div class="col-6 col-md-4">
+            <div class="card border-0 p-3 h-100">
+                <div class="card-body p-2 d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="eyebrow-label text-success mb-1">Status</span>
+                        <h6 class="fw-bold mb-1 text-muted small">Confirmed</h6>
+                        <h3 class="fw-bold mb-0 text-success" th:text="${confirmedCount}">0</h3>
+                    </div>
+                    <div class="bg-success-subtle text-success rounded-4 p-2.5 d-flex align-items-center justify-content-center"><i class="bi bi-patch-check-fill fs-4"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4">
+            <div class="card border-0 p-3 h-100">
+                <div class="card-body p-2 d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="eyebrow-label text-danger mb-1">Cancelled</span>
+                        <h6 class="fw-bold mb-1 text-muted small">Cancelled</h6>
+                        <h3 class="fw-bold mb-0 text-danger" th:text="${cancelledCount}">0</h3>
+                    </div>
+                    <div class="bg-danger-subtle text-danger rounded-4 p-2.5 d-flex align-items-center justify-content-center"><i class="bi bi-x-octagon-fill fs-4"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="card border-0 p-3 h-100">
+                <div class="card-body p-2 d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="eyebrow-label text-primary mb-1">Total Spent</span>
+                        <h6 class="fw-bold mb-1 text-muted small">Investment</h6>
+                        <h3 class="fw-bold mb-0 text-primary">₹<span th:text="${#numbers.formatDecimal(totalSpent,1,2)}">0.00</span></h3>
+                    </div>
+                    <div class="bg-info-subtle text-info rounded-4 p-2.5 d-flex align-items-center justify-content-center"><i class="bi bi-wallet2 fs-4"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Action Cards Grid -->
+    <div class="row g-4 mb-4">
+        <div class="col-6 col-lg-3">
+            <a th:href="@{/user/search}" class="text-decoration-none card border-0 p-3 text-center h-100" style="transition: transform 0.3s ease;">
+                <div class="card-body">
+                    <div class="text-primary mb-3"><i class="bi bi-search fs-2"></i></div>
+                    <h6 class="fw-bold text-dark mb-1">Book Flights</h6>
+                    <p class="text-muted mb-0 small" style="font-size: 0.75rem;">Find pathways & routes</p>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-lg-3">
+            <a th:href="@{/user/bookings}" class="text-decoration-none card border-0 p-3 text-center h-100" style="transition: transform 0.3s ease;">
+                <div class="card-body">
+                    <div class="text-success mb-3"><i class="bi bi-journal-check fs-2"></i></div>
+                    <h6 class="fw-bold text-dark mb-1">My Bookings</h6>
+                    <p class="text-muted mb-0 small" style="font-size: 0.75rem;">Manage your schedules</p>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-lg-3">
+            <a th:href="@{/user/wallet}" class="text-decoration-none card border-0 p-3 text-center h-100" style="transition: transform 0.3s ease;">
+                <div class="card-body">
+                    <div class="text-warning mb-3"><i class="bi bi-wallet-fill fs-2"></i></div>
+                    <h6 class="fw-bold text-dark mb-1">My Wallet</h6>
+                    <p class="text-muted mb-0 small" style="font-size: 0.75rem;">Check funds & points</p>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-lg-3">
+            <a th:href="@{/user/loyalty}" class="text-decoration-none card border-0 p-3 text-center h-100" style="transition: transform 0.3s ease;">
+                <div class="card-body">
+                    <div class="text-danger mb-3"><i class="bi bi-award-fill fs-2"></i></div>
+                    <h6 class="fw-bold text-dark mb-1">Loyalty Tier</h6>
+                    <p class="text-muted mb-0 small" style="font-size: 0.75rem;">Exclusive privileges</p>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Upcoming Trips Section -->
+    <div class="row" th:with="upcomingTrips=${recentBookings.?[status == 'CONFIRMED' and flight.departureDateTime.isAfter(T(java.time.LocalDateTime).now())]}">
         <div class="col-12">
-            <span class="eyebrow-label">Welcome Aboard</span>
-            <h1 class="section-title mb-1">Hello, <span th:text="${currentUser.name}">Passenger</span>!</h1>
-            <p class="text-muted small">Manage your tickets, points, and travel wallet from your dashboard.</p>
-        </div>
-    </div>
-
-    <!-- Stats Row -->
-    <div class="row g-4 mb-4">
-        <div class="col-md-4">
-            <div class="card h-100 border-0 p-3">
-                <div class="card-body d-flex align-items-center justify-content-between p-2">
-                    <div>
-                        <span class="eyebrow-label text-success mb-1">Travel Status</span>
-                        <h6 class="fw-bold mb-2">Confirmed Bookings</h6>
-                        <h2 class="fw-extrabold mb-0 text-success" th:text="${confirmedCount}">0</h2>
-                    </div>
-                    <div class="bg-success-subtle text-success rounded-4 p-3 d-inline-flex"><i class="bi bi-check-circle fs-3"></i></div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card h-100 border-0 p-3">
-                <div class="card-body d-flex align-items-center justify-content-between p-2">
-                    <div>
-                        <span class="eyebrow-label text-danger mb-1">Cancelled Status</span>
-                        <h6 class="fw-bold mb-2">Cancelled Bookings</h6>
-                        <h2 class="fw-extrabold mb-0 text-danger" th:text="${cancelledCount}">0</h2>
-                    </div>
-                    <div class="bg-danger-subtle text-danger rounded-4 p-3 d-inline-flex"><i class="bi bi-x-circle fs-3"></i></div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card h-100 border-0 p-3">
-                <div class="card-body d-flex align-items-center justify-content-between p-2">
-                    <div>
-                        <span class="eyebrow-label text-primary mb-1">Financial Status</span>
-                        <h6 class="fw-bold mb-2">Total Spent</h6>
-                        <h2 class="fw-extrabold mb-0 text-primary">₹<span th:text="${#numbers.formatDecimal(totalSpent,1,2)}">0.00</span></h2>
-                    </div>
-                    <div class="bg-info-subtle text-info rounded-4 p-3 d-inline-flex"><i class="bi bi-wallet2 fs-3"></i></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Quick Actions -->
-    <div class="row g-4 mb-4">
-        <div class="col-md-6">
-            <div class="card text-center p-4">
+            <!-- Empty state when no upcoming trips -->
+            <div th:if="${#lists.isEmpty(upcomingTrips)}" class="card border-0 p-5 text-center mb-4">
                 <div class="card-body">
-                    <div class="mb-3"><i class="bi bi-search fs-1 text-primary"></i></div>
-                    <h5 class="fw-bold section-title mb-2">Search Flights</h5>
-                    <p class="text-muted small mb-4">Find and book available flights by route and date.</p>
-                    <a th:href="@{/user/search}" class="btn-primary-theme">Search Now <i class="bi bi-chevron-right ms-1"></i></a>
+                    <i class="bi bi-calendar-x display-4 text-muted mb-3 opacity-50"></i>
+                    <h5 class="fw-bold text-dark mb-2">No Upcoming Trips</h5>
+                    <p class="text-muted small mb-4">You have no active flights booked at the moment. Plan your next getaway now!</p>
+                    <a th:href="@{/user/search}" class="btn-primary-theme">Search Flights <i class="bi bi-arrow-right ms-1"></i></a>
                 </div>
             </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card text-center p-4">
-                <div class="card-body">
-                    <div class="mb-3"><i class="bi bi-journal-check fs-1 text-success"></i></div>
-                    <h5 class="fw-bold section-title mb-2">My Bookings</h5>
-                    <p class="text-muted small mb-4">View all your past and current flight reservations.</p>
-                    <a th:href="@{/user/bookings}" class="btn-outline-theme">View Bookings <i class="bi bi-chevron-right ms-1"></i></a>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Recent Bookings -->
-    <div th:if="${!#lists.isEmpty(recentBookings)}">
-        <span class="eyebrow-label mb-3 block">Recent Activity</span>
-        <div class="card border-0 mb-4">
-            <div class="table-responsive">
-                <table class="table table-hover mb-0 align-middle">
-                    <thead class="table-light">
-                        <tr class="text-uppercase small font-monospace text-muted">
-                            <th class="py-3 px-4">Flight</th>
-                            <th class="py-3">Route</th>
-                            <th class="py-3">Seats</th>
-                            <th class="py-3">Date</th>
-                            <th class="py-3">Fare</th>
-                            <th class="py-3 text-end px-4">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="b : ${recentBookings}">
-                            <td class="py-3 px-4"><span class="badge bg-secondary-subtle text-secondary border px-2.5 py-1.5" th:text="${b.flight.flightNumber}">FL</span></td>
-                            <td class="py-3"><span class="fw-semibold" th:text="${b.flight.originAirport.airportCode}">A</span> → <span class="fw-semibold" th:text="${b.flight.destinationAirport.airportCode}">B</span></td>
-                            <td class="py-3"><code class="text-muted" th:text="${b.seatNumbers}">A1</code></td>
-                            <td class="py-3" th:text="${#temporals.format(b.bookingDate,'dd MMM yyyy')}">Date</td>
-                            <td class="py-3 fw-bold">₹<span th:text="${#numbers.formatDecimal(b.totalFare,1,2)}">0</span></td>
-                            <td class="py-3 text-end px-4">
-                                <span class="badge badge-confirmed px-3 py-1.5 rounded-pill" th:if="${b.status=='CONFIRMED'}">CONFIRMED</span>
-                                <span class="badge badge-cancelled px-3 py-1.5 rounded-pill" th:if="${b.status=='CANCELLED'}">CANCELLED</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <!-- Detailed card for the next upcoming trip -->
+            <div th:if="${not #lists.isEmpty(upcomingTrips)}" class="card border-0 mb-4" th:with="trip=${upcomingTrips[0]}">
+                <div class="card-header bg-transparent border-0 pt-4 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div>
+                        <span class="eyebrow-label text-primary">Your Next Adventure</span>
+                        <h4 class="fw-bold text-dark mb-0">Upcoming Flight</h4>
+                    </div>
+                    <div class="bg-primary text-white px-3 py-2 rounded-3 small font-monospace fw-bold" 
+                         id="countdownTimer" 
+                         th:data-departure="${trip.flight.departureDateTime}">
+                        Calculating countdown...
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row align-items-center g-4">
+                        <div class="col-md-4 text-center text-md-start">
+                            <div class="d-flex align-items-center gap-2 mb-2 justify-content-center justify-content-md-start">
+                                <span class="fw-bold fs-5 text-dark" th:text="${trip.flight.flightNumber}">FL-101</span>
+                                <span class="badge bg-primary-subtle text-primary border" th:text="${trip.cabinClass}">Economy</span>
+                            </div>
+                            <div class="text-muted small" th:text="${trip.flight.airline.airlineName}">Airline Name</div>
+                            <div class="mt-3 small">
+                                <span class="text-muted">Seats: </span>
+                                <code class="text-primary font-monospace fw-bold" th:text="${trip.seatNumbers}">A1</code>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="d-flex align-items-center justify-content-between gap-3 text-center">
+                                <div>
+                                    <div class="fs-4 fw-extrabold text-dark" th:text="${trip.flight.originAirport.airportCode}">DEL</div>
+                                    <div class="text-muted small" style="font-size: 0.75rem;" th:text="${trip.flight.originAirport.city}">Delhi</div>
+                                    <div class="small fw-semibold text-primary font-monospace mt-1" th:text="${#temporals.format(trip.flight.departureDateTime, 'HH:mm')}">10:00</div>
+                                </div>
+                                <div class="flex-grow-1 position-relative px-2">
+                                    <small class="text-muted font-monospace d-block mb-1" th:text="${trip.flight.durationMinutes + 'm'}">120m</small>
+                                    <div style="border-top: 2px dashed rgba(14, 165, 233, 0.3); position: relative;">
+                                        <i class="bi bi-airplane-fill text-primary" style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%) rotate(90deg); font-size: 0.95rem;"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="fs-4 fw-extrabold text-dark" th:text="${trip.flight.destinationAirport.airportCode}">BOM</div>
+                                    <div class="text-muted small" style="font-size: 0.75rem;" th:text="${trip.flight.destinationAirport.city}">Mumbai</div>
+                                    <div class="small fw-semibold text-primary font-monospace mt-1" th:text="${#temporals.format(trip.flight.arrivalDateTime, 'HH:mm')}">12:00</div>
+                                </div>
+                            </div>
+                            <div class="text-center mt-2 small text-muted font-monospace" th:text="${#temporals.format(trip.flight.departureDateTime, 'dd MMM yyyy')}">Date</div>
+                        </div>
+                        <div class="col-md-3 text-center text-md-end">
+                            <a th:href="@{/user/ticket/{id}(id=${trip.id})}" class="btn-primary-theme w-100 py-2.5">
+                                <i class="bi bi-ticket-perforated me-1"></i> View Ticket
+                            </a>
+                            <a th:if="${trip.checkInStatus == 'CHECKED_IN'}" th:href="@{/user/checkin/{id}/ready(id=${trip.id})}" class="btn btn-outline-success btn-sm w-100 py-2 mt-2 rounded-3 fw-bold">
+                                <i class="bi bi-door-open me-1"></i> Boarding Pass
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </main>
 <div th:replace="~{layout :: footer}"></div>
 <div th:replace="~{layout :: html_scripts}"></div>
+
+<!-- Live Countdown Timer Script -->
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        const timerElement = document.getElementById("countdownTimer");
+        if (!timerElement) return;
+
+        const departureTimeStr = timerElement.getAttribute("data-departure");
+        if (!departureTimeStr) return;
+
+        const departureDate = new Date(departureTimeStr);
+
+        function updateCountdown() {
+            const now = new Date();
+            const timeDiff = departureDate - now;
+
+            if (timeDiff <= 0) {
+                timerElement.textContent = "DEPARTED";
+                timerElement.classList.replace("bg-primary", "bg-secondary");
+                return;
+            }
+
+            const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+
+            timerElement.textContent = `DEPARTS IN: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+        }
+
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+    });
+</script>
 </body>
 </html>
