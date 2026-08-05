@@ -3,789 +3,136 @@
 <head th:replace="~{layout :: html_head('Search Flights')}"></head>
 <body>
 <div th:replace="~{layout :: user_navbar}"></div>
-
-<main class="container animate-fade-in">
-
-    <!-- ══════════════════════════════════════════════
-         PAGE HEADER
-    ══════════════════════════════════════════════ -->
-    <div class="row mb-3 animate-fade-in-up">
+<main class="container">
+    <div class="row mb-4">
         <div class="col-12">
-            <span class="eyebrow-label" style="color:var(--sky-dark); font-size:.68rem; letter-spacing:.12em;">Book Your Next Destination</span>
-            <h1 class="section-title mb-0" style="font-size:1.9rem; line-height:1.2;">Flight Search</h1>
-            <p class="text-muted small mb-0 mt-1">Compare and book flights across hundreds of premium routes instantly.</p>
+            <span class="eyebrow-label">Book Your Next Destination</span>
+            <h1 class="section-title mb-1">Search Flights</h1>
+            <p class="text-muted small">Explore and compare prices, flight timings, and find the perfect journey.</p>
         </div>
     </div>
 
-    <!-- ══════════════════════════════════════════════
-         SEARCH FORM CARD  (dark glass)
-    ══════════════════════════════════════════════ -->
-    <div class="card border-0 mb-4 overflow-hidden animate-fade-in-up delay-1"
-         style="background: linear-gradient(135deg,#0f1c2c 0%,#1e293b 100%) !important;
-                border-radius:20px !important;
-                box-shadow:0 8px 40px rgba(2,132,199,.18) !important;">
-        <div class="card-body p-4">
-
-            <!-- Trip type tabs -->
-            <div class="d-flex gap-1 mb-4" id="tripTabs">
-                <button type="button" class="trip-tab active" onclick="setTripTab(this)">
-                    <i class="bi bi-arrow-right-circle me-1"></i>One Way
-                </button>
-                <button type="button" class="trip-tab" onclick="setTripTab(this)">
-                    <i class="bi bi-arrow-left-right me-1"></i>Round Trip
-                </button>
-                <button type="button" class="trip-tab" onclick="setTripTab(this)">
-                    <i class="bi bi-diagram-3 me-1"></i>Multi-City
-                </button>
-            </div>
-
-            <!-- Search Fields -->
-            <form th:action="@{/user/search/results}" method="get">
-                <div class="row g-3 align-items-end">
-                    <!-- Origin -->
-                    <div class="col-lg-3 col-md-6">
-                        <label class="search-label">
-                            <i class="bi bi-geo-alt me-1"></i>From
-                        </label>
-                        <div class="search-select-wrap">
-                            <select class="search-select" name="originId" required>
-                                <option value="" disabled th:selected="${originId == null}">Select city / airport</option>
-                                <option th:each="ap : ${airports}"
-                                        th:value="${ap.id}"
-                                        th:text="${ap.airportCode} + ' — ' + ${ap.city}"
-                                        th:selected="${ap.id == originId}"></option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Swap icon (decorative) -->
-                    <div class="col-auto d-none d-lg-flex align-items-end pb-1">
-                        <button type="button" class="swap-btn" onclick="swapAirports()" title="Swap">
-                            <i class="bi bi-arrow-left-right"></i>
-                        </button>
-                    </div>
-
-                    <!-- Destination -->
-                    <div class="col-lg-3 col-md-6">
-                        <label class="search-label">
-                            <i class="bi bi-geo me-1"></i>To
-                        </label>
-                        <div class="search-select-wrap">
-                            <select class="search-select" name="destinationId" id="destSelect" required>
-                                <option value="" disabled th:selected="${destinationId == null}">Select city / airport</option>
-                                <option th:each="ap : ${airports}"
-                                        th:value="${ap.id}"
-                                        th:text="${ap.airportCode} + ' — ' + ${ap.city}"
-                                        th:selected="${ap.id == destinationId}"></option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Date -->
-                    <div class="col-lg-2 col-md-6">
-                        <label class="search-label">
-                            <i class="bi bi-calendar3 me-1"></i>Departure
-                        </label>
-                        <input type="date" class="search-input" name="date" th:value="${date}" required>
-                    </div>
-
-                    <!-- Passengers (UI-only) -->
-                    <div class="col-lg-2 col-md-6">
-                        <label class="search-label">
-                            <i class="bi bi-people me-1"></i>Passengers
-                        </label>
-                        <select class="search-select">
-                            <option>1 Adult</option>
-                            <option>2 Adults</option>
-                            <option>3 Adults</option>
-                        </select>
-                    </div>
-
-                    <!-- Button -->
-                    <div class="col-lg-auto col-md-12">
-                        <button type="submit" class="search-btn">
-                            <i class="bi bi-search me-2"></i>Search
-                        </button>
-                    </div>
+    <!-- Search Form -->
+    <div class="card border-0 mb-5">
+        <div class="card-body p-4 p-md-5">
+            <form th:action="@{/user/search/results}" method="get" class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold text-uppercase small text-muted">From (Origin)</label>
+                    <select class="form-select" name="originId" required>
+                        <option value="" disabled th:selected="${originId == null}">Select Origin</option>
+                        <option th:each="ap : ${airports}" th:value="${ap.id}" th:text="${ap.airportCode} + ' - ' + ${ap.city}" th:selected="${ap.id == originId}"></option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold text-uppercase small text-muted">To (Destination)</label>
+                    <select class="form-select" name="destinationId" required>
+                        <option value="" disabled th:selected="${destinationId == null}">Select Destination</option>
+                        <option th:each="ap : ${airports}" th:value="${ap.id}" th:text="${ap.airportCode} + ' - ' + ${ap.city}" th:selected="${ap.id == destinationId}"></option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold text-uppercase small text-muted">Departure Date</label>
+                    <input type="date" class="form-control" name="date" th:value="${date}" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold text-uppercase small text-muted">Airline</label>
+                    <select class="form-select" name="airline">
+                        <option value="" th:selected="${airline == null || airline == ''}">Any Airline</option>
+                        <option th:each="al : ${airlines}" th:value="${al.airlineName}" th:text="${al.airlineName}" th:selected="${al.airlineName == airline}"></option>
+                    </select>
+                </div>
+                <div class="col-md-2 mt-4">
+                    <button type="submit" class="btn-primary-theme w-100 py-3"><i class="bi bi-search"></i> Search</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- ══════════════════════════════════════════════
-         FARE SUMMARY PILLS  (shown only when results exist)
-    ══════════════════════════════════════════════ -->
-    <div class="row g-3 mb-4 animate-fade-in-up delay-2" th:if="${flights != null and !#lists.isEmpty(flights)}">
-        <div class="col-md-4">
-            <div class="fare-pill fare-pill--green hover-scale" onclick="sortCheapest()">
-                <div class="fare-pill__icon bg-success-subtle text-success">
-                    <i class="bi bi-tag-fill"></i>
-                </div>
-                <div>
-                    <div class="fare-pill__label">Cheapest Fare</div>
-                    <div class="fare-pill__value">From ₹5,400</div>
-                </div>
-                <i class="bi bi-arrow-right ms-auto text-muted" style="font-size:.8rem;"></i>
-            </div>
+    <!-- Results -->
+    <div th:if="${flights != null}">
+        <div th:if="${#lists.isEmpty(flights)}" class="alert alert-warning border-0 rounded-4 p-4 text-center">
+            <i class="bi bi-info-circle fs-3 mb-2 d-block"></i>
+            No flights found for that route and date. Try selecting different criteria.
         </div>
-        <div class="col-md-4">
-            <div class="fare-pill fare-pill--blue hover-scale" onclick="sortFastest()">
-                <div class="fare-pill__icon bg-primary-subtle text-primary">
-                    <i class="bi bi-lightning-charge-fill"></i>
-                </div>
-                <div>
-                    <div class="fare-pill__label">Fastest Route</div>
-                    <div class="fare-pill__value">2h 15m Direct</div>
-                </div>
-                <i class="bi bi-arrow-right ms-auto text-muted" style="font-size:.8rem;"></i>
+        <div th:if="${!#lists.isEmpty(flights)}">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-bold section-title mb-0">Available Flights (<span th:text="${#lists.size(flights)}">0</span> found)</h5>
             </div>
-        </div>
-        <div class="col-md-4">
-            <div class="fare-pill fare-pill--amber hover-scale">
-                <div class="fare-pill__icon bg-warning-subtle text-warning">
-                    <i class="bi bi-stars"></i>
+            <div class="row g-4">
+                <div class="col-12" th:each="f : ${flights}">
+                    <div class="card border-0">
+                        <div class="card-body p-4">
+                            <div class="row align-items-center g-3">
+                                <!-- Flight Brand -->
+                                <div class="col-md-3">
+                                    <div class="d-flex align-items-center gap-3 mb-2">
+                                        <img th:if="${f.airline.logo != null && !f.airline.logo.isEmpty()}" 
+                                             th:src="${f.airline.logo}" 
+                                             alt="Logo" 
+                                             class="img-fluid rounded border p-1 bg-white" 
+                                             style="width: 50px; height: 35px; object-fit: contain;">
+                                        <div>
+                                            <span class="badge bg-secondary-subtle text-secondary border px-2 py-1" th:text="${f.flightNumber}">FL-101</span>
+                                        </div>
+                                    </div>
+                                    <div class="fw-bold text-dark dark:text-white" th:text="${f.airline.airlineName}">Airline</div>
+                                    <div class="small text-muted" th:text="${f.aircraft != null ? f.aircraft.model : 'Unknown'}">Model</div>
+                                </div>
+                                
+                                <!-- Route and Timings -->
+                                <div class="col-md-4">
+                                    <div class="d-flex align-items-center justify-content-between gap-2">
+                                        <div class="text-start">
+                                            <div class="fs-5 fw-bold text-primary" th:text="${#temporals.format(f.departureDateTime,'HH:mm')}">00:00</div>
+                                            <div class="text-muted small fw-semibold" th:text="${f.originAirport.airportCode} + ' — ' + ${f.originAirport.city}">Origin</div>
+                                        </div>
+                                        <div class="text-center px-3 position-relative flex-grow-1">
+                                            <small class="text-muted d-block mb-1 font-monospace" th:text="${f.durationMinutes + ' min'}">0 min</small>
+                                            <div style="border-top: 2px dashed rgba(14, 165, 233, 0.2); position: relative;">
+                                                <i class="bi bi-airplane-fill text-primary" style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%) rotate(90deg); font-size: 0.9rem;"></i>
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="fs-5 fw-bold text-primary" th:text="${#temporals.format(f.arrivalDateTime,'HH:mm')}">00:00</div>
+                                            <div class="text-muted small fw-semibold" th:text="${f.destinationAirport.airportCode} + ' — ' + ${f.destinationAirport.city}">Destination</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-center mt-2 small text-muted font-monospace" th:text="${#temporals.format(f.departureDateTime,'dd MMM yyyy')}">Date</div>
+                                </div>
+
+                                <!-- Seat Info & Fare -->
+                                <div class="col-md-3 text-center">
+                                    <div class="row align-items-center">
+                                        <div class="col-6">
+                                            <div class="text-muted small">Available</div>
+                                            <div class="fw-bold fs-5" th:classappend="${f.availableSeats < 10} ? 'text-danger' : 'text-success'" th:text="${f.availableSeats}">0</div>
+                                        </div>
+                                        <div class="col-6 border-start" style="border-color: var(--border) !important;">
+                                            <div class="text-muted small">Base Fare</div>
+                                            <div class="fs-5 fw-bold text-primary">₹<span th:text="${#numbers.formatDecimal(f.fare,1,2)}">0</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Action Button -->
+                                <div class="col-md-2 text-end">
+                                    <th:block th:with="isCancelled=${f.flightStatus != null && f.flightStatus.name() == 'CANCELLED'}">
+                                        <a th:if="${f.availableSeats > 0 && !isCancelled}" th:href="@{/user/book/{id}(id=${f.id})}" class="btn-primary-theme w-100 py-2.5">
+                                            Select Seats
+                                        </a>
+                                        <span th:if="${f.availableSeats == 0 && !isCancelled}" class="badge badge-cancelled w-100 py-2">Sold Out</span>
+                                        <span th:if="${isCancelled}" class="badge badge-cancelled w-100 py-2">Cancelled</span>
+                                    </th:block>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <div class="fare-pill__label">Best Value</div>
-                    <div class="fare-pill__value">Top Rated Service</div>
-                </div>
-                <i class="bi bi-arrow-right ms-auto text-muted" style="font-size:.8rem;"></i>
             </div>
         </div>
     </div>
-
-    <!-- ══════════════════════════════════════════════
-         RESULTS GRID: sidebar + flights
-    ══════════════════════════════════════════════ -->
-    <div class="row g-4 animate-fade-in-up delay-3" th:if="${flights != null}">
-
-        <!-- ── SIDEBAR ──────────────────────── -->
-        <div class="col-xl-3 col-lg-3">
-            <div class="card border-0 shadow-sm p-4 sticky-top" style="top:80px; border-radius:18px !important;">
-                <div class="d-flex align-items-center justify-content-between mb-4">
-                    <h6 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
-                        <i class="bi bi-funnel-fill text-primary"></i> Filters
-                    </h6>
-                    <button type="button" class="btn btn-sm btn-link text-primary fw-semibold text-decoration-none p-0 small" onclick="resetFilters()">
-                        Reset
-                    </button>
-                </div>
-
-                <!-- Price range -->
-                <div class="mb-4">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="filter-label">Max Budget</span>
-                        <span class="filter-value text-primary fw-bold" id="priceDisplay">₹50,000</span>
-                    </div>
-                    <input type="range" class="form-range" id="priceRange"
-                           min="0" max="50000" step="500" value="50000"
-                           oninput="filterResults()">
-                    <div class="d-flex justify-content-between" style="font-size:.65rem; color:#94a3b8;">
-                        <span>₹0</span><span>₹50,000+</span>
-                    </div>
-                </div>
-
-                <hr class="my-3" style="border-color:var(--border);">
-
-                <!-- Airlines -->
-                <div>
-                    <div class="filter-label mb-3">Airlines</div>
-                    <div class="d-flex flex-column gap-2" id="airlineFilterContainer">
-                        <span class="text-muted small">No filters yet</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ── FLIGHT RESULTS ─────────────── -->
-        <div class="col-xl-9 col-lg-9">
-
-            <!-- Empty state -->
-            <div th:if="${#lists.isEmpty(flights)}"
-                 class="card border-0 shadow-sm text-center p-5" style="border-radius:18px !important;">
-                <div class="py-4">
-                    <div class="mb-3" style="font-size:3rem; opacity:.3;">✈️</div>
-                    <h5 class="fw-bold text-dark mb-2">No flights found</h5>
-                    <p class="text-muted small mb-0">Try a different route or date.</p>
-                </div>
-            </div>
-
-            <!-- Results list -->
-            <div th:if="${!#lists.isEmpty(flights)}">
-                <!-- Count bar -->
-                <div class="d-flex align-items-center justify-content-between mb-3 px-1">
-                    <h6 class="fw-bold text-dark mb-0">
-                        <span id="visibleCount" th:text="${#lists.size(flights)}">0</span>
-                        Available Flights
-                    </h6>
-                    <span class="text-muted small">Sorted by: Relevance</span>
-                </div>
-
-                <div class="d-flex flex-column gap-3" id="flightList">
-                    <div class="flight-card border-0 shadow-sm overflow-hidden"
-                         th:each="f, iterStat : ${flights}"
-                         th:data-fare="${f.fare}"
-                         th:data-airline="${f.airline.airlineName}"
-                         th:style="'animation-delay:' + ${iterStat.index * 80} + 'ms'">
-
-                        <!-- Main row -->
-                        <div class="flight-card__body">
-                            <div class="row align-items-center g-0">
-
-                                <!-- ① Airline brand -->
-                                <div class="col-lg-3 col-md-3 flight-col flight-col--brand">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="airline-logo-box">
-                                            <img th:if="${f.airline.logo != null and !f.airline.logo.isEmpty()}"
-                                                 th:src="${f.airline.logo}" alt="logo"
-                                                 style="width:36px;height:26px;object-fit:contain;">
-                                            <i th:unless="${f.airline.logo != null and !f.airline.logo.isEmpty()}"
-                                               class="bi bi-airplane text-primary" style="font-size:1.1rem;"></i>
-                                        </div>
-                                        <div>
-                                            <div class="fw-bold text-dark" style="font-size:.9rem;"
-                                                 th:text="${f.airline.airlineName}">Airline</div>
-                                            <div class="text-muted" style="font-size:.75rem;"
-                                                 th:text="${f.aircraft != null ? f.aircraft.model : 'Unknown'}">Model</div>
-                                            <span class="flight-number-badge" th:text="${f.flightNumber}">FL-101</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- ② Route timeline -->
-                                <div class="col-lg-5 col-md-5 flight-col flight-col--route">
-                                    <div class="route-row">
-                                        <div class="route-time">
-                                            <div class="route-time__hm" th:text="${#temporals.format(f.departureDateTime,'HH:mm')}">08:00</div>
-                                            <div class="route-time__code" th:text="${f.originAirport.airportCode}">DEL</div>
-                                            <div class="route-time__city" th:text="${f.originAirport.city}">Delhi</div>
-                                        </div>
-
-                                        <div class="route-line">
-                                            <div class="route-line__dur" th:text="${f.durationMinutes + ' min'}">120 min</div>
-                                            <div class="route-line__bar">
-                                                <div class="route-line__dot route-line__dot--left"></div>
-                                                <div class="route-line__track"></div>
-                                                <i class="bi bi-airplane-fill route-line__plane"></i>
-                                                <div class="route-line__dot route-line__dot--right"></div>
-                                            </div>
-                                            <div class="route-line__nonstop">Nonstop</div>
-                                        </div>
-
-                                        <div class="route-time route-time--right">
-                                            <div class="route-time__hm" th:text="${#temporals.format(f.arrivalDateTime,'HH:mm')}">10:00</div>
-                                            <div class="route-time__code" th:text="${f.destinationAirport.airportCode}">BOM</div>
-                                            <div class="route-time__city" th:text="${f.destinationAirport.city}">Mumbai</div>
-                                        </div>
-                                    </div>
-                                    <div class="text-center mt-2" style="font-size:.72rem; color:#94a3b8;" th:text="${#temporals.format(f.departureDateTime,'EEE, dd MMM yyyy')}">Date</div>
-                                </div>
-
-                                <!-- ③ Fare -->
-                                <div class="col-lg-2 col-md-2 flight-col flight-col--fare">
-                                    <div class="fare-tag">
-                                        <div class="fare-tag__label">Base fare</div>
-                                        <div class="fare-tag__price">₹<span th:text="${#numbers.formatDecimal(f.fare,1,0)}">0</span></div>
-                                        <span class="seats-badge"
-                                              th:classappend="${f.availableSeats < 10} ? 'seats-badge--low' : 'seats-badge--ok'">
-                                            <i class="bi bi-person-fill me-1"></i>
-                                            <span th:text="${f.availableSeats}">0</span> left
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <!-- ④ CTA -->
-                                <div class="col-lg-2 col-md-2 flight-col flight-col--cta">
-                                    <th:block th:with="isCancelled=${f.flightStatus != null and f.flightStatus.name() == 'CANCELLED'}">
-                                        <a th:if="${f.availableSeats > 0 and !isCancelled}"
-                                           th:href="@{/user/book/{id}(id=${f.id})}"
-                                           class="select-btn">
-                                            Select <i class="bi bi-chevron-right ms-1" style="font-size:.75rem;"></i>
-                                        </a>
-                                        <div th:if="${f.availableSeats == 0 and !isCancelled}" class="status-badge status-badge--soldout">Sold Out</div>
-                                        <div th:if="${isCancelled}" class="status-badge status-badge--cancelled">Cancelled</div>
-                                    </th:block>
-                                </div>
-
-                            </div><!-- /row -->
-                        </div><!-- /flight-card__body -->
-
-                        <!-- Details toggle footer -->
-                        <div class="flight-card__footer">
-                            <button type="button" class="details-toggle" onclick="toggleDetails(this)">
-                                <i class="bi bi-info-circle me-1"></i> Flight Details
-                                <i class="bi bi-chevron-down ms-1 toggle-chevron" style="font-size:.72rem; transition:transform .2s;"></i>
-                            </button>
-                            <div class="d-flex gap-3">
-                                <span class="detail-chip"><i class="bi bi-briefcase me-1"></i>Checked 25kg</span>
-                                <span class="detail-chip"><i class="bi bi-bag me-1"></i>Cabin 7kg</span>
-                                <span class="detail-chip d-none d-md-inline"><i class="bi bi-wifi me-1"></i>Wi-Fi</span>
-                            </div>
-                        </div>
-
-                        <!-- Expandable details -->
-                        <div class="flight-card__details collapse" id="detailPane">
-                            <div class="row g-4">
-                                <div class="col-md-4">
-                                    <div class="detail-group">
-                                        <div class="detail-group__title"><i class="bi bi-airplane me-2"></i>Aircraft</div>
-                                        <div class="detail-group__line" th:text="'Model: ' + ${f.aircraft != null ? f.aircraft.model : 'Boeing 737'}">Model</div>
-                                        <div class="detail-group__line">Status: Certified Elite</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="detail-group">
-                                        <div class="detail-group__title"><i class="bi bi-cup-hot me-2"></i>Amenities</div>
-                                        <div class="detail-group__line">USB Chargers + Meals</div>
-                                        <div class="detail-group__line">In-Flight Wi-Fi Available</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="detail-group">
-                                        <div class="detail-group__title"><i class="bi bi-file-text me-2"></i>Fare Rules</div>
-                                        <div class="detail-group__line">Refundable (24h prior)</div>
-                                        <div class="detail-group__line">Points: 100% miles earned</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div><!-- /flight-card -->
-                </div><!-- /flightList -->
-
-                <!-- No filter results -->
-                <div id="noFiltersResult" class="card border-0 shadow-sm text-center p-5 d-none" style="border-radius:18px !important;">
-                    <div class="py-3">
-                        <div class="mb-2" style="font-size:2.5rem; opacity:.3;"><i class="bi bi-funnel"></i></div>
-                        <h6 class="fw-bold text-dark mb-1">No matching flights</h6>
-                        <p class="text-muted small mb-0">Try adjusting the price or airline filters.</p>
-                    </div>
-                </div>
-
-            </div><!-- /!isEmpty -->
-        </div><!-- /col results -->
-    </div><!-- /row -->
-
 </main>
-
 <div th:replace="~{layout :: footer}"></div>
 <div th:replace="~{layout :: html_scripts}"></div>
-
-<!-- ══════════════════════════════════════════════
-     SCOPED STYLES
-══════════════════════════════════════════════ -->
-<style>
-    /* ── Trip tabs ── */
-    .trip-tab {
-        background: rgba(255,255,255,.07);
-        border: 1px solid rgba(255,255,255,.1);
-        color: rgba(255,255,255,.55);
-        border-radius: 10px;
-        padding: .45rem 1.1rem;
-        font-size: .82rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all .25s;
-    }
-    .trip-tab.active, .trip-tab:hover {
-        background: rgba(14,165,233,.18);
-        border-color: rgba(14,165,233,.4);
-        color: #fff;
-    }
-
-    /* ── Search form elements ── */
-    .search-label {
-        display: block;
-        font-size: .7rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: .09em;
-        color: rgba(255,255,255,.55);
-        margin-bottom: .5rem;
-    }
-    .search-select-wrap { position: relative; }
-    .search-select, .search-input {
-        width: 100%;
-        background: rgba(255,255,255,.07) !important;
-        border: 1px solid rgba(255,255,255,.12) !important;
-        color: #fff !important;
-        border-radius: 12px !important;
-        padding: .7rem 1rem !important;
-        font-size: .9rem !important;
-        outline: none;
-        appearance: none;
-        -webkit-appearance: none;
-        transition: border-color .2s, background .2s;
-    }
-    .search-select option { background: #1e293b; color:#fff; }
-    .search-select:focus, .search-input:focus {
-        border-color: rgba(14,165,233,.6) !important;
-        background: rgba(255,255,255,.1) !important;
-        box-shadow: 0 0 0 3px rgba(14,165,233,.15) !important;
-    }
-    input[type="date"].search-input::-webkit-calendar-picker-indicator { filter: invert(1) opacity(.5); }
-
-    .swap-btn {
-        background: rgba(14,165,233,.15);
-        border: 1px solid rgba(14,165,233,.3);
-        color: var(--sky-light);
-        width: 38px; height: 38px;
-        border-radius: 10px;
-        font-size: .9rem;
-        cursor: pointer;
-        display: flex; align-items:center; justify-content:center;
-        transition: all .2s;
-        margin-bottom: 1px;
-    }
-    .swap-btn:hover { background: rgba(14,165,233,.3); transform: rotate(180deg); }
-
-    .search-btn {
-        background: linear-gradient(135deg,#0ea5e9,#0369a1);
-        color: #fff;
-        border: none;
-        border-radius: 12px;
-        padding: .72rem 2rem;
-        font-size: .92rem;
-        font-weight: 700;
-        cursor: pointer;
-        white-space: nowrap;
-        transition: all .3s;
-        box-shadow: 0 4px 18px rgba(14,165,233,.35);
-        width: 100%;
-    }
-    .search-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 28px rgba(14,165,233,.45);
-    }
-
-    /* ── Fare pills ── */
-    .fare-pill {
-        background: #fff;
-        border-radius: 14px;
-        padding: .9rem 1.1rem;
-        display: flex;
-        align-items: center;
-        gap: .85rem;
-        box-shadow: 0 2px 12px rgba(15,23,42,.06);
-        border: 1px solid rgba(15,23,42,.06);
-        cursor: pointer;
-        transition: all .3s;
-    }
-    .fare-pill:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(15,23,42,.1); }
-    .fare-pill__icon {
-        width: 40px; height: 40px;
-        border-radius: 10px;
-        display: flex; align-items:center; justify-content:center;
-        font-size: 1.1rem;
-        flex-shrink: 0;
-    }
-    .fare-pill__label { font-size:.7rem; text-transform:uppercase; letter-spacing:.06em; color:#94a3b8; font-weight:700; }
-    .fare-pill__value { font-size:.92rem; font-weight:800; color:#0f172a; }
-
-    /* ── Sidebar labels ── */
-    .filter-label { font-size:.68rem; text-transform:uppercase; letter-spacing:.08em; color:#94a3b8; font-weight:700; }
-    .filter-value { font-size:.88rem; }
-
-    /* ── Flight card ── */
-    .flight-card {
-        background: #fff;
-        border-radius: 18px !important;
-        border: 1px solid rgba(15,23,42,.06) !important;
-        box-shadow: 0 2px 16px rgba(15,23,42,.06) !important;
-        transition: all .3s cubic-bezier(.16,1,.3,1);
-        animation: fadeInUp .5s both;
-        overflow: hidden;
-    }
-    .flight-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 12px 40px rgba(15,23,42,.1) !important;
-        border-color: rgba(14,165,233,.2) !important;
-    }
-    .flight-card__body { padding: 1.25rem 1.5rem; }
-
-    /* Columns internal padding */
-    .flight-col { padding: .5rem .75rem; }
-    .flight-col--brand { border-right: 1px solid rgba(15,23,42,.05); }
-    .flight-col--route {}
-    .flight-col--fare {
-        border-left: 1px solid rgba(15,23,42,.05);
-        text-align: center;
-    }
-    .flight-col--cta {
-        text-align: center;
-        padding-right: 1.25rem;
-    }
-
-    /* Airline logo box */
-    .airline-logo-box {
-        width: 48px; height: 36px;
-        background: #f8fafc;
-        border: 1px solid rgba(15,23,42,.08);
-        border-radius: 8px;
-        display: flex; align-items:center; justify-content:center;
-        flex-shrink: 0;
-    }
-
-    /* Flight number badge */
-    .flight-number-badge {
-        display: inline-block;
-        background: rgba(14,165,233,.08);
-        color: var(--sky-dark);
-        border: 1px solid rgba(14,165,233,.18);
-        border-radius: 6px;
-        padding: .1rem .5rem;
-        font-size: .65rem;
-        font-weight: 700;
-        font-family: 'Space Grotesk', monospace;
-        letter-spacing: .04em;
-        margin-top: .2rem;
-    }
-
-    /* Route timeline */
-    .route-row { display:flex; align-items:center; gap:.5rem; }
-    .route-time { text-align:center; min-width:56px; }
-    .route-time--right { text-align:center; }
-    .route-time__hm { font-size:1.25rem; font-weight:800; color:#0f172a; line-height:1; }
-    .route-time__code { font-size:.78rem; font-weight:700; color:var(--sky-dark); letter-spacing:.04em; }
-    .route-time__city { font-size:.68rem; color:#94a3b8; white-space:nowrap; }
-
-    .route-line { flex:1; text-align:center; padding:0 .5rem; }
-    .route-line__dur { font-size:.68rem; color:#94a3b8; margin-bottom:.3rem; }
-    .route-line__bar { position:relative; display:flex; align-items:center; }
-    .route-line__dot {
-        width:7px; height:7px; border-radius:50%;
-        background: var(--sky-light);
-        flex-shrink:0;
-    }
-    .route-line__track {
-        flex:1; height:2px;
-        background: linear-gradient(90deg,rgba(14,165,233,.3),rgba(14,165,233,.6));
-        border-radius:2px;
-        margin:0 2px;
-    }
-    .route-line__plane {
-        color: var(--sky-light);
-        font-size:.8rem;
-        flex-shrink:0;
-    }
-    .route-line__nonstop { font-size:.62rem; color:#94a3b8; margin-top:.25rem; }
-
-    /* Fare tag */
-    .fare-tag { padding:.25rem 0; }
-    .fare-tag__label { font-size:.65rem; text-transform:uppercase; letter-spacing:.06em; color:#94a3b8; font-weight:700; }
-    .fare-tag__price { font-size:1.3rem; font-weight:900; color:#059669; line-height:1.1; }
-
-    /* Seats badge */
-    .seats-badge {
-        display: inline-block;
-        border-radius: 20px;
-        padding: .18rem .65rem;
-        font-size: .68rem;
-        font-weight: 600;
-        margin-top: .3rem;
-    }
-    .seats-badge--ok { background:rgba(34,197,94,.1); color:#16a34a; border:1px solid rgba(34,197,94,.2); }
-    .seats-badge--low { background:rgba(239,68,68,.1); color:#dc2626; border:1px solid rgba(239,68,68,.2); }
-
-    /* Select button */
-    .select-btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(135deg,#0ea5e9,#0369a1);
-        color: #fff;
-        border-radius: 10px;
-        padding: .6rem 1.3rem;
-        font-size: .85rem;
-        font-weight: 700;
-        text-decoration: none;
-        transition: all .25s;
-        white-space: nowrap;
-        box-shadow: 0 3px 12px rgba(14,165,233,.3);
-    }
-    .select-btn:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(14,165,233,.4); color:#fff; }
-
-    .status-badge {
-        border-radius: 10px;
-        padding: .5rem 1rem;
-        font-size: .78rem;
-        font-weight: 700;
-        text-align: center;
-        display: block;
-    }
-    .status-badge--soldout { background:rgba(100,116,139,.1); color:#475569; border:1px solid rgba(100,116,139,.2); }
-    .status-badge--cancelled { background:rgba(239,68,68,.1); color:#dc2626; border:1px solid rgba(239,68,68,.2); }
-
-    /* Card footer */
-    .flight-card__footer {
-        background: #f8fafc;
-        border-top: 1px solid rgba(15,23,42,.05);
-        padding: .6rem 1.5rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 1rem;
-    }
-    .details-toggle {
-        background: none;
-        border: none;
-        color: var(--sky-dark);
-        font-size: .8rem;
-        font-weight: 600;
-        cursor: pointer;
-        padding: 0;
-        display: flex;
-        align-items: center;
-        gap: .25rem;
-        transition: color .2s;
-    }
-    .details-toggle:hover { color: var(--sky-light); }
-    .detail-chip {
-        font-size: .68rem;
-        color: #64748b;
-        background: rgba(15,23,42,.04);
-        border: 1px solid rgba(15,23,42,.07);
-        border-radius: 20px;
-        padding: .15rem .55rem;
-    }
-
-    /* Expandable details */
-    .flight-card__details {
-        padding: 1.25rem 1.5rem;
-        background: #f8fafc;
-        border-top: 1px solid rgba(15,23,42,.05);
-    }
-    .detail-group__title {
-        font-size: .72rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: .06em;
-        color: #0f172a;
-        margin-bottom: .5rem;
-    }
-    .detail-group__line {
-        font-size: .8rem;
-        color: #64748b;
-        margin-bottom: .2rem;
-    }
-
-    /* Responsive tweaks */
-    @media (max-width:991px) {
-        .flight-col--brand { border-right:none; border-bottom:1px solid rgba(15,23,42,.05); }
-        .flight-col--fare { border-left:none; border-top:1px solid rgba(15,23,42,.05); }
-        .flight-card__body { padding:1rem; }
-        .route-time__hm { font-size:1rem; }
-    }
-    @media (max-width:767px) {
-        .search-btn { margin-top:.25rem; }
-        .fare-pill { padding:.7rem .9rem; }
-    }
-</style>
-
-<!-- ══════════════════════════════════════════════
-     JAVASCRIPT
-══════════════════════════════════════════════ -->
-<script th:inline="javascript">
-    document.addEventListener("DOMContentLoaded", function() {
-        populateAirlines();
-        filterResults();
-    });
-
-    /* Trip tab toggle */
-    function setTripTab(btn) {
-        document.querySelectorAll(".trip-tab").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-    }
-
-    /* Swap airport selects */
-    function swapAirports() {
-        const o = document.querySelector("select[name='originId']");
-        const d = document.getElementById("destSelect");
-        if (!o || !d) return;
-        const tmp = o.value;
-        o.value = d.value;
-        d.value = tmp;
-    }
-
-    /* Toggle flight details row */
-    function toggleDetails(btn) {
-        const card = btn.closest(".flight-card");
-        const panel = card.querySelector(".flight-card__details");
-        const chevron = btn.querySelector(".toggle-chevron");
-        if (!panel) return;
-        const open = panel.classList.toggle("show");
-        if (chevron) chevron.style.transform = open ? "rotate(180deg)" : "";
-    }
-
-    /* Populate airline checkboxes from rendered cards */
-    function populateAirlines() {
-        const cards = document.querySelectorAll(".flight-card");
-        const container = document.getElementById("airlineFilterContainer");
-        if (!container) return;
-
-        const airlines = new Set();
-        cards.forEach(c => { const a = c.getAttribute("data-airline"); if (a) airlines.add(a); });
-
-        if (airlines.size === 0) { container.innerHTML = '<span class="text-muted small">No airlines found</span>'; return; }
-
-        container.innerHTML = "";
-        airlines.forEach(airline => {
-            const id = "f_" + airline.replace(/\s+/g, "");
-            const wrap = document.createElement("div");
-            wrap.className = "form-check";
-            wrap.innerHTML = `<input class="form-check-input airline-checkbox" type="checkbox" value="${airline}" id="${id}" checked onchange="filterResults()">
-                              <label class="form-check-label small" for="${id}" style="font-size:.82rem;">${airline}</label>`;
-            container.appendChild(wrap);
-        });
-    }
-
-    /* Filter by price + airline */
-    function filterResults() {
-        const slider = document.getElementById("priceRange");
-        const display = document.getElementById("priceDisplay");
-        const cards = document.querySelectorAll(".flight-card");
-        const countEl = document.getElementById("visibleCount");
-        const noRes = document.getElementById("noFiltersResult");
-
-        if (!slider) return;
-
-        const max = parseFloat(slider.value);
-        if (display) display.textContent = "₹" + max.toLocaleString("en-IN");
-
-        const checked = new Set();
-        document.querySelectorAll(".airline-checkbox:checked").forEach(cb => checked.add(cb.value));
-
-        let visible = 0;
-        cards.forEach(c => {
-            const fare = parseFloat(c.getAttribute("data-fare"));
-            const airline = c.getAttribute("data-airline");
-            const show = fare <= max && checked.has(airline);
-            c.classList.toggle("d-none", !show);
-            if (show) visible++;
-        });
-
-        if (countEl) countEl.textContent = visible;
-        if (noRes) noRes.classList.toggle("d-none", !(visible === 0 && cards.length > 0));
-    }
-
-    /* Sort helpers */
-    function sortCheapest() {
-        const list = document.getElementById("flightList");
-        if (!list) return;
-        [...list.children].sort((a, b) => parseFloat(a.dataset.fare) - parseFloat(b.dataset.fare))
-                          .forEach(c => list.appendChild(c));
-    }
-    function sortFastest() {
-        // Would sort by duration — extend as needed
-    }
-
-    function resetFilters() {
-        const s = document.getElementById("priceRange");
-        if (s) s.value = 50000;
-        document.querySelectorAll(".airline-checkbox").forEach(cb => cb.checked = true);
-        filterResults();
-    }
-</script>
-
 </body>
 </html>
