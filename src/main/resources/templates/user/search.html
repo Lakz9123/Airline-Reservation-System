@@ -43,12 +43,12 @@
             <form th:action="@{/user/search/results}" method="get">
                 <div class="row g-3 align-items-end">
                     <!-- Origin -->
-                    <div class="col-lg-3 col-md-6">
+                    <div class="col-lg-4 col-md-6">
                         <label class="search-label">
                             <i class="bi bi-geo-alt me-1"></i>From
                         </label>
                         <div class="search-select-wrap">
-                            <select class="search-select" name="originId" required>
+                            <select class="search-select" name="originId" id="originSelect" required>
                                 <option value="" disabled th:selected="${originId == null}">Select city / airport</option>
                                 <option th:each="ap : ${airports}"
                                         th:value="${ap.id}"
@@ -66,7 +66,7 @@
                     </div>
 
                     <!-- Destination -->
-                    <div class="col-lg-3 col-md-6">
+                    <div class="col-lg-4 col-md-6">
                         <label class="search-label">
                             <i class="bi bi-geo me-1"></i>To
                         </label>
@@ -82,29 +82,17 @@
                     </div>
 
                     <!-- Date -->
-                    <div class="col-lg-2 col-md-6">
+                    <div class="col-lg-3 col-md-6">
                         <label class="search-label">
-                            <i class="bi bi-calendar3 me-1"></i>Departure
+                            <i class="bi bi-calendar3 me-1"></i>Departure Date
                         </label>
                         <input type="date" class="search-input" name="date" th:value="${date}" required>
-                    </div>
-
-                    <!-- Passengers (UI-only) -->
-                    <div class="col-lg-2 col-md-6">
-                        <label class="search-label">
-                            <i class="bi bi-people me-1"></i>Passengers
-                        </label>
-                        <select class="search-select">
-                            <option>1 Adult</option>
-                            <option>2 Adults</option>
-                            <option>3 Adults</option>
-                        </select>
                     </div>
 
                     <!-- Button -->
                     <div class="col-lg-auto col-md-12">
                         <button type="submit" class="search-btn">
-                            <i class="bi bi-search me-2"></i>Search
+                            <i class="bi bi-search me-2"></i>Search Flights
                         </button>
                     </div>
                 </div>
@@ -410,7 +398,8 @@
         border: 1px solid rgba(255,255,255,.12) !important;
         color: #fff !important;
         border-radius: 12px !important;
-        padding: .7rem 1rem !important;
+        padding: 0 1rem !important;
+        height: 44px;
         font-size: .9rem !important;
         outline: none;
         appearance: none;
@@ -429,13 +418,13 @@
         background: rgba(14,165,233,.15);
         border: 1px solid rgba(14,165,233,.3);
         color: var(--sky-light);
-        width: 38px; height: 38px;
+        width: 40px; height: 44px;
         border-radius: 10px;
         font-size: .9rem;
         cursor: pointer;
         display: flex; align-items:center; justify-content:center;
         transition: all .2s;
-        margin-bottom: 1px;
+        flex-shrink: 0;
     }
     .swap-btn:hover { background: rgba(14,165,233,.3); transform: rotate(180deg); }
 
@@ -444,14 +433,18 @@
         color: #fff;
         border: none;
         border-radius: 12px;
-        padding: .72rem 2rem;
-        font-size: .92rem;
+        padding: 0 2rem;
+        height: 44px;
+        font-size: .9rem;
         font-weight: 700;
         cursor: pointer;
         white-space: nowrap;
         transition: all .3s;
         box-shadow: 0 4px 18px rgba(14,165,233,.35);
         width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     .search-btn:hover {
         transform: translateY(-2px);
