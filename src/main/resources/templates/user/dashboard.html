@@ -217,7 +217,7 @@
                 <div class="flex justify-between items-center mb-2">
                     <span class="bg-surface-container-low text-secondary font-label-sm text-label-sm px-3 py-1 rounded-full border border-secondary/20" 
                           th:text="${trip.flight.flightNumber} + ' • ' + ${trip.cabinClass}">SF 409 • First Class</span>
-                    <span class="font-label-sm text-label-sm text-on-surface-variant" th:text="'Conf: SKY-' + ${#strings.formatInteger(trip.id, 5)}">Conf: X8K9M2</span>
+                    <span class="font-label-sm text-label-sm text-on-surface-variant" th:text="'Conf: SKY-' + ${#numbers.formatInteger(trip.id, 5)}">Conf: X8K9M2</span>
                 </div>
                 <div class="flex items-center justify-between w-full mt-6 relative">
                     <!-- Origin -->
