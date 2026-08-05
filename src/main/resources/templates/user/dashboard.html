@@ -113,7 +113,7 @@
 
 <!-- TopNavBar -->
 <header class="bg-surface/60 backdrop-blur-xl fixed top-0 w-full z-50 border-b border-primary/10 shadow-[0_40px_60px_-15px_rgba(13,27,42,0.15)]">
-    <div class="flex justify-between items-center px-margin-desktop h-20 max-w-container-max mx-auto">
+    <div class="flex justify-between items-center px-4 md:px-12 h-20 max-w-7xl mx-auto">
         <!-- Brand -->
         <a th:href="@{/user/dashboard}" class="font-display-lg text-headline-md tracking-tighter text-primary flex items-center gap-2 text-decoration-none">
             <span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">flight_takeoff</span>
@@ -136,7 +136,7 @@
 </header>
 
 <!-- Main Content -->
-<main class="flex-grow pt-32 pb-20 px-margin-mobile md:px-margin-desktop w-full max-w-container-max mx-auto flex flex-col gap-12">
+<main class="flex-grow pt-32 pb-20 px-4 md:px-12 w-full max-w-7xl mx-auto flex flex-col gap-8">
     <!-- Welcome Banner -->
     <section class="relative w-full h-[240px] rounded-xl overflow-hidden soft-shadow bg-surface-container-high flex flex-col justify-end p-8 border border-outline-variant/20"
              th:with="wallet=${@walletService.getOrCreateWallet(currentUser)}">
@@ -151,7 +151,7 @@
     </section>
 
     <!-- Travel Stats Row -->
-    <section class="grid grid-cols-1 md:grid-cols-3 gap-gutter" th:with="wallet=${@walletService.getOrCreateWallet(currentUser)}">
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-6" th:with="wallet=${@walletService.getOrCreateWallet(currentUser)}">
         <!-- Confirmed Bookings -->
         <div class="bg-surface-container-lowest rounded-xl p-6 soft-shadow border border-outline-variant/30 flex items-center justify-between">
             <div>
@@ -185,7 +185,7 @@
     </section>
 
     <!-- Quick Actions Bento Grid -->
-    <section class="grid grid-cols-2 md:grid-cols-4 gap-gutter">
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-6">
         <!-- Search Flights -->
         <a th:href="@{/user/search}" class="group bg-surface-container-lowest rounded-xl p-6 soft-shadow border border-outline-variant/30 flex flex-col items-start gap-4 transition-all hover:-translate-y-1 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-secondary text-left">
             <div class="w-12 h-12 rounded-full bg-surface-container-low text-secondary flex items-center justify-center group-hover:bg-secondary group-hover:text-on-secondary transition-colors">
