@@ -4,66 +4,93 @@
 <body>
 <div th:replace="~{layout :: user_navbar}"></div>
 <main class="container">
+    <!-- Header -->
     <div class="row mb-4">
         <div class="col-12">
-            <span class="eyebrow-label">Book Your Next Destination</span>
+            <span class="eyebrow-label text-primary">Book Your Next Destination</span>
             <h1 class="section-title mb-1">Search Flights</h1>
             <p class="text-muted small">Explore and compare prices, flight timings, and find the perfect journey.</p>
         </div>
     </div>
 
-    <!-- Search Form -->
-    <div class="card border-0 mb-5">
+    <!-- Hero Search Bar (Styled like Landing Page embedded search) -->
+    <div class="card border-0 mb-5" 
+         style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.98) 100%) !important; border: 1px solid rgba(255,255,255,0.08) !important; box-shadow: var(--shadow-lg) !important;">
         <div class="card-body p-4 p-md-5">
             <form th:action="@{/user/search/results}" method="get" class="row g-3 align-items-end">
                 <div class="col-md-3">
-                    <label class="form-label fw-bold text-uppercase small text-muted">From (Origin)</label>
-                    <select class="form-select" name="originId" required>
+                    <label class="form-label fw-bold text-uppercase small text-white-50">From (Origin)</label>
+                    <select class="form-select bg-dark text-white border-secondary py-2.5 rounded-3" name="originId" required>
                         <option value="" disabled th:selected="${originId == null}">Select Origin</option>
                         <option th:each="ap : ${airports}" th:value="${ap.id}" th:text="${ap.airportCode} + ' - ' + ${ap.city}" th:selected="${ap.id == originId}"></option>
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label fw-bold text-uppercase small text-muted">To (Destination)</label>
-                    <select class="form-select" name="destinationId" required>
+                    <label class="form-label fw-bold text-uppercase small text-white-50">To (Destination)</label>
+                    <select class="form-select bg-dark text-white border-secondary py-2.5 rounded-3" name="destinationId" required>
                         <option value="" disabled th:selected="${destinationId == null}">Select Destination</option>
                         <option th:each="ap : ${airports}" th:value="${ap.id}" th:text="${ap.airportCode} + ' - ' + ${ap.city}" th:selected="${ap.id == destinationId}"></option>
                     </select>
                 </div>
-                <div class="col-md-2">
-                    <label class="form-label fw-bold text-uppercase small text-muted">Departure Date</label>
-                    <input type="date" class="form-control" name="date" th:value="${date}" required>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold text-uppercase small text-white-50">Departure Date</label>
+                    <input type="date" class="form-control bg-dark text-white border-secondary py-2.5 rounded-3" name="date" th:value="${date}" required>
                 </div>
-                <div class="col-md-2">
-                    <label class="form-label fw-bold text-uppercase small text-muted">Airline</label>
-                    <select class="form-select" name="airline">
-                        <option value="" th:selected="${airline == null || airline == ''}">Any Airline</option>
-                        <option th:each="al : ${airlines}" th:value="${al.airlineName}" th:text="${al.airlineName}" th:selected="${al.airlineName == airline}"></option>
-                    </select>
-                </div>
-                <div class="col-md-2 mt-4">
-                    <button type="submit" class="btn-primary-theme w-100 py-3"><i class="bi bi-search"></i> Search</button>
+                <div class="col-md-3">
+                    <button type="submit" class="btn-primary-theme w-100 py-3 fw-bold text-uppercase"><i class="bi bi-search"></i> Search</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Results -->
-    <div th:if="${flights != null}">
-        <div th:if="${#lists.isEmpty(flights)}" class="alert alert-warning border-0 rounded-4 p-4 text-center">
-            <i class="bi bi-info-circle fs-3 mb-2 d-block"></i>
-            No flights found for that route and date. Try selecting different criteria.
-        </div>
-        <div th:if="${!#lists.isEmpty(flights)}">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h5 class="fw-bold section-title mb-0">Available Flights (<span th:text="${#lists.size(flights)}">0</span> found)</h5>
+    <!-- Results section with side filters -->
+    <div class="row g-4" th:if="${flights != null}">
+        <!-- Sidebar filters -->
+        <div class="col-lg-3" th:if="${!#lists.isEmpty(flights)}">
+            <div class="card border-0 p-4 sticky-top" style="top: 85px;">
+                <h5 class="fw-bold text-dark dark:text-white section-title mb-4 pb-2 border-bottom">Filters</h5>
+                
+                <!-- Max price slider -->
+                <div class="mb-4">
+                    <label for="priceRange" class="form-label fw-bold text-uppercase small text-muted d-flex justify-content-between mb-2">
+                        <span>Max Price</span>
+                        <span class="text-primary font-monospace" id="priceDisplay">₹50,000</span>
+                    </label>
+                    <input type="range" class="form-range" id="priceRange" min="0" max="50000" step="500" value="50000" oninput="filterResults()">
+                    <div class="d-flex justify-content-between text-muted" style="font-size: 0.7rem;">
+                        <span>₹0</span>
+                        <span>₹50,000+</span>
+                    </div>
+                </div>
+
+                <!-- Airline checkboxes -->
+                <div>
+                    <label class="form-label fw-bold text-uppercase small text-muted mb-3">Airlines</label>
+                    <div class="d-flex flex-column gap-2" id="airlineFilterContainer">
+                        <!-- Populated by Javascript -->
+                    </div>
+                </div>
             </div>
-            <div class="row g-4">
-                <div class="col-12" th:each="f : ${flights}">
-                    <div class="card border-0">
+        </div>
+
+        <!-- Flights results -->
+        <div th:class="${#lists.isEmpty(flights)} ? 'col-12' : 'col-lg-9'">
+            <!-- Empty state -->
+            <div th:if="${#lists.isEmpty(flights)}" class="alert alert-warning border-0 rounded-4 p-5 text-center">
+                <i class="bi bi-info-circle display-4 text-warning mb-3 opacity-50"></i>
+                <h5 class="fw-bold text-dark">No flights found</h5>
+                <p class="text-muted small mb-0">No flights matched your requested criteria. Try selecting different options.</p>
+            </div>
+
+            <!-- List of flight cards -->
+            <div th:if="${!#lists.isEmpty(flights)}">
+                <h5 class="fw-bold section-title mb-4">Available Flights (<span id="visibleCount" th:text="${#lists.size(flights)}">0</span> found)</h5>
+                
+                <div class="d-flex flex-column gap-3" id="flightList">
+                    <div class="card border-0 flight-card" th:each="f : ${flights}" th:data-fare="${f.fare}" th:data-airline="${f.airline.airlineName}">
                         <div class="card-body p-4">
                             <div class="row align-items-center g-3">
-                                <!-- Flight Brand -->
+                                <!-- Airline -->
                                 <div class="col-md-3">
                                     <div class="d-flex align-items-center gap-3 mb-2">
                                         <img th:if="${f.airline.logo != null && !f.airline.logo.isEmpty()}" 
@@ -72,60 +99,63 @@
                                              class="img-fluid rounded border p-1 bg-white" 
                                              style="width: 50px; height: 35px; object-fit: contain;">
                                         <div>
-                                            <span class="badge bg-secondary-subtle text-secondary border px-2 py-1" th:text="${f.flightNumber}">FL-101</span>
+                                            <span class="badge bg-secondary-subtle text-secondary border px-2 py-1 font-monospace" th:text="${f.flightNumber}">FL-101</span>
                                         </div>
                                     </div>
-                                    <div class="fw-bold text-dark dark:text-white" th:text="${f.airline.airlineName}">Airline</div>
+                                    <div class="fw-bold text-dark dark:text-white mb-1" th:text="${f.airline.airlineName}">Airline</div>
                                     <div class="small text-muted" th:text="${f.aircraft != null ? f.aircraft.model : 'Unknown'}">Model</div>
                                 </div>
-                                
-                                <!-- Route and Timings -->
-                                <div class="col-md-4">
+
+                                <!-- Route -->
+                                <div class="col-md-5">
                                     <div class="d-flex align-items-center justify-content-between gap-2">
                                         <div class="text-start">
-                                            <div class="fs-5 fw-bold text-primary" th:text="${#temporals.format(f.departureDateTime,'HH:mm')}">00:00</div>
-                                            <div class="text-muted small fw-semibold" th:text="${f.originAirport.airportCode} + ' — ' + ${f.originAirport.city}">Origin</div>
+                                            <div class="fs-5 fw-bold text-primary" th:text="${#temporals.format(f.departureDateTime,'HH:mm')}">08:00</div>
+                                            <div class="text-muted small fw-semibold" th:text="${f.originAirport.airportCode}">DEL</div>
                                         </div>
                                         <div class="text-center px-3 position-relative flex-grow-1">
-                                            <small class="text-muted d-block mb-1 font-monospace" th:text="${f.durationMinutes + ' min'}">0 min</small>
+                                            <small class="text-muted d-block mb-1 font-monospace" th:text="${f.durationMinutes + 'm'}">120m</small>
                                             <div style="border-top: 2px dashed rgba(14, 165, 233, 0.2); position: relative;">
                                                 <i class="bi bi-airplane-fill text-primary" style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%) rotate(90deg); font-size: 0.9rem;"></i>
                                             </div>
                                         </div>
                                         <div class="text-end">
-                                            <div class="fs-5 fw-bold text-primary" th:text="${#temporals.format(f.arrivalDateTime,'HH:mm')}">00:00</div>
-                                            <div class="text-muted small fw-semibold" th:text="${f.destinationAirport.airportCode} + ' — ' + ${f.destinationAirport.city}">Destination</div>
+                                            <div class="fs-5 fw-bold text-primary" th:text="${#temporals.format(f.arrivalDateTime,'HH:mm')}">10:00</div>
+                                            <div class="text-muted small fw-semibold" th:text="${f.destinationAirport.airportCode}">BOM</div>
                                         </div>
                                     </div>
                                     <div class="text-center mt-2 small text-muted font-monospace" th:text="${#temporals.format(f.departureDateTime,'dd MMM yyyy')}">Date</div>
                                 </div>
 
-                                <!-- Seat Info & Fare -->
-                                <div class="col-md-3 text-center">
-                                    <div class="row align-items-center">
-                                        <div class="col-6">
-                                            <div class="text-muted small">Available</div>
-                                            <div class="fw-bold fs-5" th:classappend="${f.availableSeats < 10} ? 'text-danger' : 'text-success'" th:text="${f.availableSeats}">0</div>
-                                        </div>
-                                        <div class="col-6 border-start" style="border-color: var(--border) !important;">
-                                            <div class="text-muted small">Base Fare</div>
-                                            <div class="fs-5 fw-bold text-primary">₹<span th:text="${#numbers.formatDecimal(f.fare,1,2)}">0</span></div>
-                                        </div>
-                                    </div>
+                                <!-- Seats & Fare -->
+                                <div class="col-md-2 text-center border-md-start" style="border-color: var(--border) !important;">
+                                    <div class="text-muted small mb-1">Base Fare</div>
+                                    <div class="fs-5 fw-bold text-success mb-2">₹<span th:text="${#numbers.formatDecimal(f.fare,1,2)}">0</span></div>
+                                    <span class="badge rounded-pill px-2.5 py-1"
+                                          th:classappend="${f.availableSeats < 10} ? 'bg-danger-subtle text-danger border border-danger-subtle' : 'bg-success-subtle text-success border border-success-subtle'">
+                                        <span th:text="${f.availableSeats}">0</span> left
+                                    </span>
                                 </div>
 
-                                <!-- Action Button -->
+                                <!-- Action button -->
                                 <div class="col-md-2 text-end">
                                     <th:block th:with="isCancelled=${f.flightStatus != null && f.flightStatus.name() == 'CANCELLED'}">
-                                        <a th:if="${f.availableSeats > 0 && !isCancelled}" th:href="@{/user/book/{id}(id=${f.id})}" class="btn-primary-theme w-100 py-2.5">
-                                            Select Seats
+                                        <a th:if="${f.availableSeats > 0 && !isCancelled}" th:href="@{/user/book/{id}(id=${f.id})}" class="btn-primary-theme w-100 py-2.5 d-block text-center text-decoration-none">
+                                            Select
                                         </a>
-                                        <span th:if="${f.availableSeats == 0 && !isCancelled}" class="badge badge-cancelled w-100 py-2">Sold Out</span>
-                                        <span th:if="${isCancelled}" class="badge badge-cancelled w-100 py-2">Cancelled</span>
+                                        <span th:if="${f.availableSeats == 0 && !isCancelled}" class="badge bg-secondary text-secondary-subtle border w-100 py-2.5 d-block">Sold Out</span>
+                                        <span th:if="${isCancelled}" class="badge bg-danger text-danger-subtle border w-100 py-2.5 d-block">Cancelled</span>
                                     </th:block>
                                 </div>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Sidebar filter helper -->
+                    <div id="noFiltersResult" class="alert alert-secondary border-0 rounded-4 p-5 text-center d-none">
+                        <i class="bi bi-funnel display-4 text-muted mb-3 opacity-50"></i>
+                        <h5 class="fw-bold text-dark">No matching flights</h5>
+                        <p class="text-muted small mb-0">Adjust your price range slider or checklist filters to display other flights.</p>
                     </div>
                 </div>
             </div>
@@ -134,5 +164,88 @@
 </main>
 <div th:replace="~{layout :: footer}"></div>
 <div th:replace="~{layout :: html_scripts}"></div>
+
+<!-- Javascript Client-side Filter Logic -->
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        populateAirlines();
+        filterResults();
+    });
+
+    function populateAirlines() {
+        const flightCards = document.querySelectorAll(".flight-card");
+        const container = document.getElementById("airlineFilterContainer");
+        if (!container) return;
+
+        const airlines = new Set();
+        flightCards.forEach(card => {
+            const airline = card.getAttribute("data-airline");
+            if (airline) airlines.add(airline);
+        });
+
+        if (airlines.size === 0) {
+            container.innerHTML = '<span class="text-muted small">No airlines found</span>';
+            return;
+        }
+
+        container.innerHTML = '';
+        airlines.forEach(airline => {
+            const wrapper = document.createElement("div");
+            wrapper.className = "form-check";
+            wrapper.innerHTML = `
+                <input class="form-check-input airline-checkbox" type="checkbox" value="${airline}" id="filter_${airline.replace(/\s+/g, '')}" checked onchange="filterResults()">
+                <label class="form-check-label small text-dark dark:text-light" for="filter_${airline.replace(/\s+/g, '')}">
+                    ${airline}
+                </label>
+            `;
+            container.appendChild(wrapper);
+        });
+    }
+
+    function filterResults() {
+        const priceRange = document.getElementById("priceRange");
+        const priceDisplay = document.getElementById("priceDisplay");
+        const flightCards = document.querySelectorAll(".flight-card");
+        const visibleCountEl = document.getElementById("visibleCount");
+        const noResultsEl = document.getElementById("noFiltersResult");
+
+        if (!priceRange) return;
+
+        const maxPrice = parseFloat(priceRange.value);
+        priceDisplay.textContent = "₹" + maxPrice.toLocaleString("en-IN");
+
+        const checkedAirlines = new Set();
+        document.querySelectorAll(".airline-checkbox:checked").forEach(cb => {
+            checkedAirlines.add(cb.value);
+        });
+
+        let visibleCount = 0;
+
+        flightCards.forEach(card => {
+            const fare = parseFloat(card.getAttribute("data-fare"));
+            const airline = card.getAttribute("data-airline");
+
+            const matchesPrice = fare <= maxPrice;
+            const matchesAirline = checkedAirlines.has(airline);
+
+            if (matchesPrice && matchesAirline) {
+                card.classList.remove("d-none");
+                visibleCount++;
+            } else {
+                card.classList.add("d-none");
+            }
+        });
+
+        if (visibleCountEl) visibleCountEl.textContent = visibleCount;
+
+        if (noResultsEl) {
+            if (visibleCount === 0 && flightCards.length > 0) {
+                noResultsEl.classList.remove("d-none");
+            } else {
+                noResultsEl.classList.add("d-none");
+            }
+        }
+    }
+</script>
 </body>
 </html>
