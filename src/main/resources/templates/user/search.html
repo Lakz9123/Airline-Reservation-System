@@ -393,7 +393,7 @@
             <div class="col-md-3 p-1">
                 <div class="hero-input-group">
                     <i class="bi bi-airplane icon-left" style="transform: translateY(-50%) rotate(-45deg);"></i>
-                    <select class="form-select font-monospace" name="originId" required>
+                    <select class="form-select font-monospace" name="originId">
                         <option value="" disabled th:selected="${originId == null}">Select Origin</option>
                         <option th:each="ap : ${airports}" th:value="${ap.id}" th:text="${ap.city} + ' (' + ${ap.airportCode} + ')'" th:selected="${ap.id == originId}"></option>
                     </select>
@@ -411,7 +411,7 @@
             <div class="col-md-3 p-1 flex-grow-1">
                 <div class="hero-input-group">
                     <i class="bi bi-airplane icon-left" style="transform: translateY(-50%) rotate(45deg);"></i>
-                    <select class="form-select font-monospace" name="destinationId" required id="destSelect">
+                    <select class="form-select font-monospace" name="destinationId" id="destSelect">
                         <option value="" disabled th:selected="${destinationId == null}">Select Destination</option>
                         <option th:each="ap : ${airports}" th:value="${ap.id}" th:text="${ap.city} + ' (' + ${ap.airportCode} + ')'" th:selected="${ap.id == destinationId}"></option>
                     </select>
@@ -422,7 +422,7 @@
             <div class="col-md-2 p-1">
                 <div class="hero-input-group">
                     <i class="bi bi-calendar3 icon-left"></i>
-                    <input type="date" class="form-control" name="date" th:value="${date}" required>
+                    <input type="date" class="form-control" name="date" th:value="${date}">
                 </div>
             </div>
             

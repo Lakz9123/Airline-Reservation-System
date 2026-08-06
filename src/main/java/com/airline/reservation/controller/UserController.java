@@ -118,7 +118,12 @@ public class UserController {
     // ============================
     @GetMapping("/search")
     public String searchForm(Model model) {
-        model.addAttribute("flights", Collections.emptyList());
+        // Show all upcoming flights initially instead of an empty list
+        List<Flight> upcomingFlights = flightRepository.findAll().stream()
+                .filter(f -> f.getDepartureDateTime().isAfter(LocalDateTime.now()))
+                .sorted(java.util.Comparator.comparing(Flight::getDepartureDateTime))
+                .collect(java.util.stream.Collectors.toList());
+        model.addAttribute("flights", upcomingFlights);
         model.addAttribute("airports", airportService.getAllAirports());
         model.addAttribute("airlines", airlineService.getAllAirlines());
         return "user/search";
@@ -126,15 +131,23 @@ public class UserController {
 
     @GetMapping("/search/results")
     public String searchResults(
-            @RequestParam Long originId,
-            @RequestParam Long destinationId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(required = false) Long originId,
+            @RequestParam(required = false) Long destinationId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             @RequestParam(required = false) Double maxFare,
             @RequestParam(required = false) String airline,
             Model model) {
-        LocalDateTime startOfDay = date.atStartOfDay();
-        LocalDateTime endOfDay = date.atTime(23, 59, 59);
+        LocalDateTime startOfDay = date != null ? date.atStartOfDay() : null;
+        LocalDateTime endOfDay = date != null ? date.atTime(23, 59, 59) : null;
+        
         List<Flight> flights = flightRepository.searchFlights(originId, destinationId, startOfDay, endOfDay, maxFare, airline);
+        
+        // Filter out past flights from search results
+        flights = flights.stream()
+                .filter(f -> f.getDepartureDateTime().isAfter(LocalDateTime.now()))
+                .sorted(java.util.Comparator.comparing(Flight::getDepartureDateTime))
+                .collect(java.util.stream.Collectors.toList());
+
         model.addAttribute("flights", flights);
         model.addAttribute("originId", originId);
         model.addAttribute("destinationId", destinationId);
