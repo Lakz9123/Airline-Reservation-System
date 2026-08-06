@@ -3,102 +3,236 @@
 <head th:replace="~{layout :: html_head('Select Seats')}"></head>
 <body>
 <div th:replace="~{layout :: user_navbar}"></div>
-<main class="container">
-    <!-- Flight Header -->
-    <div class="card border-0 mb-4">
-        <div class="card-body p-4 p-md-5">
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-4">
+
+<style>
+    :root {
+        --sky-navy: #0f1c2c;
+        --sky-blue: #005cab;
+        --sky-light: #f6faff;
+        
+        --color-first: #D4AF37;
+        --color-business: #702963;
+        --color-premium: #008080;
+        --color-economy: #005cab;
+        --color-occupied: #e2e2e2;
+        --color-selected: #22c55e;
+    }
+    
+    body {
+        background-color: var(--sky-light) !important;
+        background-image: none !important;
+        padding-bottom: 120px; /* Space for fixed bottom bar */
+    }
+    body::before {
+        display: none !important; 
+    }
+
+    /* Typography */
+    .title-display {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--sky-navy);
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+    }
+    
+    /* Legend & Cards */
+    .premium-card {
+        background-color: #ffffff;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        border: 1px solid rgba(116, 119, 125, 0.2);
+    }
+    .selection-card {
+        background-color: #ebf5ff;
+        border-radius: 12px;
+        padding: 1.5rem;
+        border: 1px solid rgba(0, 92, 171, 0.2);
+    }
+    
+    /* Seat Styles */
+    .seat-base {
+        width: 44px;
+        height: 52px;
+        border-radius: 8px;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        transition: all 0.2s;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        position: relative;
+    }
+    .seat-base:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    
+    .seat-first { background-color: var(--color-first); }
+    .seat-business { background-color: var(--color-business); }
+    .seat-premium { background-color: var(--color-premium); }
+    .seat-economy { background-color: var(--color-economy); }
+    
+    .seat-occupied {
+        background-color: var(--color-occupied);
+        color: #838484;
+        cursor: not-allowed;
+        box-shadow: none;
+    }
+    .seat-occupied:hover {
+        transform: none;
+        box-shadow: none;
+    }
+    
+    .seat-selected {
+        background-color: var(--color-selected) !important;
+        color: white !important;
+        box-shadow: 0 0 0 3px white, 0 0 0 5px var(--color-selected) !important;
+        transform: scale(1.05);
+    }
+    
+    /* Aircraft Body container */
+    .aircraft-container {
+        display: flex;
+        justify-content: center;
+        padding-top: 2rem;
+        overflow-x: auto;
+    }
+    .aircraft-body {
+        background-color: white;
+        border-radius: 160px 160px 20px 20px;
+        box-shadow: 0px 4px 30px rgba(0,0,0,0.06);
+        border: 1px solid #E0E0E0;
+        padding: 3rem 2rem 8rem 2rem;
+        width: 380px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    @media (max-width: 768px) {
+        .aircraft-body { width: 340px; padding: 2rem 1rem 6rem 1rem; }
+        .seat-base { width: 38px; height: 46px; }
+    }
+    
+    .cockpit {
+        width: 80px;
+        height: 40px;
+        border-bottom: 2px solid rgba(116, 119, 125, 0.3);
+        border-radius: 50%;
+        margin-bottom: 3rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #74777d;
+    }
+    
+    /* Fixed Bottom Bar */
+    .fixed-action-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: #ffffff;
+        border-top: 1px solid rgba(116, 119, 125, 0.2);
+        padding: 1rem 2rem;
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+        z-index: 1040;
+    }
+</style>
+
+<main class="container-fluid px-4 px-md-5 pt-4 pb-5" style="max-width: 1280px; margin: 0 auto;">
+    <form th:action="@{/user/book/{id}(id=${flight.id})}" method="post" id="seatForm">
+        <input type="hidden" name="cabinClass" id="cabinClass" value="Economy">
+        
+        <div class="row g-5">
+            <!-- Left Column: Legend & Selection Summary -->
+            <div class="col-lg-4 order-2 order-lg-1 d-flex flex-column gap-4" style="position: sticky; top: 100px; height: fit-content;">
+                
                 <div>
-                    <span class="eyebrow-label">Flight Selection</span>
-                    <h3 class="section-title mb-2">
-                        <span class="badge bg-primary-subtle text-primary border px-2.5 py-1.5 me-2" th:text="${flight.flightNumber}">FL-101</span>
-                        <span th:text="${flight.airline.airlineName}">Airline</span>
-                    </h3>
-                    <div class="text-muted small">
-                        <i class="bi bi-geo-alt-fill text-primary"></i>
-                        <strong th:text="${flight.originAirport.airportCode} + ' (' + ${flight.originAirport.city} + ')'">A</strong>
-                        <i class="bi bi-arrow-right mx-2 text-primary"></i>
-                        <strong th:text="${flight.destinationAirport.airportCode} + ' (' + ${flight.destinationAirport.city} + ')'">B</strong>
-                        &nbsp;|&nbsp;
-                        <i class="bi bi-calendar3 text-primary"></i>
-                        <span th:text="${#temporals.format(flight.departureDateTime,'dd MMM yyyy HH:mm')}">Date</span>
+                    <h1 class="title-display mb-2">Select Your Seat</h1>
+                    <p class="text-muted fs-5">Choose your perfect spot for the journey to <span th:text="${flight.destinationAirport.city}">Destination</span>.</p>
+                </div>
+                
+                <!-- Legend Card -->
+                <div class="premium-card">
+                    <h4 class="font-monospace fw-bold mb-4" style="color: var(--sky-navy); font-size: 1.1rem;">Cabin Classes</h4>
+                    <div class="row g-3">
+                        <div class="col-6 d-flex align-items-center gap-2">
+                            <div class="seat-base seat-first" style="width:24px; height:24px; border-radius:4px;"><i class="bi bi-star-fill" style="font-size:10px;"></i></div>
+                            <span class="small fw-semibold text-muted">First Class</span>
+                        </div>
+                        <div class="col-6 d-flex align-items-center gap-2">
+                            <div class="seat-base seat-business" style="width:24px; height:24px; border-radius:4px;"></div>
+                            <span class="small fw-semibold text-muted">Business</span>
+                        </div>
+                        <div class="col-6 d-flex align-items-center gap-2">
+                            <div class="seat-base seat-premium" style="width:24px; height:24px; border-radius:4px;"></div>
+                            <span class="small fw-semibold text-muted">Premium Eco</span>
+                        </div>
+                        <div class="col-6 d-flex align-items-center gap-2">
+                            <div class="seat-base seat-economy" style="width:24px; height:24px; border-radius:4px;"></div>
+                            <span class="small fw-semibold text-muted">Economy</span>
+                        </div>
+                        <div class="col-6 d-flex align-items-center gap-2 mt-4">
+                            <div class="seat-base seat-occupied" style="width:24px; height:24px; border-radius:4px;"><i class="bi bi-x-lg" style="font-size:12px;"></i></div>
+                            <span class="small fw-semibold text-muted">Occupied</span>
+                        </div>
+                        <div class="col-6 d-flex align-items-center gap-2 mt-4">
+                            <div class="seat-base seat-selected" style="width:24px; height:24px; border-radius:4px;"><i class="bi bi-check-lg" style="font-size:14px;"></i></div>
+                            <span class="small fw-semibold text-muted">Selected</span>
+                        </div>
                     </div>
                 </div>
-                <div class="text-md-end">
-                    <div class="fs-4 fw-bold text-primary">From ₹<span th:text="${#numbers.formatDecimal(flight.economyFare ?: flight.fare, 1, 2)}">0</span></div>
-                    <small class="text-muted"><span th:text="${flight.availableSeats}">0</span> seats available</small>
+                
+                <!-- Current Selection Summary -->
+                <div class="selection-card">
+                    <h6 class="text-uppercase fw-bold mb-3" style="color: var(--sky-blue); font-size: 0.85rem; letter-spacing: 0.05em;">Current Selection</h6>
+                    <div class="d-flex justify-content-between align-items-end">
+                        <div>
+                            <div class="fs-1 fw-bold" style="color: var(--sky-navy); line-height: 1;" id="selectedSeatDisplay">None</div>
+                            <div class="text-muted small mt-1 fw-semibold" id="selectedClassDisplay">Select a seat</div>
+                        </div>
+                        <div class="text-end">
+                            <div class="fs-4 fw-bold" style="color: var(--sky-navy);" id="seatPriceDisplay">₹0</div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <!-- Right Column: Interactive Seat Map -->
+            <div class="col-lg-8 order-1 order-lg-2">
+                <div class="aircraft-container">
+                    <div class="aircraft-body">
+                        <!-- Cockpit -->
+                        <div class="cockpit">
+                            <i class="bi bi-airplane fs-3" style="transform: rotate(0deg);"></i>
+                        </div>
+                        
+                        <!-- Seat Map injected here by JS -->
+                        <div id="seatMap" class="w-100 d-flex flex-column gap-5"></div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Error Banner -->
-    <div th:if="${error}" class="alert alert-danger border-0 rounded-4 p-3 mb-4 small" th:text="${error}"></div>
-
-    <!-- Legend -->
-    <div class="card border-0 p-4 mb-4">
-        <div class="d-flex gap-4 mb-0 flex-wrap justify-content-center align-items-center">
-            <span class="d-flex align-items-center gap-2">
-                <button class="seat-btn" disabled style="background-color:#d97706; border-color:#b45309; width:28px; height:28px; border-radius:8px; border:none;"></button>
-                <span class="small fw-semibold text-muted">First Class</span>
-            </span>
-            <span class="d-flex align-items-center gap-2">
-                <button class="seat-btn" disabled style="background-color:#9333ea; border-color:#7e22ce; width:28px; height:28px; border-radius:8px; border:none;"></button>
-                <span class="small fw-semibold text-muted">Business</span>
-            </span>
-            <span class="d-flex align-items-center gap-2">
-                <button class="seat-btn" disabled style="background-color:#0d9488; border-color:#0f766e; width:28px; height:28px; border-radius:8px; border:none;"></button>
-                <span class="small fw-semibold text-muted">Premium Economy</span>
-            </span>
-            <span class="d-flex align-items-center gap-2">
-                <button class="seat-btn" disabled style="background-color:#0284c7; border-color:#0369a1; width:28px; height:28px; border-radius:8px; border:none;"></button>
-                <span class="small fw-semibold text-muted">Economy</span>
-            </span>
-            <span class="d-flex align-items-center gap-2">
-                <button class="seat-btn" disabled style="background-color:#64748b; width:28px; height:28px; border-radius:8px; border:none; opacity:0.6;"></button>
-                <span class="small fw-semibold text-muted">Booked</span>
-            </span>
-            <span class="d-flex align-items-center gap-2">
-                <button class="seat-btn" disabled style="background-color:#22c55e; width:28px; height:28px; border-radius:8px; border:none;"></button>
-                <span class="small fw-semibold text-muted">Selected</span>
-            </span>
-        </div>
-    </div>
-
-    <!-- Seat Map -->
-    <form th:action="@{/user/book/{id}(id=${flight.id})}" method="post" id="seatForm">
-        <div class="card border-0 p-4 p-md-5 mb-4">
-            <div class="text-center text-muted mb-4 small text-uppercase tracking-wider font-monospace"><i class="bi bi-caret-up-fill me-1"></i> Front of Plane</div>
-            <div id="seatMap" class="d-flex flex-column gap-3 align-items-center">
-                <!-- Rendered by JS -->
-            </div>
-            <div class="text-center text-muted mt-4 small text-uppercase tracking-wider font-monospace"><i class="bi bi-caret-down-fill me-1"></i> Rear of Plane</div>
-        </div>
-
-        <!-- Booking Summary -->
-        <div class="card border-0 p-4 p-md-5 mb-4">
-            <h5 class="fw-bold section-title mb-4">Booking Summary</h5>
-
-            <div class="row align-items-center g-4">
-                <div class="col-md-6">
-                    <label for="cabinClass" class="form-label fw-bold text-uppercase small text-muted">Cabin Class</label>
-                    <select class="form-select" id="cabinClass" name="cabinClass" onchange="updateSummary()">
-                        <option value="Economy">Economy</option>
-                        <option value="Premium Economy">Premium Economy</option>
-                        <option value="Business Class">Business Class</option>
-                        <option value="First Class">First Class</option>
-                    </select>
+        <!-- Fixed Bottom Action Bar -->
+        <div class="fixed-action-bar">
+            <div class="container-fluid" style="max-width: 1280px; margin: 0 auto;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small text-uppercase fw-bold" style="letter-spacing: 0.05em;">Total Amount</div>
+                        <div class="fs-3 fw-bold" style="color: var(--sky-navy);" id="totalFareDisplay">₹0.00</div>
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-primary px-4 px-md-5 py-2 py-md-3 fw-bold rounded-3 shadow-sm d-flex align-items-center gap-2" style="background-color: var(--sky-blue); border: none;" id="confirmBtn" disabled>
+                            Continue to Payment <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
                 </div>
-                <div class="col-md-6 border-start-md px-md-4">
-                    <p class="mb-2 text-muted small">Selected seats: <strong id="selectedSeatDisplay" class="text-primary fs-5">None</strong></p>
-                    <p class="mb-0 text-muted small">Total fare: <strong id="totalFareDisplay" class="text-primary fs-4">₹0.00</strong></p>
-                </div>
-            </div>
-
-            <div class="mt-4 pt-3 border-top d-flex justify-content-end">
-                <button type="submit" class="btn-primary-theme py-3 px-5 text-uppercase" id="confirmBtn" disabled>
-                    Proceed to Payment <i class="bi bi-arrow-right ms-2"></i>
-                </button>
             </div>
         </div>
     </form>
@@ -110,13 +244,11 @@
     const bookedSeats = new Set(/*[[${bookedSeats}]]*/ []);
     const farePerSeat = /*[[${flight.fare}]]*/ 0;
 
-    // Actual per-class fares from the flight entity
     const economyFare        = /*[[${flight.economyFare ?: flight.fare}]]*/ 0;
     const premiumEconomyFare = /*[[${flight.premiumEconomyFare ?: (flight.fare * 1.5)}]]*/ 0;
     const businessFare       = /*[[${flight.businessFare ?: (flight.fare * 2.5)}]]*/ 0;
     const firstClassFare     = /*[[${flight.firstClassFare ?: (flight.fare * 4.0)}]]*/ 0;
 
-    // Four-section seat counts (derived server-side from aircraft config)
     const seatCounts = {
         firstClass:     /*[[${seatCounts.firstClass}]]*/ 0,
         business:       /*[[${seatCounts.business}]]*/ 0,
@@ -127,28 +259,20 @@
 <script>
     const seatMap             = document.getElementById('seatMap');
     const selectedSeatDisplay = document.getElementById('selectedSeatDisplay');
+    const selectedClassDisplay= document.getElementById('selectedClassDisplay');
+    const seatPriceDisplay    = document.getElementById('seatPriceDisplay');
     const totalFareDisplay    = document.getElementById('totalFareDisplay');
     const confirmBtn          = document.getElementById('confirmBtn');
     const seatForm            = document.getElementById('seatForm');
-    const cabinClassSelect    = document.getElementById('cabinClass');
+    const cabinClassInput     = document.getElementById('cabinClass');
     let selectedSeats = new Set();
 
-    // Cabin zone boundaries (cumulative index into allSeats[])
     const zones = [
-        { name: 'First Class',     count: seatCounts.firstClass,     color: '#d97706', border: '#b45309', cols: 4, aisle: 2, value: 'First Class'     },
-        { name: 'Business Class',  count: seatCounts.business,       color: '#9333ea', border: '#7e22ce', cols: 4, aisle: 2, value: 'Business Class'   },
-        { name: 'Premium Economy', count: seatCounts.premiumEconomy, color: '#0d9488', border: '#0f766e', cols: 5, aisle: 2, value: 'Premium Economy'  },
-        { name: 'Economy',         count: seatCounts.economy,        color: '#0284c7', border: '#0369a1', cols: 6, aisle: 3, value: 'Economy'          }
+        { name: 'First Class',     count: seatCounts.firstClass,     classBase: 'seat-first', cols: 4, aisle: 2, value: 'First Class', price: firstClassFare || (farePerSeat*4) },
+        { name: 'Business Class',  count: seatCounts.business,       classBase: 'seat-business', cols: 4, aisle: 2, value: 'Business Class', price: businessFare || (farePerSeat*2.5) },
+        { name: 'Premium Economy', count: seatCounts.premiumEconomy, classBase: 'seat-premium', cols: 5, aisle: 2, value: 'Premium Economy', price: premiumEconomyFare || (farePerSeat*1.5) },
+        { name: 'Economy',         count: seatCounts.economy,        classBase: 'seat-economy', cols: 6, aisle: 3, value: 'Economy', price: economyFare || farePerSeat }
     ];
-
-    // Build a seat→zone lookup: { seatLabel -> zone }
-    const seatZoneMap = {};
-    let idx = 0;
-    for (const zone of zones) {
-        for (let i = 0; i < zone.count && idx < allSeats.length; i++, idx++) {
-            seatZoneMap[allSeats[idx]] = zone;
-        }
-    }
 
     function renderSeats() {
         seatMap.innerHTML = '';
@@ -157,97 +281,117 @@
         for (const zone of zones) {
             if (zone.count <= 0) continue;
 
-            // Section header
+            const sectionWrapper = document.createElement('div');
+            sectionWrapper.className = 'w-100';
+            
+            // Section Header
             const header = document.createElement('div');
-            header.className = 'w-100 text-center fw-bold my-3 py-2 rounded-3 small text-uppercase tracking-wider';
-            header.style.backgroundColor = zone.color + '15'; // subtle tint
-            header.style.color = zone.color;
-            header.style.borderLeft = `4px solid ${zone.color}`;
-            header.textContent = `— ${zone.name} —`;
-            seatMap.appendChild(header);
+            header.className = 'text-center text-muted small fw-bold text-uppercase mb-4';
+            header.style.letterSpacing = '0.1em';
+            header.textContent = zone.name;
+            sectionWrapper.appendChild(header);
+            
+            const rowsContainer = document.createElement('div');
+            rowsContainer.className = 'd-flex flex-column gap-3';
 
             let zoneCount = 0;
+            let rowNumber = 1;
             while (zoneCount < zone.count && currentIndex < allSeats.length) {
                 const rowDiv = document.createElement('div');
-                rowDiv.className = 'd-flex gap-2 justify-content-center';
+                rowDiv.className = 'd-flex justify-content-between align-items-center w-100';
+
+                // Left block
+                const leftBlock = document.createElement('div');
+                leftBlock.className = 'd-flex gap-2 gap-md-3';
+                
+                // Row Number (Center)
+                const rowNumDiv = document.createElement('div');
+                rowNumDiv.className = 'text-muted small fw-bold text-center';
+                rowNumDiv.style.width = '30px';
+                rowNumDiv.textContent = rowNumber++;
+                
+                // Right block
+                const rightBlock = document.createElement('div');
+                rightBlock.className = 'd-flex gap-2 gap-md-3';
 
                 for (let j = 0; j < zone.cols && zoneCount < zone.count && currentIndex < allSeats.length; j++, currentIndex++, zoneCount++) {
-                    if (j === zone.aisle) {
-                        const spacer = document.createElement('div');
-                        spacer.style.width = '28px';
-                        rowDiv.appendChild(spacer);
+                    const btn = createSeatBtn(allSeats[currentIndex], zone);
+                    if (j < zone.aisle) {
+                        leftBlock.appendChild(btn);
+                    } else {
+                        rightBlock.appendChild(btn);
                     }
-                    createSeatBtn(allSeats[currentIndex], rowDiv, zone);
                 }
-                seatMap.appendChild(rowDiv);
+                
+                rowDiv.appendChild(leftBlock);
+                rowDiv.appendChild(rowNumDiv);
+                rowDiv.appendChild(rightBlock);
+                rowsContainer.appendChild(rowDiv);
             }
+            
+            sectionWrapper.appendChild(rowsContainer);
+            seatMap.appendChild(sectionWrapper);
         }
     }
 
-    function createSeatBtn(seat, rowDiv, zone) {
+    function createSeatBtn(seat, zone) {
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.textContent = seat;
-        btn.style.width = '38px';
-        btn.style.height = '38px';
-        btn.style.fontSize = '9px';
-        btn.style.borderRadius = '8px';
-        btn.style.fontWeight = '700';
-        btn.style.border = 'none';
-        btn.style.transition = 'all 0.2s ease';
-        btn.dataset.zone = zone.value;
+        btn.className = `seat-base ${zone.classBase}`;
+        
+        // Tooltip for seat number
+        const span = document.createElement('span');
+        span.textContent = seat;
+        span.style.fontSize = '10px';
+        span.style.fontWeight = 'bold';
+        btn.appendChild(span);
 
         if (bookedSeats.has(seat)) {
-            btn.style.backgroundColor = '#64748b';
-            btn.style.color = '#fff';
-            btn.style.opacity = '0.5';
-            btn.style.cursor = 'not-allowed';
+            btn.className = 'seat-base seat-occupied';
+            btn.innerHTML = '<i class="bi bi-x-lg"></i>';
             btn.disabled = true;
         } else {
-            btn.style.backgroundColor = zone.color;
-            btn.style.color = '#fff';
-            btn.style.cursor = 'pointer';
             btn.addEventListener('click', () => toggleSeat(seat, btn, zone));
         }
-        rowDiv.appendChild(btn);
+        return btn;
     }
 
     function toggleSeat(seat, btn, zone) {
         if (selectedSeats.has(seat)) {
             selectedSeats.delete(seat);
-            btn.style.backgroundColor = zone.color;
-            btn.style.transform = 'scale(1)';
+            btn.classList.remove('seat-selected');
+            btn.classList.add(zone.classBase);
+            btn.innerHTML = `<span style="font-size:10px; font-weight:bold;">${seat}</span>`;
         } else {
             selectedSeats.add(seat);
-            btn.style.backgroundColor = '#22c55e'; // selected color matches legend
-            btn.style.transform = 'scale(1.08)';
-            cabinClassSelect.value = zone.value;
+            btn.classList.remove(zone.classBase);
+            btn.classList.add('seat-selected');
+            btn.innerHTML = '<i class="bi bi-check-lg"></i>';
+            cabinClassInput.value = zone.value;
         }
-        updateSummary();
+        updateSummary(zone);
     }
 
-    function getFarePerSeat(cabinClass) {
-        switch (cabinClass) {
-            case 'First Class':     return firstClassFare     || (farePerSeat * 4.0);
-            case 'Business Class':  return businessFare       || (farePerSeat * 2.5);
-            case 'Premium Economy': return premiumEconomyFare || (farePerSeat * 1.5);
-            default:                return economyFare        || farePerSeat;
-        }
-    }
-
-    function updateSummary() {
+    function updateSummary(lastSelectedZone) {
         seatForm.querySelectorAll('input[name="selectedSeats"]').forEach(el => el.remove());
+        
         if (selectedSeats.size === 0) {
             selectedSeatDisplay.textContent = 'None';
+            selectedClassDisplay.textContent = 'Select a seat';
+            seatPriceDisplay.textContent = '₹0';
             totalFareDisplay.textContent = '₹0.00';
             confirmBtn.disabled = true;
         } else {
             const arr = [...selectedSeats];
             selectedSeatDisplay.textContent = arr.join(', ');
+            selectedClassDisplay.textContent = lastSelectedZone.name;
+            
+            // Format numbers to Indian locale string for nice commas
+            const perSeatFormatted = Number(lastSelectedZone.price).toLocaleString('en-IN', { maximumFractionDigits: 0 });
+            seatPriceDisplay.textContent = `₹${perSeatFormatted} /ea`;
 
-            const perSeat = getFarePerSeat(cabinClassSelect.value);
-            const total = arr.length * perSeat;
-            totalFareDisplay.textContent = '₹' + total.toFixed(2);
+            const total = arr.length * lastSelectedZone.price;
+            totalFareDisplay.textContent = '₹' + Number(total).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             confirmBtn.disabled = false;
 
             arr.forEach(s => {
@@ -262,7 +406,7 @@
 
     renderSeats();
 </script>
-<div th:replace="~{layout :: footer}"></div>
+
 <div th:replace="~{layout :: html_scripts}"></div>
 </body>
 </html>

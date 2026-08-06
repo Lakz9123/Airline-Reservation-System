@@ -4,208 +4,340 @@
 <body>
 <div th:replace="~{layout :: user_navbar}"></div>
 
-<main class="container">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card border-0 mb-4">
-                <div class="card-body p-4 p-md-5">
-                    <div class="mb-4">
-                        <span class="eyebrow-label">Secure Checkout</span>
-                        <h2 class="section-title mb-1"><i class="bi bi-credit-card text-primary me-2"></i>Payment Details</h2>
-                        <p class="text-muted small">Complete your booking by selecting add-ons and entering payment info.</p>
+<style>
+    :root {
+        --sky-navy: #0f1c2c;
+        --sky-blue: #005cab;
+        --sky-light: #f6faff;
+        
+        --glass-bg: rgba(255, 255, 255, 0.85);
+        --glass-border: rgba(224, 224, 224, 0.4);
+        --glass-shadow: 0px 4px 20px rgba(0, 0, 0, 0.05);
+    }
+    
+    body {
+        background-color: var(--sky-light) !important;
+        background-image: none !important;
+    }
+    body::before {
+        display: none !important;
+    }
+
+    .title-display {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--sky-navy);
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+    }
+
+    .glass-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(16px);
+        border: 1px solid var(--glass-border);
+        box-shadow: var(--glass-shadow);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    @media (max-width: 768px) {
+        .glass-card { padding: 1.5rem; }
+    }
+
+    .section-title {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--sky-navy);
+    }
+
+    /* Timeline */
+    .flight-timeline-node {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: var(--sky-blue);
+        border: 2px solid #ffffff;
+        box-shadow: 0 0 0 2px var(--sky-blue);
+    }
+    .flight-timeline-line {
+        flex-grow: 1;
+        height: 2px;
+        background-color: var(--sky-navy);
+        opacity: 0.2;
+        margin: 0 8px;
+    }
+    
+    /* Baggage Custom Inputs */
+    .baggage-input-wrapper {
+        border: 1px solid rgba(116, 119, 125, 0.2);
+        border-radius: 12px;
+        padding: 1rem;
+        background-color: #ffffff;
+        transition: all 0.2s;
+    }
+    .baggage-input-wrapper:focus-within {
+        border-color: var(--sky-blue);
+        box-shadow: 0 0 0 4px rgba(0, 92, 171, 0.1);
+    }
+
+    /* Form Controls Override */
+    .form-control {
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        border-color: rgba(116, 119, 125, 0.3);
+    }
+    .form-control:focus {
+        border-color: var(--sky-blue);
+        box-shadow: 0 0 0 0.25rem rgba(0, 92, 171, 0.25);
+    }
+    
+    /* Switch */
+    .form-switch .form-check-input {
+        width: 3em;
+        height: 1.5em;
+    }
+    .form-switch .form-check-input:checked {
+        background-color: var(--sky-blue);
+        border-color: var(--sky-blue);
+    }
+    
+    /* Coupons */
+    .coupon-card {
+        border: 1px solid rgba(116, 119, 125, 0.2);
+        border-radius: 12px;
+        background-color: #ffffff;
+        padding: 1rem;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    
+    .sticky-sidebar {
+        position: sticky;
+        top: 100px;
+    }
+</style>
+
+<main class="container-fluid px-4 px-md-5 pt-4 pb-5" style="max-width: 1280px; margin: 0 auto;">
+    
+    <div class="mb-5">
+        <h1 class="title-display mb-2">Complete Payment</h1>
+        <p class="text-muted fs-5">Review your flight details and securely complete your booking.</p>
+    </div>
+    
+    <form th:action="@{/user/payment/{id}(id=${flight.id})}" method="post" id="paymentForm">
+        <th:block th:each="seat : ${selectedSeats}">
+            <input type="hidden" name="selectedSeats" th:value="${seat}">
+        </th:block>
+        <input type="hidden" name="cabinClass" th:value="${cabinClass}">
+        <input type="hidden" name="appliedCouponCode" id="appliedCouponCode" value="">
+        <input type="hidden" name="extraBags" id="formExtraBags" value="0">
+        <input type="hidden" name="extraWeightKg" id="formExtraWeightKg" value="0">
+        
+        <div class="row g-5">
+            <!-- Left Column: Payment Flow -->
+            <div class="col-lg-7 d-flex flex-column gap-3">
+                
+                <!-- Flight Summary Card -->
+                <section class="glass-card">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="section-title mb-0">Flight Summary</h2>
+                        <span class="badge rounded-pill fw-bold text-uppercase px-3 py-2" style="background-color: #ebf5ff; color: var(--sky-blue);" th:text="${cabinClass}">Class</span>
                     </div>
-
-                    <!-- Flight Summary -->
-                    <h5 class="fw-bold section-title mb-3 pb-2 border-bottom">Flight Summary</h5>
-                    <div class="row mb-4 g-3">
-                        <div class="col-md-6">
-                            <p class="mb-1 text-muted small">Flight: <strong class="text-dark dark:text-white" th:text="${flight.flightNumber} + ' (' + ${flight.airline.airlineName} + ')'"></strong></p>
-                            <p class="mb-1 text-muted small">Route: <strong class="text-dark dark:text-white" th:text="${flight.originAirport.airportCode} + ' → ' + ${flight.destinationAirport.airportCode}"></strong></p>
-                            <p class="mb-1 text-muted small">Passenger: <strong class="text-dark dark:text-white" th:text="${#authentication.principal.username}"></strong></p>
-                        </div>
-                        <div class="col-md-6">
-                            <p class="mb-1 text-muted small">Departure: <strong class="text-dark dark:text-white" th:text="${#temporals.format(flight.departureDateTime, 'dd MMM yyyy HH:mm')}"></strong></p>
-                            <p class="mb-1 text-muted small">Cabin & Seats: <strong class="text-dark dark:text-white" th:text="${cabinClass} + ' | ' + ${#strings.listJoin(selectedSeats, ', ')}"></strong></p>
-                        </div>
-                    </div>
-
-                    <!-- Baggage Section -->
-                    <h5 class="fw-bold section-title mb-3 pb-2 border-bottom">Baggage Add-ons</h5>
-                    <div class="card bg-light border-0 p-4 mb-4">
-                        <div class="d-flex justify-content-between mb-3 align-items-center flex-wrap gap-2">
-                            <span class="text-muted small fw-bold"><i class="bi bi-briefcase-fill me-1 text-primary"></i> INCLUDED ALLOWANCE:</span>
-                            <span class="fw-bold text-dark small">
-                                <span th:text="${baggageAllowance.cabinBagWeightLimit} + ' kg Cabin, '"></span>
-                                <span th:text="${baggageAllowance.checkedBagCountIncluded} + ' Checked Bag(s) up to ' + ${baggageAllowance.checkedBagWeightLimit} + ' kg'"></span>
-                            </span>
-                        </div>
-                        <hr class="my-2" style="border-color: var(--border) !important;">
-                        <div class="row g-3 align-items-center mb-3">
-                            <div class="col-md-7">
-                                <label for="extraBagsInput" class="form-label small fw-bold text-muted mb-0">EXTRA CHECKED BAG(S) (₹<span th:text="${#numbers.formatDecimal(baggagePricing.costPerExtraBag, 1, 0)}"></span>/bag)</label>
-                            </div>
-                            <div class="col-md-5">
-                                <input type="number" class="form-control" id="extraBagsInput" min="0" value="0" onchange="recalculateFare()">
-                            </div>
-                        </div>
-                        <div class="row g-3 align-items-center">
-                            <div class="col-md-7">
-                                <label for="extraWeightKgInput" class="form-label small fw-bold text-muted mb-0">EXTRA WEIGHT (₹<span th:text="${#numbers.formatDecimal(baggagePricing.costPerExtraKg, 1, 0)}"></span>/kg)</label>
-                            </div>
-                            <div class="col-md-5">
-                                <input type="number" class="form-control" id="extraWeightKgInput" min="0" value="0" onchange="recalculateFare()">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Fare Breakdown -->
-                    <h5 class="fw-bold section-title mb-3 pb-2 border-bottom">Fare Breakdown</h5>
-                    <div class="card bg-light border-0 p-4 mb-4" id="fareBreakdown">
-                        <div class="d-flex justify-content-between mb-2 small text-muted">
-                            <span>Base Fare:</span>
-                            <span class="fw-semibold text-dark">₹<span th:text="${#numbers.formatDecimal(originalFare, 1, 2)}">0.00</span></span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-2 small text-muted">
-                            <span>Taxes (18%):</span>
-                            <span class="fw-semibold text-dark">₹<span th:text="${#numbers.formatDecimal(taxes, 1, 2)}">0.00</span></span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-2 small text-muted">
-                            <span>Convenience Fee:</span>
-                            <span class="fw-semibold text-dark">₹<span th:text="${#numbers.formatDecimal(convenienceFee, 1, 2)}">0.00</span></span>
-                        </div>
-
-                        <div id="baggageCostRow" class="d-none justify-content-between mb-2 small text-muted">
-                            <span>Extra Baggage:</span>
-                            <span class="fw-semibold text-dark">+₹<span id="baggageCostDisplay">0.00</span></span>
+                    
+                    <div class="d-flex flex-column flex-md-row gap-4 justify-content-between align-items-start align-items-md-center">
+                        <!-- Origin -->
+                        <div class="d-flex flex-column">
+                            <span class="fs-1 fw-bold" style="color: var(--sky-navy); line-height: 1;" th:text="${flight.originAirport.airportCode}">JFK</span>
+                            <span class="text-muted mt-2 fw-semibold" th:text="${flight.originAirport.city} + ', ' + ${#temporals.format(flight.departureDateTime, 'HH:mm')}">New York, 08:30 AM</span>
+                            <span class="small text-muted mt-1 fw-bold text-uppercase" th:text="${#temporals.format(flight.departureDateTime, 'dd MMM yyyy')}">Oct 12, 2024</span>
                         </div>
                         
-                        <div id="couponDiscountRow" class="d-none justify-content-between mb-2 small text-muted">
-                            <span>Coupon Discount:</span>
-                            <span class="text-success fw-bold">-₹<span id="discountAmountDisplay">0.00</span></span>
+                        <!-- Timeline -->
+                        <div class="flex-grow-1 d-none d-sm-flex align-items-center px-4 w-100 w-md-auto">
+                            <div class="flight-timeline-node"></div>
+                            <div class="flight-timeline-line"></div>
+                            <div class="d-flex flex-column align-items-center mx-3">
+                                <i class="bi bi-airplane-fill fs-4 text-muted" style="transform: rotate(90deg);"></i>
+                                <span class="small text-muted mt-1 fw-bold" th:text="${flight.flightNumber}">FL-123</span>
+                            </div>
+                            <div class="flight-timeline-line"></div>
+                            <div class="flight-timeline-node"></div>
                         </div>
                         
-                        <hr class="my-2" style="border-color: var(--border) !important;">
+                        <!-- Destination -->
+                        <div class="d-flex flex-column text-md-end">
+                            <span class="fs-1 fw-bold" style="color: var(--sky-navy); line-height: 1;" th:text="${flight.destinationAirport.airportCode}">LHR</span>
+                            <span class="text-muted mt-2 fw-semibold" th:text="${flight.destinationAirport.city}">London</span>
+                            <span class="small text-muted mt-1 fw-bold text-uppercase">Seats: <span th:text="${#strings.listJoin(selectedSeats, ', ')}"></span></span>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Baggage Add-ons -->
+                <section class="glass-card">
+                    <h2 class="section-title mb-4">Baggage Options</h2>
+                    
+                    <div class="baggage-input-wrapper mb-3" style="background-color: #ebf5ff; border-color: rgba(0, 92, 171, 0.2);">
                         <div class="d-flex justify-content-between align-items-center">
-                            <span class="text-muted fw-bold">Final Amount:</span>
-                            <span class="fw-bold text-success fs-5">
-                                ₹<span id="finalFareDisplay" th:text="${#numbers.formatDecimal(totalFare, 1, 2)}">0.00</span>
-                            </span>
-                        </div>
-                        <div id="savingsRow" class="d-none text-end mt-1">
-                            <span class="badge bg-success">You Saved ₹<span id="savingsAmountDisplay">0.00</span></span>
-                        </div>
-                        
-                        <hr id="walletDivider" class="d-none my-2" style="border-color: var(--border) !important;">
-                        <div id="walletDiscountRow" class="d-none justify-content-between mb-2 small">
-                            <span class="text-muted"><i class="bi bi-wallet2 text-primary"></i> Wallet Applied:</span>
-                            <span class="text-primary fw-bold">-₹<span id="walletAppliedDisplay">0.00</span></span>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center mt-2">
-                            <span class="text-dark fw-bold fs-5">Amount to Pay:</span>
-                            <span class="fw-bold text-dark fs-4">
-                                ₹<span id="amountToPayDisplay" th:text="${#numbers.formatDecimal(totalFare, 1, 2)}">0.00</span>
-                            </span>
+                            <div>
+                                <div class="fw-bold fs-5" style="color: var(--sky-navy);">Standard Allowance</div>
+                                <div class="text-muted small fw-semibold mt-1">
+                                    <span th:text="${baggageAllowance.cabinBagWeightLimit} + ' kg Cabin, '"></span>
+                                    <span th:text="${baggageAllowance.checkedBagCountIncluded} + ' Checked Bag(s) up to ' + ${baggageAllowance.checkedBagWeightLimit} + ' kg'"></span>
+                                </div>
+                            </div>
+                            <div class="fw-bold fs-5 text-success">Included</div>
                         </div>
                     </div>
-
-                    <!-- Coupon Section -->
-                    <h5 class="fw-bold section-title mb-3 pb-2 border-bottom">Apply Coupon</h5>
-                    <div id="couponMessageArea" class="d-none alert p-2.5 small mb-3 border-0 rounded-3"></div>
-
-                    <div class="input-group mb-4">
-                        <input type="text" id="couponCodeInput" class="form-control text-uppercase" placeholder="Enter promo code" style="border-top-right-radius: 0px !important; border-bottom-right-radius: 0px !important;">
-                        <button class="btn btn-outline-primary px-4 fw-bold" type="button" id="applyCouponBtn" onclick="applyCouponCode()">Apply</button>
-                        <button class="btn btn-outline-danger px-4 fw-bold d-none" type="button" id="removeCouponBtn" onclick="removeCoupon()">Remove</button>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="baggage-input-wrapper h-100">
+                                <label class="form-label small fw-bold text-muted mb-2 text-uppercase">Extra Checked Bag(s) (+₹<span th:text="${#numbers.formatDecimal(baggagePricing.costPerExtraBag, 1, 0)}"></span>/ea)</label>
+                                <input type="number" class="form-control fw-bold fs-5" id="extraBagsInput" min="0" value="0" onchange="recalculateFare()">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="baggage-input-wrapper h-100">
+                                <label class="form-label small fw-bold text-muted mb-2 text-uppercase">Extra Weight (+₹<span th:text="${#numbers.formatDecimal(baggagePricing.costPerExtraKg, 1, 0)}"></span>/kg)</label>
+                                <input type="number" class="form-control fw-bold fs-5" id="extraWeightKgInput" min="0" value="0" onchange="recalculateFare()">
+                            </div>
+                        </div>
                     </div>
+                </section>
 
-                    <!-- Available Coupons -->
-                    <div th:if="${availableCoupons != null && !availableCoupons.isEmpty()}" class="mb-4">
-                        <p class="text-muted small fw-bold mb-2 text-uppercase tracking-wider">Available Coupons</p>
-                        <div class="row g-3">
-                            <div th:each="coupon : ${availableCoupons}" class="col-md-6">
-                                <div class="card h-100 border-primary" style="border-style: dashed !important; border-width: 1.5px !important; background: rgba(14, 165, 233, 0.02) !important;">
-                                    <div class="card-body p-3 d-flex flex-column justify-content-between">
-                                        <div class="d-flex justify-content-between align-items-center mb-2 gap-2">
-                                            <span class="badge bg-primary-subtle text-primary border px-2.5 py-1.5" th:text="${coupon.code}">CODE</span>
-                                            <button type="button" class="btn btn-sm btn-primary" th:attr="onclick=|document.getElementById('couponCodeInput').value='${coupon.code}'; applyCouponCode();|">Apply</button>
-                                        </div>
-                                        <div>
-                                            <p class="mb-1 text-dark fw-bold small">
-                                                <span th:if="${coupon.discountType.name() == 'FLAT'}">Flat ₹<span th:text="${coupon.discountValue}"></span> Off</span>
-                                                <span th:if="${coupon.discountType.name() == 'PERCENTAGE'}"><span th:text="${coupon.discountValue}"></span>% Off</span>
-                                            </p>
-                                            <p class="mb-0 text-muted small" style="font-size: 0.75rem;">
-                                                Valid until <span th:text="${#temporals.format(coupon.expiryDate, 'dd MMM yyyy')}"></span>
-                                            </p>
-                                        </div>
+                <!-- Offers & Promos -->
+                <section class="glass-card">
+                    <h2 class="section-title mb-4">Offers & Promos</h2>
+                    
+                    <div id="couponMessageArea" class="d-none alert p-3 small mb-4 border-0 rounded-3 fw-bold"></div>
+                    
+                    <div class="d-flex gap-2 mb-4">
+                        <input type="text" id="couponCodeInput" class="form-control form-control-lg text-uppercase fs-6" placeholder="Enter promo code" style="background-color: #ffffff;">
+                        <button class="btn btn-primary px-4 fw-bold text-uppercase" style="background-color: var(--sky-blue); border: none;" type="button" id="applyCouponBtn" onclick="applyCouponCode()">Apply</button>
+                        <button class="btn btn-outline-danger px-4 fw-bold text-uppercase d-none" type="button" id="removeCouponBtn" onclick="removeCoupon()">Remove</button>
+                    </div>
+                    
+                    <div th:if="${availableCoupons != null && !availableCoupons.isEmpty()}">
+                        <div class="row g-3 overflow-auto flex-nowrap pb-2" style="margin-left: -0.75rem; margin-right: -0.75rem; padding-left: 0.75rem; padding-right: 0.75rem;">
+                            <div th:each="coupon : ${availableCoupons}" class="col-auto" style="min-width: 280px;">
+                                <div class="coupon-card">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div class="badge px-2 py-1 fs-6 fw-bold text-uppercase" style="background-color: #ebf5ff; color: var(--sky-blue);" th:text="${coupon.code}">CODE</div>
                                     </div>
+                                    <p class="mb-4 text-dark fw-bold fs-5 mt-2">
+                                        <span th:if="${coupon.discountType.name() == 'FLAT'}">Flat ₹<span th:text="${coupon.discountValue}"></span> Off</span>
+                                        <span th:if="${coupon.discountType.name() == 'PERCENTAGE'}"><span th:text="${coupon.discountValue}"></span>% Off</span>
+                                        <br><span class="text-muted small fw-semibold" style="font-size: 0.8rem;">Valid until <span th:text="${#temporals.format(coupon.expiryDate, 'dd MMM yyyy')}"></span></span>
+                                    </p>
+                                    <button type="button" class="btn btn-link p-0 text-decoration-none text-start fw-bold text-uppercase small" style="color: var(--sky-blue); letter-spacing: 0.05em;" th:attr="onclick=|document.getElementById('couponCodeInput').value='${coupon.code}'; applyCouponCode();|">Tap to Apply</button>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </section>
+                
+                <!-- Wallet Checkbox -->
+                <section class="glass-card py-4" th:if="${walletBalance != null && walletBalance > 0}">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-4">
+                            <i class="bi bi-wallet2 fs-1" style="color: var(--sky-navy);"></i>
+                            <div>
+                                <div class="fw-bold fs-5" style="color: var(--sky-navy);">Use SkyFly Wallet Balance</div>
+                                <div class="text-muted fw-semibold">Available: ₹<span id="walletAvailableText" th:text="${#numbers.formatDecimal(walletBalance, 1, 2)}"></span></div>
+                            </div>
+                        </div>
+                        <div class="form-check form-switch m-0">
+                            <input class="form-check-input" type="checkbox" role="switch" id="useWalletBalance" name="useWalletBalance" value="true" onchange="recalculateFare()">
+                        </div>
+                    </div>
+                </section>
 
-                    <!-- Payment Information Form -->
-                    <h5 class="fw-bold section-title mb-3 pb-2 border-bottom mt-5">Payment Information</h5>
-                    <form th:action="@{/user/payment/{id}(id=${flight.id})}" method="post" id="paymentForm">
-                        <th:block th:each="seat : ${selectedSeats}">
-                            <input type="hidden" name="selectedSeats" th:value="${seat}">
-                        </th:block>
-                        <input type="hidden" name="cabinClass" th:value="${cabinClass}">
-                        <input type="hidden" name="appliedCouponCode" id="appliedCouponCode" value="">
-                        <input type="hidden" name="extraBags" id="formExtraBags" value="0">
-                        <input type="hidden" name="extraWeightKg" id="formExtraWeightKg" value="0">
-                        
-                        <!-- Wallet Checkbox -->
-                        <div class="card bg-light border-0 mb-4" th:if="${walletBalance != null && walletBalance > 0}">
-                            <div class="card-body py-3 px-4">
-                                <div class="form-check form-switch d-flex align-items-center mb-0">
-                                    <input class="form-check-input fs-4 mt-0 me-3" type="checkbox" role="switch" id="useWalletBalance" name="useWalletBalance" value="true" onchange="recalculateFare()">
-                                    <label class="form-check-label d-flex flex-column" for="useWalletBalance" style="cursor:pointer;">
-                                        <span class="fw-bold text-dark">Use Wallet Balance</span>
-                                        <span class="text-muted small">Available: ₹<span id="walletAvailableText" th:text="${#numbers.formatDecimal(walletBalance, 1, 2)}"></span></span>
-                                    </label>
-                                </div>
-                            </div>
+                <!-- Payment Information Form -->
+                <section class="glass-card">
+                    <h2 class="section-title mb-4">Payment Information</h2>
+                    
+                    <div class="mb-4">
+                        <label class="form-label text-muted small fw-bold text-uppercase tracking-wider">Card Number</label>
+                        <input type="text" class="form-control form-control-lg fs-6" placeholder="0000 0000 0000 0000" required>
+                    </div>
+                    
+                    <div class="row mb-4 g-3">
+                        <div class="col-6">
+                            <label class="form-label text-muted small fw-bold text-uppercase tracking-wider">Expiry Date</label>
+                            <input type="text" class="form-control form-control-lg fs-6" placeholder="MM/YY" required>
                         </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label text-muted small fw-bold">CARD NUMBER</label>
-                            <input type="text" class="form-control" placeholder="0000 0000 0000 0000" required>
+                        <div class="col-6">
+                            <label class="form-label text-muted small fw-bold text-uppercase tracking-wider">CVV</label>
+                            <input type="password" class="form-control form-control-lg fs-6" placeholder="123" required>
                         </div>
-                        
-                        <div class="row mb-3">
-                            <div class="col-6">
-                                <label class="form-label text-muted small fw-bold">EXPIRY DATE</label>
-                                <input type="text" class="form-control" placeholder="MM/YY" required>
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label text-muted small fw-bold">CVV</label>
-                                <input type="password" class="form-control" placeholder="123" required>
-                            </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label text-muted small fw-bold text-uppercase tracking-wider">Cardholder Name</label>
+                        <input type="text" class="form-control form-control-lg fs-6" placeholder="John Doe" required>
+                    </div>
+                </section>
+
+            </div>
+            
+            <!-- Right Column: Fare Breakdown -->
+            <div class="col-lg-5">
+                <div class="glass-card sticky-sidebar">
+                    <h2 class="section-title mb-4">Fare Breakdown</h2>
+                    
+                    <div class="d-flex flex-column gap-3 fs-6">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-muted fw-semibold">Base Fare</span>
+                            <span class="fw-bold" style="color: var(--sky-navy);">₹<span th:text="${#numbers.formatDecimal(originalFare, 1, 2)}">0.00</span></span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-muted fw-semibold">Taxes & Fees (18%)</span>
+                            <span class="fw-bold" style="color: var(--sky-navy);">₹<span th:text="${#numbers.formatDecimal(taxes, 1, 2)}">0.00</span></span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-muted fw-semibold">Convenience Fee</span>
+                            <span class="fw-bold" style="color: var(--sky-navy);">₹<span th:text="${#numbers.formatDecimal(convenienceFee, 1, 2)}">0.00</span></span>
                         </div>
 
-                        <div class="mb-4">
-                            <label class="form-label text-muted small fw-bold">CARDHOLDER NAME</label>
-                            <input type="text" class="form-control" placeholder="John Doe" required>
+                        <div id="baggageCostRow" class="d-none justify-content-between align-items-center">
+                            <span class="text-muted fw-semibold">Extra Baggage</span>
+                            <span class="fw-bold" style="color: var(--sky-navy);">+₹<span id="baggageCostDisplay">0.00</span></span>
                         </div>
-
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <button type="submit" class="btn-primary-theme w-100 py-3">
-                                    Pay ₹<span id="payButtonAmount" th:text="${#numbers.formatDecimal(totalFare, 1, 2)}">0.00</span> & Confirm
-                                </button>
-                            </div>
-                            <div class="col-md-6">
-                                <a th:href="@{/user/book/{id}(id=${flight.id})}" class="btn-outline-theme w-100 py-3">
-                                    Cancel & Back
-                                </a>
-                            </div>
+                        
+                        <div id="couponDiscountRow" class="d-none justify-content-between align-items-center" style="color: var(--sky-blue);">
+                            <span class="fw-bold">Coupon Discount</span>
+                            <span class="fw-bold">-₹<span id="discountAmountDisplay">0.00</span></span>
                         </div>
-                    </form>
+                        
+                        <div id="walletDiscountRow" class="d-none justify-content-between align-items-center" style="color: var(--sky-blue);">
+                            <span class="fw-bold">Wallet Applied</span>
+                            <span class="fw-bold">-₹<span id="walletAppliedDisplay">0.00</span></span>
+                        </div>
+                        
+                        <hr class="my-3" style="border-color: rgba(116, 119, 125, 0.2);">
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <span class="section-title mb-0 fs-4">Total Amount</span>
+                            <span class="title-display fs-2" id="amountToPayDisplay" th:text="'₹' + ${#numbers.formatDecimal(totalFare, 1, 2)}">₹0.00</span>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" form="paymentForm" class="btn btn-primary w-100 py-3 fs-5 fw-bold text-uppercase rounded-3 shadow" style="background-color: var(--sky-blue); border: none; letter-spacing: 0.05em;">
+                        Pay Now
+                    </button>
+                    
+                    <div class="text-center mt-4 text-muted small fw-semibold d-flex justify-content-center align-items-center gap-2">
+                        <i class="bi bi-lock-fill"></i> Secure 256-bit SSL encryption
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </form>
 </main>
 
 <script th:inline="javascript">
@@ -215,6 +347,10 @@
     const costPerExtraKg = /*[[${baggagePricing.costPerExtraKg}]]*/ 0.0;
     let currentCouponDiscount = 0.0;
     
+    function formatMoney(num) {
+        return Number(num).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
     function recalculateFare() {
         const extraBags = parseInt(document.getElementById('extraBagsInput')?.value || 0);
         const extraKg = parseInt(document.getElementById('extraWeightKgInput')?.value || 0);
@@ -227,14 +363,13 @@
         if (baggageCost > 0) {
             document.getElementById('baggageCostRow').classList.remove('d-none');
             document.getElementById('baggageCostRow').classList.add('d-flex');
-            document.getElementById('baggageCostDisplay').innerText = baggageCost.toFixed(2);
+            document.getElementById('baggageCostDisplay').innerText = formatMoney(baggageCost);
         } else {
             document.getElementById('baggageCostRow').classList.add('d-none');
             document.getElementById('baggageCostRow').classList.remove('d-flex');
         }
 
         let finalFare = baseTotalFare + baggageCost - currentCouponDiscount;
-        document.getElementById('finalFareDisplay').innerText = finalFare.toFixed(2);
         
         const useWalletCheckbox = document.getElementById('useWalletBalance');
         let walletApplied = 0.0;
@@ -243,18 +378,20 @@
             walletApplied = Math.min(finalFare, walletBalance);
             finalFare -= walletApplied;
             
-            document.getElementById('walletDivider').classList.remove('d-none');
             document.getElementById('walletDiscountRow').classList.remove('d-none');
             document.getElementById('walletDiscountRow').classList.add('d-flex');
-            document.getElementById('walletAppliedDisplay').innerText = walletApplied.toFixed(2);
+            document.getElementById('walletAppliedDisplay').innerText = formatMoney(walletApplied);
         } else {
-            document.getElementById('walletDivider').classList.add('d-none');
             document.getElementById('walletDiscountRow').classList.add('d-none');
             document.getElementById('walletDiscountRow').classList.remove('d-flex');
         }
         
-        document.getElementById('amountToPayDisplay').innerText = finalFare.toFixed(2);
-        document.getElementById('payButtonAmount').innerText = finalFare.toFixed(2);
+        const totalEl = document.getElementById('amountToPayDisplay');
+        totalEl.style.opacity = '0.5';
+        setTimeout(() => {
+            totalEl.innerText = '₹' + formatMoney(finalFare);
+            totalEl.style.opacity = '1';
+        }, 150);
     }
     
     function applyCouponCode() {
@@ -286,24 +423,13 @@
             
             if (data.valid) {
                 msgArea.classList.add('alert-success');
-                msgArea.innerHTML = `<strong>${data.message}</strong>`;
+                msgArea.innerHTML = `<i class="bi bi-check-circle-fill me-2"></i>${data.message}`;
                 
-                // Update Fare Breakdown
                 document.getElementById('couponDiscountRow').classList.remove('d-none');
                 document.getElementById('couponDiscountRow').classList.add('d-flex');
-                document.getElementById('discountAmountDisplay').innerText = data.discountAmount.toFixed(2);
+                document.getElementById('discountAmountDisplay').innerText = formatMoney(data.discountAmount);
                 
                 currentCouponDiscount = data.discountAmount;
-                const extraBags = parseInt(document.getElementById('extraBagsInput')?.value || 0);
-                const extraKg = parseInt(document.getElementById('extraWeightKgInput')?.value || 0);
-                const baggageCost = (extraBags * costPerExtraBag) + (extraKg * costPerExtraKg);
-                
-                const finalBeforeWallet = baseTotalFare + baggageCost - currentCouponDiscount;
-                document.getElementById('finalFareDisplay').innerText = finalBeforeWallet.toFixed(2);
-                
-                document.getElementById('savingsRow').classList.remove('d-none');
-                document.getElementById('savingsAmountDisplay').innerText = data.discountAmount.toFixed(2);
-                
                 document.getElementById('appliedCouponCode').value = data.code;
                 
                 document.getElementById('applyCouponBtn').classList.add('d-none');
@@ -311,10 +437,9 @@
                 document.getElementById('couponCodeInput').readOnly = true;
                 
                 recalculateFare();
-                
             } else {
                 msgArea.classList.add('alert-danger');
-                msgArea.innerText = data.message;
+                msgArea.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-2"></i>${data.message}`;
             }
         })
         .catch(err => {
@@ -334,8 +459,6 @@
         
         document.getElementById('couponDiscountRow').classList.add('d-none');
         document.getElementById('couponDiscountRow').classList.remove('d-flex');
-        
-        document.getElementById('savingsRow').classList.add('d-none');
         
         currentCouponDiscount = 0.0;
         recalculateFare();
