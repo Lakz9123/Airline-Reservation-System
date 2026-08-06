@@ -19,12 +19,7 @@
     }
     
     body {
-        background-color: var(--sky-light) !important;
-        background-image: none !important;
         padding-bottom: 120px; /* Space for fixed bottom bar */
-    }
-    body::before {
-        display: none !important; 
     }
 
     /* Typography */
@@ -303,19 +298,19 @@
                 // Left block
                 const leftBlock = document.createElement('div');
                 leftBlock.className = 'd-flex gap-2';
-                leftBlock.style.width = '140px';
+                leftBlock.style.flex = '0 0 160px';
                 leftBlock.style.justifyContent = 'flex-end';
                 
                 // Row Number (Center Aisle)
                 const rowNumDiv = document.createElement('div');
                 rowNumDiv.className = 'text-muted small fw-bold text-center';
-                rowNumDiv.style.width = '24px';
+                rowNumDiv.style.flex = '0 0 30px';
                 rowNumDiv.textContent = rowNumber++;
                 
                 // Right block
                 const rightBlock = document.createElement('div');
                 rightBlock.className = 'd-flex gap-2';
-                rightBlock.style.width = '140px';
+                rightBlock.style.flex = '0 0 160px';
                 rightBlock.style.justifyContent = 'flex-start';
 
                 for (let j = 0; j < zone.cols && zoneCount < zone.count && currentIndex < allSeats.length; j++, currentIndex++, zoneCount++) {
