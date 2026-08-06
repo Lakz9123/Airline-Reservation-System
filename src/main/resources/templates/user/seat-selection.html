@@ -298,21 +298,25 @@
             let rowNumber = 1;
             while (zoneCount < zone.count && currentIndex < allSeats.length) {
                 const rowDiv = document.createElement('div');
-                rowDiv.className = 'd-flex justify-content-between align-items-center w-100';
+                rowDiv.className = 'd-flex justify-content-center align-items-center w-100 gap-2 gap-md-4';
 
                 // Left block
                 const leftBlock = document.createElement('div');
-                leftBlock.className = 'd-flex gap-2 gap-md-3';
+                leftBlock.className = 'd-flex gap-2';
+                leftBlock.style.width = '140px';
+                leftBlock.style.justifyContent = 'flex-end';
                 
-                // Row Number (Center)
+                // Row Number (Center Aisle)
                 const rowNumDiv = document.createElement('div');
                 rowNumDiv.className = 'text-muted small fw-bold text-center';
-                rowNumDiv.style.width = '30px';
+                rowNumDiv.style.width = '24px';
                 rowNumDiv.textContent = rowNumber++;
                 
                 // Right block
                 const rightBlock = document.createElement('div');
-                rightBlock.className = 'd-flex gap-2 gap-md-3';
+                rightBlock.className = 'd-flex gap-2';
+                rightBlock.style.width = '140px';
+                rightBlock.style.justifyContent = 'flex-start';
 
                 for (let j = 0; j < zone.cols && zoneCount < zone.count && currentIndex < allSeats.length; j++, currentIndex++, zoneCount++) {
                     const btn = createSeatBtn(allSeats[currentIndex], zone);
