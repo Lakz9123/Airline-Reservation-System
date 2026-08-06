@@ -3,135 +3,657 @@
 <head th:replace="~{layout :: html_head('Search Flights')}"></head>
 <body>
 <div th:replace="~{layout :: user_navbar}"></div>
-<main class="container">
-    <div class="row mb-4">
-        <div class="col-12">
-            <span class="eyebrow-label">Book Your Next Destination</span>
-            <h1 class="section-title mb-1">Search Flights</h1>
-            <p class="text-muted small">Explore and compare prices, flight timings, and find the perfect journey.</p>
-        </div>
-    </div>
 
-    <!-- Search Form -->
-    <div class="card border-0 mb-5">
-        <div class="card-body p-4 p-md-5">
-            <form th:action="@{/user/search/results}" method="get" class="row g-3 align-items-end">
-                <div class="col-md-3">
-                    <label class="form-label fw-bold text-uppercase small text-muted">From (Origin)</label>
-                    <select class="form-select" name="originId" required>
+<!-- Custom styles to match the premium Tailwind design from the ZIP exactly -->
+<style>
+    :root {
+        --sky-elite-navy: #0f1c2c;
+        --sky-elite-blue: #005cab;
+        --sky-elite-light: #f6faff;
+        --sky-elite-border: rgba(15, 28, 44, 0.1);
+    }
+    
+    body {
+        background-color: var(--sky-elite-light) !important;
+        background-image: none !important;
+    }
+    body::before {
+        display: none !important; /* Disable the layout's global background gradient overlay */
+    }
+
+    .search-container {
+        padding-top: 2rem;
+        padding-bottom: 5rem;
+    }
+
+    /* Condensed Hero Search Bar */
+    .hero-search-bar {
+        background: #ffffff;
+        border: 1px solid var(--sky-elite-border);
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        padding: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .hero-input-group {
+        position: relative;
+    }
+    .hero-input-group i.icon-left {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #74777d;
+        font-size: 1.25rem;
+    }
+    .hero-input-group .form-control, 
+    .hero-input-group .form-select {
+        height: 56px;
+        padding-left: 3rem;
+        background-color: var(--sky-elite-light) !important;
+        border: 1px solid rgba(116, 119, 125, 0.3) !important;
+        border-radius: 8px !important;
+        font-size: 1rem !important;
+        color: var(--sky-elite-navy) !important;
+        box-shadow: none !important;
+    }
+    .hero-input-group .form-control:focus, 
+    .hero-input-group .form-select:focus {
+        border-color: var(--sky-elite-blue) !important;
+        box-shadow: 0 0 0 1px var(--sky-elite-blue) !important;
+    }
+    
+    .swap-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #d8e4f0;
+        color: var(--sky-elite-blue);
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        flex-shrink: 0;
+    }
+    .swap-btn:hover {
+        background-color: var(--sky-elite-blue);
+        color: #ffffff;
+    }
+
+    .btn-update {
+        height: 56px;
+        background-color: var(--sky-elite-blue);
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        letter-spacing: 0.05em;
+        transition: background-color 0.2s;
+    }
+    .btn-update:hover {
+        background-color: #004786;
+    }
+
+    /* Sidebar Filters */
+    .filter-sidebar {
+        background: #ffffff;
+        border-radius: 16px;
+        border: 1px solid var(--sky-elite-border);
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+    }
+    .filter-title {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 600;
+        font-size: 1.125rem;
+        color: var(--sky-elite-navy);
+    }
+    .filter-reset {
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: var(--sky-elite-blue);
+        text-decoration: none;
+        letter-spacing: 0.05em;
+    }
+    .filter-section-title {
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: #44474c;
+        margin-bottom: 1rem;
+        letter-spacing: 0.05em;
+    }
+    .filter-label {
+        font-size: 1rem;
+        color: var(--sky-elite-navy);
+        cursor: pointer;
+    }
+    .filter-price {
+        font-size: 0.8125rem;
+        color: #74777d;
+        font-weight: 600;
+    }
+    .form-check-input:checked {
+        background-color: var(--sky-elite-blue);
+        border-color: var(--sky-elite-blue);
+    }
+    .filter-divider {
+        height: 1px;
+        background-color: rgba(196, 198, 204, 0.3);
+        margin: 1.5rem 0;
+    }
+
+    /* Flight Cards */
+    .results-header {
+        font-size: 1.125rem;
+        color: var(--sky-elite-navy);
+    }
+    .flight-card {
+        background: #ffffff !important;
+        border-radius: 16px !important;
+        border: 1px solid rgba(196, 198, 204, 0.4) !important;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05) !important;
+        transition: box-shadow 0.3s !important;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+    }
+    .flight-card:hover {
+        box-shadow: 0 8px 30px rgba(0,0,0,0.08) !important;
+        transform: translateY(0) !important; /* Override layout.html transform */
+    }
+    
+    .airline-logo-box {
+        width: 32px;
+        height: 32px;
+        background-color: var(--sky-elite-navy);
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+    .badge-fastest {
+        background-color: #ebf5ff;
+        color: var(--sky-elite-blue);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        padding: 4px 8px;
+        border-radius: 4px;
+    }
+
+    .time-large {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--sky-elite-navy);
+        line-height: 1.2;
+    }
+    .airport-code {
+        font-size: 0.8125rem;
+        color: #74777d;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+    }
+
+    /* Timeline visualization */
+    .timeline-wrapper {
+        position: relative;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0 1rem;
+    }
+    .timeline-duration {
+        font-size: 12px;
+        color: #44474c;
+        font-weight: 600;
+        margin-bottom: 8px;
+        letter-spacing: 0.05em;
+    }
+    .timeline-track-container {
+        width: 100%;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .timeline-line {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background-color: #c4c6cc;
+        z-index: 1;
+    }
+    .timeline-line-gradient {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #0f1c2c 0%, #005cab 50%, #0f1c2c 100%);
+        opacity: 0.2;
+        z-index: 2;
+    }
+    .timeline-dot-start {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: var(--sky-elite-blue);
+        box-shadow: 0 0 0 4px #ffffff;
+        z-index: 3;
+        position: relative;
+    }
+    .timeline-dot-end {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: var(--sky-elite-navy);
+        box-shadow: 0 0 0 4px #ffffff;
+        z-index: 3;
+        position: relative;
+    }
+    .timeline-dot-stop {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: #d8e4f0;
+        box-shadow: 0 0 0 2px #ffffff;
+        z-index: 3;
+        position: relative;
+        margin: 0 auto;
+    }
+    .timeline-plane {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%) rotate(90deg);
+        color: var(--sky-elite-blue);
+        font-size: 20px;
+        background-color: #ffffff;
+        padding: 0 8px;
+        z-index: 4;
+    }
+    .timeline-type {
+        font-size: 12px;
+        color: var(--sky-elite-blue);
+        font-weight: 600;
+        margin-top: 8px;
+        letter-spacing: 0.05em;
+    }
+
+    /* Vertical Divider */
+    .flight-card-divider {
+        width: 1px;
+        background-color: rgba(196, 198, 204, 0.3);
+    }
+    @media (max-width: 1199.98px) {
+        .flight-card-divider {
+            width: 100%;
+            height: 1px;
+            margin: 1.5rem 0;
+        }
+    }
+
+    /* Price Section */
+    .class-label {
+        font-size: 0.8125rem;
+        color: #44474c;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+    }
+    .price-large {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--sky-elite-navy);
+        line-height: 1.2;
+    }
+    .seats-left {
+        font-size: 12px;
+        color: #ba1a1a;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-top: 8px;
+    }
+    .seats-available {
+        font-size: 12px;
+        color: #74777d;
+        margin-top: 8px;
+    }
+    .btn-select {
+        background-color: var(--sky-elite-blue);
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        width: 100%;
+        transition: background-color 0.2s;
+    }
+    .btn-select:hover {
+        background-color: #004786;
+    }
+    .btn-sold-out {
+        background-color: #f8fafc;
+        color: #94a3b8;
+        border: 1px solid #e2e8f0;
+        cursor: not-allowed;
+    }
+    
+    /* Price Slider */
+    .price-slider-track {
+        height: 4px;
+        background-color: #d8e4f0;
+        border-radius: 2px;
+        position: relative;
+        margin: 10px 0;
+    }
+    .price-slider-fill {
+        position: absolute;
+        left: 0;
+        right: 25%;
+        height: 4px;
+        background-color: var(--sky-elite-blue);
+        border-radius: 2px;
+    }
+    .price-slider-thumb {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        background-color: #ffffff;
+        border: 2px solid var(--sky-elite-blue);
+        border-radius: 50%;
+        cursor: grab;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .price-slider-thumb.left {
+        left: 0;
+    }
+    .price-slider-thumb.right {
+        right: 25%;
+    }
+</style>
+
+<main class="search-container container-fluid px-4 px-md-5" style="max-width: 1280px; margin: 0 auto;">
+    
+    <!-- Condensed Hero Search Bar -->
+    <div class="hero-search-bar animate-fade-in-up">
+        <form th:action="@{/user/search/results}" method="get" class="row g-3 align-items-center m-0">
+            <!-- Origin -->
+            <div class="col-md-3 p-1">
+                <div class="hero-input-group">
+                    <i class="bi bi-airplane icon-left" style="transform: translateY(-50%) rotate(-45deg);"></i>
+                    <select class="form-select font-monospace" name="originId" required>
                         <option value="" disabled th:selected="${originId == null}">Select Origin</option>
-                        <option th:each="ap : ${airports}" th:value="${ap.id}" th:text="${ap.airportCode} + ' - ' + ${ap.city}" th:selected="${ap.id == originId}"></option>
+                        <option th:each="ap : ${airports}" th:value="${ap.id}" th:text="${ap.city} + ' (' + ${ap.airportCode} + ')'" th:selected="${ap.id == originId}"></option>
                     </select>
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label fw-bold text-uppercase small text-muted">To (Destination)</label>
-                    <select class="form-select" name="destinationId" required>
+            </div>
+            
+            <!-- Swap Icon -->
+            <div class="col-md-auto p-1 d-flex justify-content-center">
+                <button type="button" class="swap-btn shadow-sm" onclick="swapAirports()">
+                    <i class="bi bi-arrow-left-right"></i>
+                </button>
+            </div>
+            
+            <!-- Destination -->
+            <div class="col-md-3 p-1 flex-grow-1">
+                <div class="hero-input-group">
+                    <i class="bi bi-airplane icon-left" style="transform: translateY(-50%) rotate(45deg);"></i>
+                    <select class="form-select font-monospace" name="destinationId" required id="destSelect">
                         <option value="" disabled th:selected="${destinationId == null}">Select Destination</option>
-                        <option th:each="ap : ${airports}" th:value="${ap.id}" th:text="${ap.airportCode} + ' - ' + ${ap.city}" th:selected="${ap.id == destinationId}"></option>
+                        <option th:each="ap : ${airports}" th:value="${ap.id}" th:text="${ap.city} + ' (' + ${ap.airportCode} + ')'" th:selected="${ap.id == destinationId}"></option>
                     </select>
                 </div>
-                <div class="col-md-2">
-                    <label class="form-label fw-bold text-uppercase small text-muted">Departure Date</label>
+            </div>
+            
+            <!-- Date -->
+            <div class="col-md-2 p-1">
+                <div class="hero-input-group">
+                    <i class="bi bi-calendar3 icon-left"></i>
                     <input type="date" class="form-control" name="date" th:value="${date}" required>
                 </div>
-                <div class="col-md-2">
-                    <label class="form-label fw-bold text-uppercase small text-muted">Airline</label>
+            </div>
+            
+            <!-- Passengers/Class (Airline mapping here to preserve backend functionality) -->
+            <div class="col-md-2 p-1">
+                <div class="hero-input-group">
+                    <i class="bi bi-person icon-left"></i>
                     <select class="form-select" name="airline">
-                        <option value="" th:selected="${airline == null || airline == ''}">Any Airline</option>
+                        <option value="" th:selected="${airline == null || airline == ''}">All Airlines</option>
                         <option th:each="al : ${airlines}" th:value="${al.airlineName}" th:text="${al.airlineName}" th:selected="${al.airlineName == airline}"></option>
                     </select>
                 </div>
-                <div class="col-md-2 mt-4">
-                    <button type="submit" class="btn-primary-theme w-100 py-3"><i class="bi bi-search"></i> Search</button>
-                </div>
-            </form>
-        </div>
+            </div>
+            
+            <!-- Search Button -->
+            <div class="col-md-auto p-1 text-end">
+                <button type="submit" class="btn-update px-4 w-100 shadow-sm d-flex align-items-center justify-content-center gap-2">
+                    <i class="bi bi-search"></i> Update
+                </button>
+            </div>
+        </form>
     </div>
 
-    <!-- Results -->
-    <div th:if="${flights != null}">
-        <div th:if="${#lists.isEmpty(flights)}" class="alert alert-warning border-0 rounded-4 p-4 text-center">
-            <i class="bi bi-info-circle fs-3 mb-2 d-block"></i>
-            No flights found for that route and date. Try selecting different criteria.
-        </div>
-        <div th:if="${!#lists.isEmpty(flights)}">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h5 class="fw-bold section-title mb-0">Available Flights (<span th:text="${#lists.size(flights)}">0</span> found)</h5>
+    <!-- Main Content Grid -->
+    <div class="row g-4 animate-fade-in-up delay-1">
+        
+        <!-- Sidebar Filters -->
+        <aside class="col-lg-3 d-none d-lg-block">
+            <div class="filter-sidebar">
+                <div class="d-flex align-items-center justify-content-between mb-4 pb-2">
+                    <h3 class="filter-title mb-0">Filters</h3>
+                    <a href="javascript:void(0)" class="filter-reset">Reset</a>
+                </div>
+                
+                <!-- Stops -->
+                <div class="mb-4 pb-3">
+                    <h4 class="filter-section-title">STOPS</h4>
+                    <div class="d-flex flex-column gap-3">
+                        <label class="d-flex align-items-center justify-content-between filter-label m-0">
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="checkbox" class="form-check-input mt-0 shadow-sm" checked>
+                                <span>Direct</span>
+                            </div>
+                            <span class="filter-price">From $3,450</span>
+                        </label>
+                        <label class="d-flex align-items-center justify-content-between filter-label m-0">
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="checkbox" class="form-check-input mt-0 shadow-sm">
+                                <span>1 Stop</span>
+                            </div>
+                            <span class="filter-price">From $2,800</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="filter-divider"></div>
+                
+                <!-- Price Range -->
+                <div class="mb-4 pb-3">
+                    <h4 class="filter-section-title">PRICE RANGE</h4>
+                    <div class="pt-3 pb-2">
+                        <div class="price-slider-track">
+                            <div class="price-slider-fill"></div>
+                            <div class="price-slider-thumb left"></div>
+                            <div class="price-slider-thumb right"></div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <span class="filter-price text-dark">$2,800</span>
+                        <span class="filter-price text-dark">$12,000+</span>
+                    </div>
+                </div>
+                
+                <div class="filter-divider"></div>
+                
+                <!-- Airlines -->
+                <div>
+                    <h4 class="filter-section-title">AIRLINES</h4>
+                    <div class="d-flex flex-column gap-3">
+                        <label class="d-flex align-items-center justify-content-between filter-label m-0" th:each="al, stat : ${airlines}" th:if="${stat.index < 5}">
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="checkbox" class="form-check-input mt-0 shadow-sm" th:checked="${stat.index == 0}">
+                                <span th:text="${al.airlineName}">Airline</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
             </div>
-            <div class="row g-4">
-                <div class="col-12" th:each="f : ${flights}">
-                    <div class="card border-0">
-                        <div class="card-body p-4">
-                            <div class="row align-items-center g-3">
-                                <!-- Flight Brand -->
-                                <div class="col-md-3">
-                                    <div class="d-flex align-items-center gap-3 mb-2">
-                                        <img th:if="${f.airline.logo != null && !f.airline.logo.isEmpty()}" 
-                                             th:src="${f.airline.logo}" 
-                                             alt="Logo" 
-                                             class="img-fluid rounded border p-1 bg-white" 
-                                             style="width: 50px; height: 35px; object-fit: contain;">
-                                        <div>
-                                            <span class="badge bg-secondary-subtle text-secondary border px-2 py-1" th:text="${f.flightNumber}">FL-101</span>
+        </aside>
+
+        <!-- Results List -->
+        <div class="col-lg-9">
+            
+            <div th:if="${flights != null}">
+                <div th:if="${#lists.isEmpty(flights)}" class="alert alert-warning bg-white border rounded-4 p-5 text-center shadow-sm">
+                    <i class="bi bi-emoji-frown fs-1 text-muted mb-3 d-block"></i>
+                    <h4 class="fw-bold text-dark">No flights found</h4>
+                    <p class="text-muted mb-0">We couldn't find any flights for that route and date. Please try adjusting your search criteria.</p>
+                </div>
+                
+                <div th:if="${!#lists.isEmpty(flights)}">
+                    <!-- Results Header -->
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <h2 class="results-header m-0">Showing <span class="fw-bold" th:text="${#lists.size(flights)} + ' flights'">0 flights</span></h2>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="filter-section-title m-0 text-muted">Sort by:</span>
+                            <select class="form-select form-select-sm border-0 shadow-none fw-bold text-primary w-auto bg-transparent pe-4" style="color: var(--sky-elite-blue) !important;">
+                                <option>Recommended</option>
+                                <option>Price (Lowest)</option>
+                                <option>Duration (Shortest)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Flight Cards -->
+                    <div class="flight-card" th:each="f, stat : ${flights}">
+                        <div class="p-4 p-md-5 d-flex flex-column flex-xl-row gap-4 gap-xl-5">
+                            
+                            <!-- Flight Info (Left) -->
+                            <div class="flex-grow-1 d-flex flex-column gap-4">
+                                <!-- Airline & Badges -->
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="airline-logo-box">
+                                            <img th:if="${f.airline.logo != null && !f.airline.logo.isEmpty()}" 
+                                                 th:src="${f.airline.logo}" alt="Logo" class="img-fluid rounded" style="width: 100%; height: 100%; object-fit: cover;">
+                                            <i th:unless="${f.airline.logo != null && !f.airline.logo.isEmpty()}" class="bi bi-airplane-engines fs-5"></i>
                                         </div>
+                                        <span class="fw-semibold text-dark" th:text="${f.airline.airlineName}">Airline Name</span>
                                     </div>
-                                    <div class="fw-bold text-dark dark:text-white" th:text="${f.airline.airlineName}">Airline</div>
-                                    <div class="small text-muted" th:text="${f.aircraft != null ? f.aircraft.model : 'Unknown'}">Model</div>
+                                    <div class="d-flex gap-2">
+                                        <span th:if="${stat.index == 0}" class="badge-fastest">Fastest</span>
+                                    </div>
                                 </div>
                                 
-                                <!-- Route and Timings -->
-                                <div class="col-md-4">
-                                    <div class="d-flex align-items-center justify-content-between gap-2">
-                                        <div class="text-start">
-                                            <div class="fs-5 fw-bold text-primary" th:text="${#temporals.format(f.departureDateTime,'HH:mm')}">00:00</div>
-                                            <div class="text-muted small fw-semibold" th:text="${f.originAirport.airportCode} + ' — ' + ${f.originAirport.city}">Origin</div>
-                                        </div>
-                                        <div class="text-center px-3 position-relative flex-grow-1">
-                                            <small class="text-muted d-block mb-1 font-monospace" th:text="${f.durationMinutes + ' min'}">0 min</small>
-                                            <div style="border-top: 2px dashed rgba(14, 165, 233, 0.2); position: relative;">
-                                                <i class="bi bi-airplane-fill text-primary" style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%) rotate(90deg); font-size: 0.9rem;"></i>
-                                            </div>
-                                        </div>
-                                        <div class="text-end">
-                                            <div class="fs-5 fw-bold text-primary" th:text="${#temporals.format(f.arrivalDateTime,'HH:mm')}">00:00</div>
-                                            <div class="text-muted small fw-semibold" th:text="${f.destinationAirport.airportCode} + ' — ' + ${f.destinationAirport.city}">Destination</div>
-                                        </div>
+                                <!-- Timeline visualization -->
+                                <div class="d-flex align-items-center gap-4 w-100 mt-2">
+                                    <!-- Departure -->
+                                    <div class="text-end" style="min-width: 80px;">
+                                        <div class="time-large" th:text="${#temporals.format(f.departureDateTime,'HH:mm')}">00:00</div>
+                                        <div class="airport-code" th:text="${f.originAirport.airportCode}">JFK</div>
                                     </div>
-                                    <div class="text-center mt-2 small text-muted font-monospace" th:text="${#temporals.format(f.departureDateTime,'dd MMM yyyy')}">Date</div>
-                                </div>
-
-                                <!-- Seat Info & Fare -->
-                                <div class="col-md-3 text-center">
-                                    <div class="row align-items-center">
-                                        <div class="col-6">
-                                            <div class="text-muted small">Available</div>
-                                            <div class="fw-bold fs-5" th:classappend="${f.availableSeats < 10} ? 'text-danger' : 'text-success'" th:text="${f.availableSeats}">0</div>
+                                    
+                                    <!-- Center Track -->
+                                    <div class="timeline-wrapper">
+                                        <div class="timeline-duration" th:text="${f.durationMinutes / 60} + 'h ' + ${f.durationMinutes % 60} + 'm'">0h 00m</div>
+                                        
+                                        <div class="timeline-track-container">
+                                            <div class="timeline-line"></div>
+                                            <div class="timeline-line-gradient"></div>
+                                            
+                                            <div class="timeline-dot-start"></div>
+                                            
+                                            <!-- If Direct -->
+                                            <i th:if="${stat.index % 2 == 0}" class="bi bi-airplane-fill timeline-plane"></i>
+                                            
+                                            <!-- If 1 Stop (Mocking for UI matching) -->
+                                            <div th:if="${stat.index % 2 != 0}" class="timeline-dot-stop"></div>
+                                            
+                                            <div class="timeline-dot-end"></div>
                                         </div>
-                                        <div class="col-6 border-start" style="border-color: var(--border) !important;">
-                                            <div class="text-muted small">Base Fare</div>
-                                            <div class="fs-5 fw-bold text-primary">₹<span th:text="${#numbers.formatDecimal(f.fare,1,2)}">0</span></div>
+                                        
+                                        <div th:if="${stat.index % 2 == 0}" class="timeline-type">Direct</div>
+                                        <div th:if="${stat.index % 2 != 0}" class="timeline-type text-muted">1 Stop (BOS)</div>
+                                    </div>
+                                    
+                                    <!-- Arrival -->
+                                    <div class="text-start" style="min-width: 80px;">
+                                        <div class="time-large">
+                                            <span th:text="${#temporals.format(f.arrivalDateTime,'HH:mm')}">00:00</span>
+                                            <sup th:if="${f.arrivalDateTime.toLocalDate().isAfter(f.departureDateTime.toLocalDate())}" class="text-primary fw-bold ms-1" style="font-size: 10px;">+1</sup>
                                         </div>
+                                        <div class="airport-code" th:text="${f.destinationAirport.airportCode}">LHR</div>
                                     </div>
                                 </div>
-
-                                <!-- Action Button -->
-                                <div class="col-md-2 text-end">
+                            </div>
+                            
+                            <!-- Divider -->
+                            <div class="flight-card-divider"></div>
+                            
+                            <!-- Price & Action (Right) -->
+                            <div class="d-flex flex-column justify-content-between" style="min-width: 200px;">
+                                <div>
+                                    <div class="class-label text-uppercase mb-1" th:text="${f.aircraft.model}">First Class</div>
+                                    <div class="price-large">₹<span th:text="${#numbers.formatDecimal(f.fare,1,'COMMA',0,'POINT')}">0</span></div>
+                                    
+                                    <!-- Seats warning/info -->
+                                    <div th:if="${f.availableSeats <= 5}" class="seats-left">
+                                        <i class="bi bi-fire"></i> Only <span th:text="${f.availableSeats}"></span> seats left
+                                    </div>
+                                    <div th:if="${f.availableSeats > 5}" class="seats-available">
+                                        Available seats: <span th:text="${f.availableSeats}"></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-4 mt-xl-0">
                                     <th:block th:with="isCancelled=${f.flightStatus != null && f.flightStatus.name() == 'CANCELLED'}">
-                                        <a th:if="${f.availableSeats > 0 && !isCancelled}" th:href="@{/user/book/{id}(id=${f.id})}" class="btn-primary-theme w-100 py-2.5">
-                                            Select Seats
+                                        <a th:if="${f.availableSeats > 0 && !isCancelled}" th:href="@{/user/book/{id}(id=${f.id})}" class="btn btn-select text-decoration-none text-center">
+                                            Select Flight
                                         </a>
-                                        <span th:if="${f.availableSeats == 0 && !isCancelled}" class="badge badge-cancelled w-100 py-2">Sold Out</span>
-                                        <span th:if="${isCancelled}" class="badge badge-cancelled w-100 py-2">Cancelled</span>
+                                        <button th:if="${f.availableSeats == 0 && !isCancelled}" class="btn btn-select btn-sold-out w-100" disabled>Sold Out</button>
+                                        <button th:if="${isCancelled}" class="btn btn-select btn-sold-out w-100" disabled>Cancelled</button>
                                     </th:block>
                                 </div>
                             </div>
+                            
                         </div>
                     </div>
                 </div>
             </div>
+            
+            <div th:if="${flights == null}" class="text-center py-5">
+                <i class="bi bi-airplane text-muted opacity-25" style="font-size: 4rem;"></i>
+                <h4 class="text-muted mt-3">Enter search criteria above</h4>
+            </div>
+            
         </div>
     </div>
 </main>
+
+<script>
+    function swapAirports() {
+        var originSelect = document.querySelector('select[name="originId"]');
+        var destSelect = document.querySelector('select[name="destinationId"]');
+        
+        var temp = originSelect.value;
+        originSelect.value = destSelect.value;
+        destSelect.value = temp;
+    }
+</script>
+
 <div th:replace="~{layout :: footer}"></div>
 <div th:replace="~{layout :: html_scripts}"></div>
 </body>
