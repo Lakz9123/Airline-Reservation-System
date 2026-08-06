@@ -123,6 +123,22 @@
         align-items: center;
         color: #74777d;
     }
+
+    .seat-row-grid {
+        display: grid;
+        grid-template-columns: 44px 44px 44px 40px 44px 44px 44px;
+        gap: 12px;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    @media (max-width: 768px) {
+        .seat-row-grid {
+            grid-template-columns: 38px 38px 38px 30px 38px 38px 38px;
+            gap: 8px;
+        }
+    }
     
     /* Fixed Bottom Bar */
     .fixed-action-bar {
@@ -265,7 +281,7 @@
     const zones = [
         { name: 'First Class',     count: seatCounts.firstClass,     classBase: 'seat-first', cols: 4, aisle: 2, value: 'First Class', price: firstClassFare || (farePerSeat*4) },
         { name: 'Business Class',  count: seatCounts.business,       classBase: 'seat-business', cols: 4, aisle: 2, value: 'Business Class', price: businessFare || (farePerSeat*2.5) },
-        { name: 'Premium Economy', count: seatCounts.premiumEconomy, classBase: 'seat-premium', cols: 5, aisle: 2, value: 'Premium Economy', price: premiumEconomyFare || (farePerSeat*1.5) },
+        { name: 'Premium Economy', count: seatCounts.premiumEconomy, classBase: 'seat-premium', cols: 4, aisle: 2, value: 'Premium Economy', price: premiumEconomyFare || (farePerSeat*1.5) },
         { name: 'Economy',         count: seatCounts.economy,        classBase: 'seat-economy', cols: 6, aisle: 3, value: 'Economy', price: economyFare || farePerSeat }
     ];
 
@@ -293,38 +309,36 @@
             let rowNumber = 1;
             while (zoneCount < zone.count && currentIndex < allSeats.length) {
                 const rowDiv = document.createElement('div');
-                rowDiv.className = 'd-flex justify-content-center align-items-center w-100 gap-2 gap-md-4';
+                rowDiv.className = 'seat-row-grid';
 
-                // Left block
-                const leftBlock = document.createElement('div');
-                leftBlock.className = 'd-flex gap-2';
-                leftBlock.style.flex = '0 0 160px';
-                leftBlock.style.justifyContent = 'flex-end';
+                let leftSeats = zone.aisle;
+                let rightSeats = zone.cols - zone.aisle;
                 
-                // Row Number (Center Aisle)
-                const rowNumDiv = document.createElement('div');
-                rowNumDiv.className = 'text-muted small fw-bold text-center';
-                rowNumDiv.style.flex = '0 0 30px';
-                rowNumDiv.textContent = rowNumber++;
-                
-                // Right block
-                const rightBlock = document.createElement('div');
-                rightBlock.className = 'd-flex gap-2';
-                rightBlock.style.flex = '0 0 160px';
-                rightBlock.style.justifyContent = 'flex-start';
+                // Calculate starting grid column for the left block so it is flush against the aisle (col 4)
+                let currentGridCol = (4 - leftSeats);
 
-                for (let j = 0; j < zone.cols && zoneCount < zone.count && currentIndex < allSeats.length; j++, currentIndex++, zoneCount++) {
+                // Left block seats
+                for (let j = 0; j < leftSeats && zoneCount < zone.count && currentIndex < allSeats.length; j++, currentIndex++, zoneCount++) {
                     const btn = createSeatBtn(allSeats[currentIndex], zone);
-                    if (j < zone.aisle) {
-                        leftBlock.appendChild(btn);
-                    } else {
-                        rightBlock.appendChild(btn);
-                    }
+                    btn.style.gridColumn = currentGridCol++;
+                    rowDiv.appendChild(btn);
                 }
                 
-                rowDiv.appendChild(leftBlock);
+                // Row Number (Center Aisle) is always column 4
+                const rowNumDiv = document.createElement('div');
+                rowNumDiv.className = 'text-muted small fw-bold text-center d-flex align-items-center justify-content-center';
+                rowNumDiv.style.gridColumn = '4';
+                rowNumDiv.textContent = rowNumber++;
                 rowDiv.appendChild(rowNumDiv);
-                rowDiv.appendChild(rightBlock);
+                
+                // Right block seats start at column 5
+                currentGridCol = 5;
+                for (let j = 0; j < rightSeats && zoneCount < zone.count && currentIndex < allSeats.length; j++, currentIndex++, zoneCount++) {
+                    const btn = createSeatBtn(allSeats[currentIndex], zone);
+                    btn.style.gridColumn = currentGridCol++;
+                    rowDiv.appendChild(btn);
+                }
+                
                 rowsContainer.appendChild(rowDiv);
             }
             
