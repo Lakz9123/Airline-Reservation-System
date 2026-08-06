@@ -1,83 +1,217 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{layout :: html_head('Payment Successful')}"></head>
-<body>
-<div th:replace="~{layout :: user_navbar}"></div>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Booking Success - SkyFly Elite</title>
+    
+    <!-- CSRF Tokens -->
+    <meta th:if="${_csrf != null}" name="_csrf" th:content="${_csrf.token}"/>
+    <meta th:if="${_csrf != null}" name="_csrf_header" th:content="${_csrf.headerName}"/>
 
-<main class="container">
-    <div class="row justify-content-center">
-        <div class="col-lg-6">
-            <div class="card border-0 text-center p-4 p-md-5">
-                <div class="card-body">
-                    <div class="mb-4">
-                        <i class="bi bi-check-circle-fill text-success" style="font-size: 4.5rem;"></i>
-                    </div>
-                    <span class="eyebrow-label">Confirmed Reservation</span>
-                    <h2 class="section-title text-success mb-2">Booking Successful!</h2>
-                    <p class="text-muted small mb-4">Your flight has been successfully booked. An email confirmation has been sent.</p>
-
-                    <div class="card bg-light border-0 p-4 text-start mb-4">
-                        <div class="d-flex justify-content-between mb-2 small text-muted">
-                            <span class="fw-bold text-uppercase">Booking ID:</span>
-                            <span class="fw-bold text-primary" th:text="${'SKY-' + #numbers.formatInteger(booking.id, 5)}">SKY-00001</span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-2 small text-muted">
-                            <span>Flight:</span>
-                            <span class="fw-bold text-dark dark:text-white" th:text="${booking.flight.flightNumber}"></span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-2 small text-muted">
-                            <span>Route:</span>
-                            <span class="fw-bold text-dark dark:text-white" th:text="${booking.flight.originAirport.airportCode} + ' → ' + ${booking.flight.destinationAirport.airportCode}"></span>
-                        </div>
-                        
-                        <hr class="my-2" style="border-color: var(--border) !important;">
-                        
-                        <!-- Fare and Coupon Breakdown -->
-                        <div th:if="${booking.discountAmount != null && booking.discountAmount > 0}">
-                            <div class="d-flex justify-content-between mb-2 small text-muted">
-                                <span>Coupon Used:</span>
-                                <span class="badge bg-primary-subtle text-primary border px-2 py-1" th:text="${booking.couponCode}"></span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2 small text-muted">
-                                <span>Original Fare:</span>
-                                <span class="fw-semibold text-dark">₹<span th:text="${#numbers.formatDecimal(booking.totalFare + booking.discountAmount, 1, 2)}"></span></span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2 small text-muted">
-                                <span>Discount:</span>
-                                <span class="text-success fw-bold">-₹<span th:text="${#numbers.formatDecimal(booking.discountAmount, 1, 2)}"></span></span>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center mt-3">
-                                <span class="text-muted fw-bold">Final Amount Paid:</span>
-                                <span class="fw-bold text-success fs-5">₹<span th:text="${#numbers.formatDecimal(booking.totalFare, 1, 2)}"></span></span>
-                            </div>
-                            <div class="text-end mt-2">
-                                <span class="badge bg-success px-2.5 py-1.5">You Saved ₹<span th:text="${#numbers.formatDecimal(booking.discountAmount, 1, 2)}"></span></span>
-                            </div>
-                        </div>
-
-                        <div th:if="${booking.discountAmount == null || booking.discountAmount == 0.0}">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="text-muted fw-bold">Amount Paid:</span>
-                                <span class="fw-bold text-success fs-5">₹<span th:text="${#numbers.formatDecimal(booking.totalFare, 1, 2)}"></span></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <p class="text-muted small fst-italic mb-4">
-                        Thank you for choosing SkyFly Elite. Have a safe and pleasant journey!
-                    </p>
-                    
-                    <div class="d-flex flex-column flex-md-row gap-3 justify-content-center">
-                        <a th:href="@{/user/ticket/{id}(id=${booking.id})}" class="btn-primary-theme py-2.5 px-4"><i class="bi bi-file-earmark-pdf"></i> Download Ticket</a>
-                        <a th:href="@{/user/bookings}" class="btn-outline-theme py-2.5 px-4">View All Bookings</a>
-                    </div>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Montserrat:wght@600;700&amp;display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-on-surface": "#e6f2fe",
+                        "outline": "#74777d",
+                        "on-surface-variant": "#44474c",
+                        "on-background": "#111d25",
+                        "primary-fixed-dim": "#bac8dc",
+                        "error": "#ba1a1a",
+                        "on-error-container": "#93000a",
+                        "surface": "rgba(246, 250, 255, 0.85)", // Made slightly transparent
+                        "secondary-fixed-dim": "#a5c8ff",
+                        "primary-container": "#0f1c2c",
+                        "on-surface": "#111d25",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "on-primary-container": "#778598",
+                        "secondary": "#005cab",
+                        "surface-tint": "#525f71",
+                        "tertiary-fixed": "#e2e2e2",
+                        "surface-bright": "#f6faff",
+                        "on-tertiary-container": "#838484",
+                        "on-secondary-container": "#fefcff",
+                        "surface-variant": "#d8e4f0",
+                        "on-secondary-fixed": "#001c3a",
+                        "surface-container-lowest": "rgba(255, 255, 255, 0.85)", // Transparent Card
+                        "surface-container-highest": "#d8e4f0",
+                        "on-secondary-fixed-variant": "#004786",
+                        "tertiary-container": "#1a1c1c",
+                        "inverse-surface": "#26323b",
+                        "primary-fixed": "#d6e4f9",
+                        "surface-container-high": "#ddeaf5",
+                        "surface-container": "#e3effb",
+                        "secondary-fixed": "#d4e3ff",
+                        "secondary-container": "#0075d6",
+                        "surface-dim": "#cfdce7",
+                        "error-container": "#ffdad6",
+                        "on-tertiary": "#ffffff",
+                        "tertiary": "#000000",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "tertiary-fixed-dim": "#c6c6c6",
+                        "outline-variant": "#c4c6cc",
+                        "on-primary-fixed-variant": "#3a4859",
+                        "on-error": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed": "#0f1c2c",
+                        "primary": "#000000",
+                        "inverse-primary": "#bac8dc",
+                        "surface-container-low": "rgba(235, 245, 255, 0.8)", // Transparent Icon BG
+                        "background": "transparent"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "64px",
+                        "unit": "8px",
+                        "gutter": "24px",
+                        "margin-mobile": "20px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Montserrat"],
+                        "display-lg-mobile": ["Montserrat"],
+                        "display-lg": ["Montserrat"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "label-sm": ["13px", { "lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: url('https://images.unsplash.com/photo-1569154941061-e231b4725ef1?auto=format&fit=crop&w=1920&q=80') center center / cover no-repeat fixed !important;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg,
+                rgba(248, 250, 252, 0.90) 0%,
+                rgba(248, 250, 252, 0.85) 50%,
+                rgba(14, 165, 233, 0.15) 100%);
+            z-index: -1;
+            pointer-events: none;
+        }
+        .confetti {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: #005cab;
+            border-radius: 50%;
+            animation: fall linear infinite;
+        }
+        @keyframes fall {
+            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+        .confetti:nth-child(even) { background-color: #a5c8ff; border-radius: 0; }
+        
+        .glass-card {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body class="text-on-background font-body-md h-screen flex flex-col relative overflow-hidden">
+<!-- Confetti Background -->
+<div class="absolute inset-0 pointer-events-none z-0" id="confetti-container"></div>
+<main class="flex-grow flex items-center justify-center p-margin-mobile md:p-margin-desktop z-10 relative">
+    <div class="glass-card bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] p-10 md:p-16 max-w-2xl w-full text-center relative overflow-hidden border border-outline-variant/30">
+        <!-- Subtle Top Accent -->
+        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-secondary to-secondary-fixed-dim"></div>
+        <!-- Success Icon -->
+        <div class="w-24 h-24 bg-surface-container-low rounded-full mx-auto flex items-center justify-center mb-8 relative">
+            <div class="absolute inset-0 bg-secondary/10 rounded-full animate-ping"></div>
+            <span class="material-symbols-outlined text-secondary" style="font-size: 48px; font-variation-settings: 'FILL' 1;">check_circle</span>
+        </div>
+        <!-- Header -->
+        <h1 class="font-headline-md text-headline-md text-on-surface mb-2">Booking Confirmed</h1>
+        <p class="font-body-lg text-body-lg text-on-surface-variant mb-8">Your journey awaits. Get ready for an elevated experience.</p>
+        <!-- Booking Details Card -->
+        <div class="bg-surface p-6 rounded-lg border border-outline-variant mb-8 text-left shadow-sm">
+            <div class="flex justify-between items-center mb-4 pb-4 border-b border-outline-variant">
+                <div>
+                    <span class="font-label-sm text-label-sm text-outline uppercase tracking-wider block mb-1">Booking Reference</span>
+                    <span class="font-headline-md text-headline-md text-primary tracking-widest" th:text="${'SFE-' + #numbers.formatInteger(booking.id, 5)}">SFE-892A4</span>
+                </div>
+                <span class="material-symbols-outlined text-outline-variant" style="font-size: 32px;">flight_takeoff</span>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <span class="font-label-sm text-label-sm text-outline block mb-1">Passenger</span>
+                    <span class="font-body-md text-body-md text-on-surface font-semibold" sec:authentication="name">Alex Mercer</span>
+                </div>
+                <div>
+                    <span class="font-label-sm text-label-sm text-outline block mb-1">Date</span>
+                    <span class="font-body-md text-body-md text-on-surface font-semibold" th:text="${#temporals.format(booking.flight.departureDateTime, 'MMM dd, yyyy')}">Oct 24, 2024</span>
                 </div>
             </div>
         </div>
+        <!-- Savings Badge -->
+        <div th:if="${booking.discountAmount != null && booking.discountAmount > 0}" class="inline-flex items-center bg-secondary-fixed text-on-secondary-fixed px-4 py-2 rounded-full mb-10 shadow-sm">
+            <span class="material-symbols-outlined mr-2" style="font-size: 20px;">savings</span>
+            <span class="font-label-sm text-label-sm">You Saved ₹<span th:text="${#numbers.formatDecimal(booking.discountAmount, 1, 2)}">2,500</span> with Elite Rewards</span>
+        </div>
+        <!-- Amount Paid Fallback -->
+        <div th:if="${booking.discountAmount == null || booking.discountAmount == 0.0}" class="inline-flex items-center bg-surface-container-highest text-on-surface px-4 py-2 rounded-full mb-10 shadow-sm">
+            <span class="material-symbols-outlined mr-2" style="font-size: 20px;">payments</span>
+            <span class="font-label-sm text-label-sm">Amount Paid: ₹<span th:text="${#numbers.formatDecimal(booking.totalFare, 1, 2)}">0.00</span></span>
+        </div>
+        <!-- Actions -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a th:href="@{/user/ticket/{id}(id=${booking.id})}" class="bg-primary-container text-on-primary hover:bg-on-background transition-colors duration-300 font-label-sm text-label-sm px-8 py-4 rounded-lg flex items-center justify-center shadow-md no-underline">
+                <span class="material-symbols-outlined mr-2">download</span>
+                Download Ticket
+            </a>
+            <a th:href="@{/user/bookings}" class="bg-transparent border-2 border-secondary text-secondary hover:bg-secondary/5 transition-colors duration-300 font-label-sm text-label-sm px-8 py-4 rounded-lg flex items-center justify-center no-underline">
+                <span class="material-symbols-outlined mr-2">receipt_long</span>
+                View All Bookings
+            </a>
+        </div>
+        <a class="inline-block mt-8 font-label-sm text-label-sm text-on-surface-variant hover:text-secondary transition-colors underline decoration-outline-variant underline-offset-4" th:href="@{/user/dashboard}">Return to Dashboard</a>
     </div>
 </main>
-
-<div th:replace="~{layout :: footer}"></div>
-<div th:replace="~{layout :: html_scripts}"></div>
+<script>
+    // Simple Confetti Effect
+    document.addEventListener('DOMContentLoaded', () => {
+        const container = document.getElementById('confetti-container');
+        const colors = ['#005cab', '#a5c8ff', '#bac8dc', '#ffffff'];
+        
+        for (let i = 0; i < 50; i++) {
+            const confetti = document.createElement('div');
+            confetti.classList.add('confetti');
+            
+            // Randomize properties
+            confetti.style.left = `${Math.random() * 100}vw`;
+            confetti.style.animationDuration = `${Math.random() * 3 + 2}s`;
+            confetti.style.animationDelay = `${Math.random() * 5}s`;
+            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            
+            container.appendChild(confetti);
+        }
+    });
+</script>
 </body>
 </html>

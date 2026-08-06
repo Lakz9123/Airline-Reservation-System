@@ -131,31 +131,86 @@ public class UserController {
 
     @GetMapping("/search/results")
     public String searchResults(
+            @RequestParam(required = false, defaultValue = "ONE_WAY") String tripType,
             @RequestParam(required = false) Long originId,
             @RequestParam(required = false) Long destinationId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate returnDate,
+            @RequestParam(required = false) List<Long> originIds,
+            @RequestParam(required = false) List<Long> destinationIds,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) List<LocalDate> dates,
             @RequestParam(required = false) Double maxFare,
             @RequestParam(required = false) String airline,
             Model model) {
-        LocalDateTime startOfDay = date != null ? date.atStartOfDay() : null;
-        LocalDateTime endOfDay = date != null ? date.atTime(23, 59, 59) : null;
         
-        List<Flight> flights = flightRepository.searchFlights(originId, destinationId, startOfDay, endOfDay, maxFare, airline);
-        
-        // Filter out past flights from search results
-        flights = flights.stream()
-                .filter(f -> f.getDepartureDateTime().isAfter(LocalDateTime.now()))
-                .sorted(java.util.Comparator.comparing(Flight::getDepartureDateTime))
-                .collect(java.util.stream.Collectors.toList());
-
-        model.addAttribute("flights", flights);
-        model.addAttribute("originId", originId);
-        model.addAttribute("destinationId", destinationId);
+        model.addAttribute("tripType", tripType);
         model.addAttribute("airports", airportService.getAllAirports());
         model.addAttribute("airlines", airlineService.getAllAirlines());
-        model.addAttribute("date", date);
         model.addAttribute("maxFare", maxFare);
         model.addAttribute("airline", airline);
+
+        if ("MULTI_CITY".equals(tripType)) {
+            List<List<Flight>> multiCityFlights = new ArrayList<>();
+            if (originIds != null && destinationIds != null && dates != null) {
+                int count = Math.min(Math.min(originIds.size(), destinationIds.size()), dates.size());
+                for (int i = 0; i < count; i++) {
+                    Long oId = originIds.get(i);
+                    Long dId = destinationIds.get(i);
+                    LocalDate dt = dates.get(i);
+                    LocalDateTime startOfDay = dt != null ? dt.atStartOfDay() : null;
+                    LocalDateTime endOfDay = dt != null ? dt.atTime(23, 59, 59) : null;
+                    List<Flight> segFlights = flightRepository.searchFlights(oId, dId, startOfDay, endOfDay, maxFare, airline);
+                    segFlights = segFlights.stream()
+                            .filter(f -> f.getDepartureDateTime().isAfter(LocalDateTime.now()))
+                            .sorted(Comparator.comparing(Flight::getDepartureDateTime))
+                            .collect(java.util.stream.Collectors.toList());
+                    multiCityFlights.add(segFlights);
+                }
+            }
+            model.addAttribute("multiCityFlights", multiCityFlights);
+            model.addAttribute("originIds", originIds);
+            model.addAttribute("destinationIds", destinationIds);
+            model.addAttribute("dates", dates);
+        } else if ("ROUND_TRIP".equals(tripType)) {
+            // Outbound
+            LocalDateTime startOfDay = date != null ? date.atStartOfDay() : null;
+            LocalDateTime endOfDay = date != null ? date.atTime(23, 59, 59) : null;
+            List<Flight> outboundFlights = flightRepository.searchFlights(originId, destinationId, startOfDay, endOfDay, maxFare, airline);
+            outboundFlights = outboundFlights.stream()
+                    .filter(f -> f.getDepartureDateTime().isAfter(LocalDateTime.now()))
+                    .sorted(Comparator.comparing(Flight::getDepartureDateTime))
+                    .collect(java.util.stream.Collectors.toList());
+            model.addAttribute("outboundFlights", outboundFlights);
+            
+            // Return
+            LocalDateTime returnStartOfDay = returnDate != null ? returnDate.atStartOfDay() : null;
+            LocalDateTime returnEndOfDay = returnDate != null ? returnDate.atTime(23, 59, 59) : null;
+            List<Flight> returnFlights = flightRepository.searchFlights(destinationId, originId, returnStartOfDay, returnEndOfDay, maxFare, airline);
+            returnFlights = returnFlights.stream()
+                    .filter(f -> f.getDepartureDateTime().isAfter(LocalDateTime.now()))
+                    .sorted(Comparator.comparing(Flight::getDepartureDateTime))
+                    .collect(java.util.stream.Collectors.toList());
+            model.addAttribute("returnFlights", returnFlights);
+            
+            model.addAttribute("originId", originId);
+            model.addAttribute("destinationId", destinationId);
+            model.addAttribute("date", date);
+            model.addAttribute("returnDate", returnDate);
+        } else {
+            // ONE_WAY
+            LocalDateTime startOfDay = date != null ? date.atStartOfDay() : null;
+            LocalDateTime endOfDay = date != null ? date.atTime(23, 59, 59) : null;
+            List<Flight> flights = flightRepository.searchFlights(originId, destinationId, startOfDay, endOfDay, maxFare, airline);
+            flights = flights.stream()
+                    .filter(f -> f.getDepartureDateTime().isAfter(LocalDateTime.now()))
+                    .sorted(Comparator.comparing(Flight::getDepartureDateTime))
+                    .collect(java.util.stream.Collectors.toList());
+            model.addAttribute("flights", flights);
+            model.addAttribute("originId", originId);
+            model.addAttribute("destinationId", destinationId);
+            model.addAttribute("date", date);
+        }
+
         return "user/search";
     }
 
@@ -198,9 +253,11 @@ public class UserController {
     @GetMapping("/payment/{flightId}")
     public String showPaymentPage(@PathVariable Long flightId,
                                   Model model,
-                                  @AuthenticationPrincipal UserDetails principal,
-                                  @ModelAttribute("selectedSeats") List<String> selectedSeats,
-                                  @ModelAttribute("cabinClass") String cabinClass) {
+                                  @AuthenticationPrincipal UserDetails principal) {
+        
+        List<String> selectedSeats = (List<String>) model.getAttribute("selectedSeats");
+        String cabinClass = (String) model.getAttribute("cabinClass");
+
         if (selectedSeats == null || selectedSeats.isEmpty()) {
             return "redirect:/user/book/" + flightId;
         }

@@ -30,6 +30,33 @@
         padding: 1.5rem;
         margin-bottom: 2.5rem;
     }
+    
+    /* Trip Type Selector */
+    .trip-type-selector {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .trip-type-pill {
+        background: transparent;
+        border: 1px solid var(--sky-elite-border);
+        border-radius: 20px;
+        padding: 0.5rem 1.25rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--sky-elite-navy);
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .trip-type-pill:hover {
+        border-color: var(--sky-elite-blue);
+        color: var(--sky-elite-blue);
+    }
+    .trip-type-pill.active {
+        background: var(--sky-elite-blue);
+        border-color: var(--sky-elite-blue);
+        color: #ffffff;
+    }
 
     .hero-input-group {
         position: relative;
@@ -383,62 +410,106 @@
     
     <!-- Condensed Hero Search Bar -->
     <div class="hero-search-bar animate-fade-in-up">
-        <form th:action="@{/user/search/results}" method="get" class="row g-3 align-items-center m-0">
-            <!-- Origin -->
-            <div class="col-md-3 p-1">
-                <div class="hero-input-group">
-                    <i class="bi bi-airplane icon-left" style="transform: translateY(-50%) rotate(-45deg);"></i>
-                    <select class="form-select font-monospace" name="originId">
-                        <option value="" disabled th:selected="${originId == null}">Select Origin</option>
-                        <option th:each="ap : ${airports}" th:value="${ap.id}" th:text="${ap.city} + ' (' + ${ap.airportCode} + ')'" th:selected="${ap.id == originId}"></option>
-                    </select>
+        
+        <!-- Trip Type Selector -->
+        <div class="trip-type-selector">
+            <button type="button" id="btn-ONE_WAY" class="trip-type-pill active" onclick="setTripType('ONE_WAY')">One Way</button>
+            <button type="button" id="btn-ROUND_TRIP" class="trip-type-pill" onclick="setTripType('ROUND_TRIP')">Round Trip</button>
+            <button type="button" id="btn-MULTI_CITY" class="trip-type-pill" onclick="setTripType('MULTI_CITY')">Multi-City</button>
+        </div>
+
+        <form th:action="@{/user/search/results}" method="get" id="flightSearchForm" onsubmit="return validateSearchForm(event)">
+            <input type="hidden" name="tripType" id="tripTypeInput" th:value="${tripType != null ? tripType : 'ONE_WAY'}">
+            
+            <!-- Standard Search (One Way / Round Trip) -->
+            <div id="standardSearchContainer" class="row g-3 align-items-center m-0">
+                <!-- Origin -->
+                <div class="col-md-3 p-1">
+                    <div class="hero-input-group">
+                        <i class="bi bi-airplane icon-left" style="transform: translateY(-50%) rotate(-45deg);"></i>
+                        <select class="form-select font-monospace" name="originId" id="originId">
+                            <option value="" disabled th:selected="${originId == null}">Select Origin</option>
+                            <option th:each="ap : ${airports}" th:value="${ap.id}" th:text="${ap.city} + ' (' + ${ap.airportCode} + ')'" th:selected="${ap.id == originId}"></option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Swap Icon -->
+                <div class="col-md-auto p-1 d-flex justify-content-center">
+                    <button type="button" class="swap-btn shadow-sm" onclick="swapAirports()">
+                        <i class="bi bi-arrow-left-right"></i>
+                    </button>
+                </div>
+                
+                <!-- Destination -->
+                <div class="col-md-3 p-1 flex-grow-1">
+                    <div class="hero-input-group">
+                        <i class="bi bi-airplane icon-left" style="transform: translateY(-50%) rotate(45deg);"></i>
+                        <select class="form-select font-monospace" name="destinationId" id="destSelect">
+                            <option value="" disabled th:selected="${destinationId == null}">Select Destination</option>
+                            <option th:each="ap : ${airports}" th:value="${ap.id}" th:text="${ap.city} + ' (' + ${ap.airportCode} + ')'" th:selected="${ap.id == destinationId}"></option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Date -->
+                <div class="col-md-2 p-1">
+                    <div class="hero-input-group">
+                        <i class="bi bi-calendar3 icon-left"></i>
+                        <input type="date" class="form-control" name="date" id="dateInput" th:value="${date}">
+                    </div>
+                </div>
+
+                <!-- Return Date (Hidden by default, shown for Round Trip) -->
+                <div class="col-md-2 p-1" id="returnDateContainer" style="display: none;">
+                    <div class="hero-input-group">
+                        <i class="bi bi-calendar3 icon-left"></i>
+                        <input type="date" class="form-control" name="returnDate" id="returnDateInput" th:value="${returnDate}">
+                    </div>
+                </div>
+                
+                <!-- Passengers/Class -->
+                <div class="col-md-2 p-1">
+                    <div class="hero-input-group">
+                        <i class="bi bi-person icon-left"></i>
+                        <select class="form-select" name="airline">
+                            <option value="" th:selected="${airline == null || airline == ''}">All Airlines</option>
+                            <option th:each="al : ${airlines}" th:value="${al.airlineName}" th:text="${al.airlineName}" th:selected="${al.airlineName == airline}"></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Multi-City Search (Hidden by default) -->
+            <div id="multiCitySearchContainer" style="display: none;">
+                <div id="multiCitySegments" class="d-flex flex-column gap-2">
+                    <!-- Javascript will populate this initially with 2 segments -->
+                </div>
+                <div class="d-flex justify-content-start mt-3 ms-1">
+                    <button type="button" class="btn btn-link text-decoration-none fw-bold p-0" style="color: var(--sky-elite-blue);" onclick="addMultiCitySegment()">
+                        <i class="bi bi-plus-circle me-1"></i> Add Another Flight
+                    </button>
                 </div>
             </div>
             
-            <!-- Swap Icon -->
-            <div class="col-md-auto p-1 d-flex justify-content-center">
-                <button type="button" class="swap-btn shadow-sm" onclick="swapAirports()">
-                    <i class="bi bi-arrow-left-right"></i>
-                </button>
-            </div>
-            
-            <!-- Destination -->
-            <div class="col-md-3 p-1 flex-grow-1">
-                <div class="hero-input-group">
-                    <i class="bi bi-airplane icon-left" style="transform: translateY(-50%) rotate(45deg);"></i>
-                    <select class="form-select font-monospace" name="destinationId" id="destSelect">
-                        <option value="" disabled th:selected="${destinationId == null}">Select Destination</option>
-                        <option th:each="ap : ${airports}" th:value="${ap.id}" th:text="${ap.city} + ' (' + ${ap.airportCode} + ')'" th:selected="${ap.id == destinationId}"></option>
-                    </select>
-                </div>
-            </div>
-            
-            <!-- Date -->
-            <div class="col-md-2 p-1">
-                <div class="hero-input-group">
-                    <i class="bi bi-calendar3 icon-left"></i>
-                    <input type="date" class="form-control" name="date" th:value="${date}">
-                </div>
-            </div>
-            
-            <!-- Passengers/Class (Airline mapping here to preserve backend functionality) -->
-            <div class="col-md-2 p-1">
-                <div class="hero-input-group">
-                    <i class="bi bi-person icon-left"></i>
-                    <select class="form-select" name="airline">
-                        <option value="" th:selected="${airline == null || airline == ''}">All Airlines</option>
-                        <option th:each="al : ${airlines}" th:value="${al.airlineName}" th:text="${al.airlineName}" th:selected="${al.airlineName == airline}"></option>
-                    </select>
-                </div>
-            </div>
-            
+            <!-- Error message container -->
+            <div id="formError" class="text-danger small fw-bold mt-3 text-center" style="display: none;"></div>
+
             <!-- Search Button -->
-            <div class="col-md-auto p-1 text-end">
-                <button type="submit" class="btn-update px-4 w-100 shadow-sm d-flex align-items-center justify-content-center gap-2">
-                    <i class="bi bi-search"></i> Search Flights
-                </button>
+            <div class="row g-0 mt-4">
+                <div class="col-12 text-end">
+                    <button type="submit" class="btn-update px-5 shadow-sm d-inline-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-search"></i> Search Flights
+                    </button>
+                </div>
             </div>
         </form>
+    </div>
+
+    <!-- Hidden template for JS options cloning -->
+    <div id="airportOptionsTemplate" style="display:none;">
+        <option value="" disabled selected>Select Airport</option>
+        <option th:each="ap : ${airports}" th:value="${ap.id}" th:text="${ap.city} + ' (' + ${ap.airportCode} + ')'"></option>
     </div>
 
     <!-- Main Content Grid -->
@@ -511,29 +582,82 @@
         <!-- Results List -->
         <div class="col-lg-9">
             
-            <div th:if="${flights != null}">
-                <div th:if="${#lists.isEmpty(flights)}" class="alert alert-warning bg-white border rounded-4 p-5 text-center shadow-sm">
-                    <i class="bi bi-emoji-frown fs-1 text-muted mb-3 d-block"></i>
-                    <h4 class="fw-bold text-dark">No flights found</h4>
-                    <p class="text-muted mb-0">We couldn't find any flights for that route and date. Please try adjusting your search criteria.</p>
-                </div>
-                
-                <div th:if="${!#lists.isEmpty(flights)}">
-                    <!-- Results Header -->
-                    <div class="d-flex align-items-center justify-content-between mb-4">
-                        <h2 class="results-header m-0">Showing <span class="fw-bold" th:text="${#lists.size(flights)} + ' flights'">0 flights</span></h2>
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="filter-section-title m-0 text-muted">Sort by:</span>
-                            <select class="form-select form-select-sm border-0 shadow-none fw-bold text-primary w-auto bg-transparent pe-4" style="color: var(--sky-elite-blue) !important;">
-                                <option>Recommended</option>
-                                <option>Price (Lowest)</option>
-                                <option>Duration (Shortest)</option>
-                            </select>
-                        </div>
+            <!-- Results based on Trip Type -->
+            <div th:if="${tripType == null || tripType == 'ONE_WAY'}">
+                <div th:if="${flights != null}">
+                    <div th:if="${#lists.isEmpty(flights)}" class="alert alert-warning bg-white border rounded-4 p-5 text-center shadow-sm">
+                        <i class="bi bi-emoji-frown fs-1 text-muted mb-3 d-block"></i>
+                        <h4 class="fw-bold text-dark">No flights found</h4>
+                        <p class="text-muted mb-0">We couldn't find any flights for that route and date. Please try adjusting your search criteria.</p>
                     </div>
                     
-                    <!-- Flight Cards -->
-                    <div class="flight-card" th:each="f, stat : ${flights}">
+                    <div th:if="${!#lists.isEmpty(flights)}">
+                        <!-- Results Header -->
+                        <div class="d-flex align-items-center justify-content-between mb-4">
+                            <h2 class="results-header m-0">Showing <span class="fw-bold" th:text="${#lists.size(flights)} + ' flights'">0 flights</span></h2>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="filter-section-title m-0 text-muted">Sort by:</span>
+                                <select class="form-select form-select-sm border-0 shadow-none fw-bold text-primary w-auto bg-transparent pe-4" style="color: var(--sky-elite-blue) !important;">
+                                    <option>Recommended</option>
+                                    <option>Price (Lowest)</option>
+                                    <option>Duration (Shortest)</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Flight Cards -->
+                        <div th:each="f, stat : ${flights}">
+                            <div th:replace="~{:: flightCard(${f}, ${stat})}"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div th:if="${tripType == 'ROUND_TRIP'}">
+                <!-- Outbound -->
+                <div class="mb-5">
+                    <h2 class="results-header fw-bold mb-4" style="color: var(--sky-elite-blue);"><i class="bi bi-arrow-right-circle me-2"></i>Outbound Flights</h2>
+                    <div th:if="${outboundFlights != null && !#lists.isEmpty(outboundFlights)}">
+                        <div th:each="f, stat : ${outboundFlights}">
+                            <div th:replace="~{:: flightCard(${f}, ${stat})}"></div>
+                        </div>
+                    </div>
+                    <div th:if="${outboundFlights == null || #lists.isEmpty(outboundFlights)}" class="alert alert-warning bg-white border rounded-4 p-4 text-center shadow-sm">
+                        <p class="text-muted mb-0">No outbound flights found.</p>
+                    </div>
+                </div>
+                
+                <!-- Return -->
+                <div class="mb-5">
+                    <h2 class="results-header fw-bold mb-4" style="color: var(--sky-elite-blue);"><i class="bi bi-arrow-left-circle me-2"></i>Return Flights</h2>
+                    <div th:if="${returnFlights != null && !#lists.isEmpty(returnFlights)}">
+                        <div th:each="f, stat : ${returnFlights}">
+                            <div th:replace="~{:: flightCard(${f}, ${stat})}"></div>
+                        </div>
+                    </div>
+                    <div th:if="${returnFlights == null || #lists.isEmpty(returnFlights)}" class="alert alert-warning bg-white border rounded-4 p-4 text-center shadow-sm">
+                        <p class="text-muted mb-0">No return flights found.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div th:if="${tripType == 'MULTI_CITY'}">
+                <div th:if="${multiCityFlights != null && !#lists.isEmpty(multiCityFlights)}" th:each="segFlights, segStat : ${multiCityFlights}" class="mb-5">
+                    <h2 class="results-header fw-bold mb-4" style="color: var(--sky-elite-blue);"><i class="bi bi-airplane-engines me-2"></i>Flight <span th:text="${segStat.index + 1}">1</span></h2>
+                    
+                    <div th:if="${!#lists.isEmpty(segFlights)}">
+                        <div th:each="f, stat : ${segFlights}">
+                            <div th:replace="~{:: flightCard(${f}, ${stat})}"></div>
+                        </div>
+                    </div>
+                    <div th:if="${#lists.isEmpty(segFlights)}" class="alert alert-warning bg-white border rounded-4 p-4 text-center shadow-sm">
+                        <p class="text-muted mb-0">No flights found for this segment.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fragment for Flight Card -->
+            <div th:fragment="flightCard(f, stat)" class="flight-card" th:if="${f != null}">
                         <div class="p-4 p-md-5 d-flex flex-column flex-xl-row gap-4 gap-xl-5">
                             
                             <!-- Flight Info (Left) -->
@@ -626,10 +750,9 @@
                             
                         </div>
                     </div>
-                </div>
             </div>
             
-            <div th:if="${flights == null}" class="text-center py-5">
+            <div th:if="${flights == null && outboundFlights == null && multiCityFlights == null}" class="text-center py-5">
                 <i class="bi bi-airplane text-muted opacity-25" style="font-size: 4rem;"></i>
                 <h4 class="text-muted mt-3">Enter search criteria above</h4>
             </div>
@@ -647,6 +770,204 @@
         originSelect.value = destSelect.value;
         destSelect.value = temp;
     }
+
+    let multiCityCount = 0;
+
+    function setTripType(type) {
+        document.getElementById('tripTypeInput').value = type;
+        
+        // Update Pills
+        document.querySelectorAll('.trip-type-pill').forEach(el => el.classList.remove('active'));
+        document.getElementById('btn-' + type).classList.add('active');
+        
+        // Toggle Containers
+        const stdContainer = document.getElementById('standardSearchContainer');
+        const mcContainer = document.getElementById('multiCitySearchContainer');
+        const retDateContainer = document.getElementById('returnDateContainer');
+        
+        if (type === 'ONE_WAY') {
+            stdContainer.style.display = '';
+            mcContainer.style.display = 'none';
+            retDateContainer.style.display = 'none';
+            
+            // Re-enable standard inputs to submit
+            document.querySelectorAll('#standardSearchContainer input, #standardSearchContainer select').forEach(el => el.disabled = false);
+            document.getElementById('returnDateInput').disabled = true;
+            document.querySelectorAll('#multiCitySearchContainer input, #multiCitySearchContainer select').forEach(el => el.disabled = true);
+            
+        } else if (type === 'ROUND_TRIP') {
+            stdContainer.style.display = '';
+            mcContainer.style.display = 'none';
+            retDateContainer.style.display = 'block';
+            
+            document.querySelectorAll('#standardSearchContainer input, #standardSearchContainer select').forEach(el => el.disabled = false);
+            document.querySelectorAll('#multiCitySearchContainer input, #multiCitySearchContainer select').forEach(el => el.disabled = true);
+            
+        } else if (type === 'MULTI_CITY') {
+            stdContainer.style.display = 'none';
+            mcContainer.style.display = 'block';
+            
+            document.querySelectorAll('#standardSearchContainer input, #standardSearchContainer select').forEach(el => el.disabled = true);
+            document.querySelectorAll('#multiCitySearchContainer input, #multiCitySearchContainer select').forEach(el => el.disabled = false);
+            
+            // Initialize if empty
+            if (multiCityCount === 0) {
+                addMultiCitySegment();
+                addMultiCitySegment();
+            }
+        }
+        
+        document.getElementById('formError').style.display = 'none';
+    }
+
+    function addMultiCitySegment() {
+        multiCityCount++;
+        const container = document.getElementById('multiCitySegments');
+        const templateOpts = document.getElementById('airportOptionsTemplate').innerHTML;
+        
+        const row = document.createElement('div');
+        row.className = 'row g-2 align-items-center mb-2 animate-fade-in-up';
+        row.id = 'mc-segment-' + multiCityCount;
+        
+        row.innerHTML = `
+            <div class="col-md-auto p-1" style="min-width: 80px;">
+                <span class="badge bg-secondary">Flight ${multiCityCount}</span>
+            </div>
+            <div class="col-md p-1">
+                <div class="hero-input-group">
+                    <i class="bi bi-airplane icon-left" style="transform: translateY(-50%) rotate(-45deg);"></i>
+                    <select class="form-select font-monospace mc-origin" name="originIds" required>
+                        ${templateOpts}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md p-1">
+                <div class="hero-input-group">
+                    <i class="bi bi-airplane icon-left" style="transform: translateY(-50%) rotate(45deg);"></i>
+                    <select class="form-select font-monospace mc-dest" name="destinationIds" required>
+                        ${templateOpts}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-3 p-1">
+                <div class="hero-input-group">
+                    <i class="bi bi-calendar3 icon-left"></i>
+                    <input type="date" class="form-control mc-date" name="dates" required>
+                </div>
+            </div>
+            <div class="col-md-auto p-1">
+                <button type="button" class="btn btn-outline-danger shadow-sm border-0" style="height: 56px; border-radius: 8px;" onclick="removeMultiCitySegment(${multiCityCount})" ${multiCityCount === 1 ? 'disabled style="visibility:hidden;"' : ''}>
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+        `;
+        container.appendChild(row);
+    }
+
+    function removeMultiCitySegment(id) {
+        const seg = document.getElementById('mc-segment-' + id);
+        if (seg) seg.remove();
+        // We don't decrement count because it acts as an ID, but we could rename the badges
+        updateSegmentBadges();
+    }
+
+    function updateSegmentBadges() {
+        const segments = document.getElementById('multiCitySegments').children;
+        for (let i = 0; i < segments.length; i++) {
+            const badge = segments[i].querySelector('.badge');
+            if (badge) badge.textContent = 'Flight ' + (i + 1);
+        }
+    }
+
+    function validateSearchForm(event) {
+        const type = document.getElementById('tripTypeInput').value;
+        const errDiv = document.getElementById('formError');
+        errDiv.style.display = 'none';
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (type === 'ONE_WAY' || type === 'ROUND_TRIP') {
+            const origin = document.getElementById('originId').value;
+            const dest = document.getElementById('destSelect').value;
+            const dateStr = document.getElementById('dateInput').value;
+            
+            if (!origin || !dest || !dateStr) {
+                errDiv.textContent = 'Please fill out all required fields.';
+                errDiv.style.display = 'block';
+                event.preventDefault(); return false;
+            }
+            if (origin === dest) {
+                errDiv.textContent = 'Origin and Destination cannot be the same.';
+                errDiv.style.display = 'block';
+                event.preventDefault(); return false;
+            }
+            const date = new Date(dateStr);
+            if (date < today) {
+                errDiv.textContent = 'Departure date cannot be in the past.';
+                errDiv.style.display = 'block';
+                event.preventDefault(); return false;
+            }
+            
+            if (type === 'ROUND_TRIP') {
+                const retDateStr = document.getElementById('returnDateInput').value;
+                if (!retDateStr) {
+                    errDiv.textContent = 'Please select a return date.';
+                    errDiv.style.display = 'block';
+                    event.preventDefault(); return false;
+                }
+                const retDate = new Date(retDateStr);
+                if (retDate < date) {
+                    errDiv.textContent = 'Return date cannot be earlier than departure date.';
+                    errDiv.style.display = 'block';
+                    event.preventDefault(); return false;
+                }
+            }
+        } else if (type === 'MULTI_CITY') {
+            const origins = document.querySelectorAll('.mc-origin');
+            const dests = document.querySelectorAll('.mc-dest');
+            const dates = document.querySelectorAll('.mc-date');
+            
+            if (origins.length < 2) {
+                errDiv.textContent = 'Multi-city requires at least 2 flights.';
+                errDiv.style.display = 'block';
+                event.preventDefault(); return false;
+            }
+            
+            let prevDate = null;
+            for (let i = 0; i < origins.length; i++) {
+                if (!origins[i].value || !dests[i].value || !dates[i].value) {
+                    errDiv.textContent = 'Please fill out all fields for Flight ' + (i+1) + '.';
+                    errDiv.style.display = 'block';
+                    event.preventDefault(); return false;
+                }
+                if (origins[i].value === dests[i].value) {
+                    errDiv.textContent = 'Origin and Destination cannot be the same for Flight ' + (i+1) + '.';
+                    errDiv.style.display = 'block';
+                    event.preventDefault(); return false;
+                }
+                const currDate = new Date(dates[i].value);
+                if (currDate < today) {
+                    errDiv.textContent = 'Date for Flight ' + (i+1) + ' cannot be in the past.';
+                    errDiv.style.display = 'block';
+                    event.preventDefault(); return false;
+                }
+                if (prevDate && currDate < prevDate) {
+                    errDiv.textContent = 'Date for Flight ' + (i+1) + ' cannot be earlier than Flight ' + i + '.';
+                    errDiv.style.display = 'block';
+                    event.preventDefault(); return false;
+                }
+                prevDate = currDate;
+            }
+        }
+        return true;
+    }
+
+    // Initialize state on load
+    document.addEventListener('DOMContentLoaded', () => {
+        const initialType = document.getElementById('tripTypeInput').value || 'ONE_WAY';
+        setTripType(initialType);
+    });
 </script>
 
 <div th:replace="~{layout :: footer}"></div>
