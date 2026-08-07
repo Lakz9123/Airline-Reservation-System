@@ -41,6 +41,15 @@
         .seat-item { transition: all 0.2s ease-in-out; }
         .seat-item:hover:not(.occupied) { transform: scale(1.1); cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         .tw-scope { font-family: 'Inter', sans-serif; }
+        
+        /* Override Global Layout Styles */
+        body {
+            background: #f6faff !important;
+            color: #111d25 !important;
+            font-family: 'Inter', sans-serif !important;
+        }
+        body::before { display: none !important; }
+        main { padding-top: 8rem !important; padding-bottom: 5rem !important; } /* Adjusting for standard Tailwind spacing pt-32 pb-20 */
     </style>
 </head>
 <body class="bg-surface text-[#111d25] antialiased min-h-screen flex flex-col tw-scope">
