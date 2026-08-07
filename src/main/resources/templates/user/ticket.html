@@ -198,7 +198,7 @@
                         <span>Total Paid</span>
                         <span th:text="${'&#8377;' + #numbers.formatDecimal(booking.totalFare, 1, 2)}">$4,635.50</span>
                     </div>
-                    <p class="font-label-sm text-[13px] text-on-surface-variant mt-4" th:text="${booking.paymentStatus == 'PAID' ? 'Payment Completed' : 'Payment Pending'}">Paid via Visa</p>
+                    <p class="font-label-sm text-[13px] text-on-surface-variant mt-4" th:text="${booking.status == 'CONFIRMED' ? 'Payment Completed' : 'Payment Failed/Cancelled'}">Payment Completed</p>
                 </div>
             </div>
             
