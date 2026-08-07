@@ -1,240 +1,324 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{layout :: html_head('Online Check-in - Confirm Seats')}"></head>
-<body>
-<div th:replace="~{layout :: user_navbar}"></div>
-<main class="container">
-    <!-- Flight Header -->
-    <div class="card border-0 mb-4">
-        <div class="card-body p-4 p-md-5">
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-4">
-                <div>
-                    <span class="eyebrow-label">Check-In Seat Selection</span>
-                    <h3 class="section-title mb-2">
-                        <span class="badge bg-primary-subtle text-primary border px-2.5 py-1.5 me-2" th:text="${flight.flightNumber}">FL-101</span>
-                        <span th:text="${flight.airline.airlineName}">Airline</span>
-                    </h3>
-                    <div class="text-muted small">
-                        <i class="bi bi-geo-alt-fill text-primary"></i>
-                        <strong th:text="${flight.originAirport.airportCode} + ' (' + ${flight.originAirport.city} + ')'">A</strong>
-                        <i class="bi bi-arrow-right mx-2 text-primary"></i>
-                        <strong th:text="${flight.destinationAirport.airportCode} + ' (' + ${flight.destinationAirport.city} + ')'">B</strong>
-                        &nbsp;|&nbsp;
-                        <i class="bi bi-calendar3 text-primary"></i>
-                        <span th:text="${#temporals.format(flight.departureDateTime,'dd MMM yyyy HH:mm')}">Date</span>
+<head>
+    <th:block th:replace="~{layout :: html_head('Check-in Seat Selection')}"></th:block>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Montserrat:wght@600;700&display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary-container": "#0f1c2c",
+                        "on-primary-container": "#778598",
+                        "secondary": "#005cab",
+                        "secondary-container": "#0075d6",
+                        "on-secondary-container": "#fefcff",
+                        "on-surface-variant": "#44474c",
+                        "surface": "#f6faff",
+                        "surface-container": "#e3effb",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#c4c6cc",
+                        "inverse-surface": "#26323b",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed-dim": "#c6c6c6"
+                    },
+                    fontFamily: {
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Montserrat"],
+                        "display-lg": ["Montserrat"],
+                        "display-lg-mobile": ["Montserrat"]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .seat-item { transition: all 0.2s ease-in-out; }
+        .seat-item:hover:not(.occupied) { transform: scale(1.1); cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .tw-scope { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-[#111d25] antialiased min-h-screen flex flex-col tw-scope">
+    <!-- Navbar -->
+    <header class="bg-white/60 backdrop-blur-xl fixed top-0 w-full z-50 border-b border-[#0f1c2c]/10 shadow-[0_40px_60px_-15px_rgba(13,27,42,0.15)] flex justify-between items-center px-4 md:px-16 h-20 max-w-[1280px] mx-auto">
+        <div class="flex items-center gap-4">
+            <a aria-label="Back" class="text-on-surface-variant hover:text-secondary transition-colors" th:href="@{/user/bookings}">
+                <span class="material-symbols-outlined">arrow_back</span>
+            </a>
+            <div class="font-display-lg text-2xl tracking-tighter text-[#0f1c2c]">SkyFly Elite</div>
+        </div>
+        <div class="text-on-surface-variant font-label-sm text-[13px]">Check-In Step 2 of 4</div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow pt-32 pb-20 px-4 md:px-16 max-w-[1280px] mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-10">
+        
+        <!-- Left Column: Context & Summary -->
+        <div class="lg:col-span-4 flex flex-col gap-8">
+            <section class="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-[#e2e2e2]">
+                <h1 class="font-display-lg-mobile md:font-display-lg text-3xl md:text-5xl text-[#000000] mb-2">Confirm Your Seat</h1>
+                <p class="font-body-lg text-lg text-on-surface-variant mb-6" th:text="'Flight ' + ${booking.flight.flightNumber} + ' to ' + ${booking.flight.destinationAirport.city} + ' (' + ${booking.flight.destinationAirport.airportCode} + ')'">Flight SF402 to London Heathrow (LHR)</p>
+                
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="bg-[#d8e4f0] w-16 h-16 rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[#005cab]" style="font-variation-settings: 'FILL' 1; font-size: 32px;">person</span>
+                    </div>
+                    <div>
+                        <div class="font-label-sm text-[13px] text-on-surface-variant uppercase tracking-wider">Passenger</div>
+                        <div class="font-headline-md text-2xl text-[#111d25]" th:text="${booking.user.name}">Alex Mercer</div>
                     </div>
                 </div>
-                <div class="text-md-end">
-                    <div class="fs-5 fw-bold text-success"><i class="bi bi-patch-check-fill me-1"></i>Check-In Open</div>
-                    <small class="text-muted"><span th:text="${flight.availableSeats}">0</span> seats available to switch</small>
+                
+                <div class="border-t border-[#e2e2e2] pt-6">
+                    <div class="flex justify-between items-end mb-2">
+                        <div>
+                            <div class="font-label-sm text-[13px] text-on-surface-variant uppercase tracking-wider mb-1">Current Selection</div>
+                            <div class="font-headline-md text-2xl text-[#0f1c2c]" id="selectedSeatDisplay" th:text="${booking.seatNumbers != null and !booking.seatNumbers.isEmpty() ? booking.seatNumbers : 'None'}">4A</div>
+                        </div>
+                        <div class="text-right">
+                            <span class="bg-[#e6e6fa] text-[#4b0082] px-3 py-1 rounded-full font-label-sm text-[13px]" th:text="${booking.cabinClass}">Business</span>
+                        </div>
+                    </div>
+                    <p class="font-body-md text-base text-on-surface-variant">Seat details selected for your journey.</p>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Error Banner -->
-    <div th:if="${error}" class="alert alert-danger border-0 rounded-4 p-3 mb-4 small" th:text="${error}"></div>
-
-    <!-- Legend -->
-    <div class="card border-0 p-4 mb-4">
-        <div class="d-flex gap-4 mb-0 flex-wrap justify-content-center align-items-center">
-            <span class="d-flex align-items-center gap-2">
-                <button class="seat-btn" disabled style="background-color:#d97706; border-color:#b45309; width:28px; height:28px; border-radius:8px; border:none;"></button>
-                <span class="small fw-semibold text-muted">First Class</span>
-            </span>
-            <span class="d-flex align-items-center gap-2">
-                <button class="seat-btn" disabled style="background-color:#9333ea; border-color:#7e22ce; width:28px; height:28px; border-radius:8px; border:none;"></button>
-                <span class="small fw-semibold text-muted">Business</span>
-            </span>
-            <span class="d-flex align-items-center gap-2">
-                <button class="seat-btn" disabled style="background-color:#0d9488; border-color:#0f766e; width:28px; height:28px; border-radius:8px; border:none;"></button>
-                <span class="small fw-semibold text-muted">Premium Economy</span>
-            </span>
-            <span class="d-flex align-items-center gap-2">
-                <button class="seat-btn" disabled style="background-color:#0284c7; border-color:#0369a1; width:28px; height:28px; border-radius:8px; border:none;"></button>
-                <span class="small fw-semibold text-muted">Economy</span>
-            </span>
-            <span class="d-flex align-items-center gap-2">
-                <button class="seat-btn" disabled style="background-color:#64748b; width:28px; height:28px; border-radius:8px; border:none; opacity:0.6;"></button>
-                <span class="small fw-semibold text-muted">Booked</span>
-            </span>
-            <span class="d-flex align-items-center gap-2">
-                <button class="seat-btn" disabled style="background-color:#22c55e; width:28px; height:28px; border-radius:8px; border:none;"></button>
-                <span class="small fw-semibold text-muted">Selected</span>
-            </span>
-        </div>
-    </div>
-
-    <!-- Seat Map -->
-    <form th:action="@{/user/checkin/{id}/confirm(id=${booking.id})}" method="post" id="seatForm">
-        <div class="card border-0 p-4 p-md-5 mb-4">
-            <div class="text-center text-muted mb-4 small text-uppercase tracking-wider font-monospace"><i class="bi bi-caret-up-fill me-1"></i> Front of Plane</div>
-            <div id="seatMap" class="d-flex flex-column gap-3 align-items-center">
-                <!-- Rendered by JS -->
-            </div>
-            <div class="text-center text-muted mt-4 small text-uppercase tracking-wider font-monospace"><i class="bi bi-caret-down-fill me-1"></i> Rear of Plane</div>
-        </div>
-
-        <!-- Checkin Selection Info -->
-        <div class="card border-0 p-4 p-md-5 mb-4 text-center">
-            <h5 class="fw-bold section-title mb-3">Confirm Your Seats</h5>
-            <p class="mb-3 text-muted small">You are currently assigned: <strong class="text-dark dark:text-white" th:text="${booking.seatNumbers}"></strong>. You can keep these or select different available seats.</p>
-            <p class="mb-4 text-muted small">Selected seats: <strong id="selectedSeatDisplay" class="text-primary fs-5">None</strong></p>
+            </section>
             
-            <div class="d-flex justify-content-center">
-                <button type="submit" class="btn-primary-theme py-3 px-5 text-uppercase" id="confirmBtn" disabled>
-                    <i class="bi bi-check2-circle me-1"></i> Confirm Check-In
-                </button>
+            <!-- Legend Card -->
+            <section class="bg-white rounded-xl p-6 shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-[#e2e2e2]">
+                <h3 class="font-headline-md text-xl text-[#000000] mb-4">Seat Legend</h3>
+                <div class="grid grid-cols-2 gap-y-4 gap-x-2">
+                    <div class="flex items-center gap-3">
+                        <div class="w-6 h-6 rounded bg-[#ffd700] border border-[#daa520]"></div>
+                        <span class="font-body-md text-base text-on-surface-variant">First Class</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-6 h-6 rounded bg-[#9370db] border border-[#8a2be2]"></div>
+                        <span class="font-body-md text-base text-on-surface-variant">Business</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-6 h-6 rounded bg-[#20b2aa] border border-[#008080]"></div>
+                        <span class="font-body-md text-base text-on-surface-variant">Premium Econ</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-6 h-6 rounded bg-[#87ceeb] border border-[#4682b4]"></div>
+                        <span class="font-body-md text-base text-on-surface-variant">Economy</span>
+                    </div>
+                    <div class="flex items-center gap-3 mt-2 col-span-2 pt-2 border-t border-[#e2e2e2]">
+                        <div class="w-6 h-6 rounded bg-[#c6c6c6] border border-[#c4c6cc] flex items-center justify-center">
+                            <span class="material-symbols-outlined text-[14px] text-on-surface-variant">close</span>
+                        </div>
+                        <span class="font-body-md text-base text-on-surface-variant">Occupied</span>
+                    </div>
+                    <div class="flex items-center gap-3 col-span-2 pt-1">
+                        <div class="w-6 h-6 rounded bg-[#9370db] border border-[#8a2be2] ring-2 ring-[#0f1c2c] ring-offset-2"></div>
+                        <span class="font-body-md text-base text-on-surface-variant">Your Seat</span>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Right Column: Interactive Seat Map -->
+        <div class="lg:col-span-8">
+            <div class="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-[#e2e2e2] overflow-x-auto relative">
+                <!-- Plane Nose -->
+                <div class="w-full flex justify-center mb-8 relative">
+                    <div class="w-3/4 h-16 bg-[#d8e4f0] rounded-t-full relative border-t-2 border-x-2 border-[#c6c6c6]">
+                        <div class="absolute inset-0 flex items-center justify-center opacity-30">
+                            <span class="material-symbols-outlined" style="font-size: 48px;">flight</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <form th:action="@{/user/checkin/{id}/confirm(id=${booking.id})}" method="post" id="seatForm">
+                    <div id="seatMap" class="min-w-[400px] mx-auto flex flex-col items-center">
+                        <!-- JS injected seats go here -->
+                    </div>
+                    
+                    <!-- Action Bar Fixed to bottom on mobile, inline on desktop -->
+                    <div class="mt-12 flex justify-end gap-4 fixed bottom-0 left-0 w-full bg-white p-4 border-t border-[#e2e2e2] lg:static lg:bg-transparent lg:border-none lg:p-0 z-40">
+                        <button type="button" class="px-6 py-3 rounded-lg border border-primary-container text-primary-container font-label-sm text-[13px] hover:bg-[#d8e4f0] transition-colors" onclick="window.location.href='/user/bookings'">Skip for now</button>
+                        <button type="submit" id="confirmBtn" class="px-8 py-3 rounded-lg bg-primary-container text-white hover:bg-[#26323b] transition-colors font-label-sm text-[13px] shadow-md disabled:opacity-50 disabled:cursor-not-allowed">Confirm Check-In</button>
+                    </div>
+                </form>
             </div>
         </div>
-    </form>
-</main>
+    </main>
 
-<!-- Pass data from Thymeleaf → JS -->
-<script th:inline="javascript">
-    const allSeats       = /*[[${allSeats}]]*/ [];
-    const bookedSeats    = new Set(/*[[${bookedSeats}]]*/ []);
-    const currentSeatsArr = /*[[${currentSeats}]]*/ [];
-    const targetSeatCount = currentSeatsArr.length;
+    <!-- Pass data from Thymeleaf to JS -->
+    <script th:inline="javascript">
+        const allSeats       = /*[[${allSeats}]]*/ [];
+        const bookedSeats    = new Set(/*[[${bookedSeats}]]*/ []);
+        const currentSeatsArr = /*[[${currentSeats}]]*/ [];
+        const targetSeatCount = currentSeatsArr.length > 0 ? currentSeatsArr.length : /*[[${booking.numberOfPassengers != null ? booking.numberOfPassengers : 1}]]*/ 1;
 
-    // Four-section seat counts (derived server-side from aircraft config)
-    const seatCounts = {
-        firstClass:     /*[[${seatCounts.firstClass}]]*/ 0,
-        business:       /*[[${seatCounts.business}]]*/ 0,
-        premiumEconomy: /*[[${seatCounts.premiumEconomy}]]*/ 0,
-        economy:        /*[[${seatCounts.economy}]]*/ 0
-    };
-</script>
-<script>
-    const seatMap             = document.getElementById('seatMap');
-    const selectedSeatDisplay = document.getElementById('selectedSeatDisplay');
-    const confirmBtn          = document.getElementById('confirmBtn');
-    const seatForm            = document.getElementById('seatForm');
-    let selectedSeats = new Set(currentSeatsArr);
+        const seatCounts = {
+            firstClass:     /*[[${seatCounts.firstClass}]]*/ 0,
+            business:       /*[[${seatCounts.business}]]*/ 0,
+            premiumEconomy: /*[[${seatCounts.premiumEconomy}]]*/ 0,
+            economy:        /*[[${seatCounts.economy}]]*/ 0
+        };
+    </script>
+    <script>
+        const seatMap             = document.getElementById('seatMap');
+        const selectedSeatDisplay = document.getElementById('selectedSeatDisplay');
+        const confirmBtn          = document.getElementById('confirmBtn');
+        const seatForm            = document.getElementById('seatForm');
+        let selectedSeats         = new Set(currentSeatsArr);
 
-    // Cabin zones
-    const zones = [
-        { name: 'First Class',     count: seatCounts.firstClass,     color: '#d97706', border: '#b45309', cols: 4, aisle: 2 },
-        { name: 'Business Class',  count: seatCounts.business,       color: '#9333ea', border: '#7e22ce', cols: 4, aisle: 2 },
-        { name: 'Premium Economy', count: seatCounts.premiumEconomy, color: '#0d9488', border: '#0f766e', cols: 5, aisle: 2 },
-        { name: 'Economy',         count: seatCounts.economy,        color: '#0284c7', border: '#0369a1', cols: 6, aisle: 3 }
-    ];
+        // Map zones for Tailwind design
+        const zones = [
+            { name: 'First Class',     count: seatCounts.firstClass,     cols: 4, aisle: 2, 
+              bgClass: 'bg-[#ffd700]', borderClass: 'border-[#daa520]' },
+            { name: 'Business Class',  count: seatCounts.business,       cols: 4, aisle: 2, 
+              bgClass: 'bg-[#9370db]', borderClass: 'border-[#8a2be2]' },
+            { name: 'Premium Economy', count: seatCounts.premiumEconomy, cols: 5, aisle: 2, 
+              bgClass: 'bg-[#20b2aa]', borderClass: 'border-[#008080]' },
+            { name: 'Economy Class',   count: seatCounts.economy,        cols: 6, aisle: 3, 
+              bgClass: 'bg-[#87ceeb]', borderClass: 'border-[#4682b4]' }
+        ];
 
-    // Build a seat→zone lookup
-    const seatZoneMap = {};
-    let idx = 0;
-    for (const zone of zones) {
-        for (let i = 0; i < zone.count && idx < allSeats.length; i++, idx++) {
-            seatZoneMap[allSeats[idx]] = zone;
-        }
-    }
-
-    function renderSeats() {
-        seatMap.innerHTML = '';
-        let currentIndex = 0;
-
+        let seatZoneMap = {};
+        let idx = 0;
         for (const zone of zones) {
-            if (zone.count <= 0) continue;
+            for (let i = 0; i < zone.count && idx < allSeats.length; i++, idx++) {
+                seatZoneMap[allSeats[idx]] = zone;
+            }
+        }
 
-            const header = document.createElement('div');
-            header.className = 'w-100 text-center fw-bold my-3 py-2 rounded-3 small text-uppercase tracking-wider';
-            header.style.backgroundColor = zone.color + '15';
-            header.style.color = zone.color;
-            header.style.borderLeft = `4px solid ${zone.color}`;
-            header.textContent = `— ${zone.name} —`;
-            seatMap.appendChild(header);
+        function renderSeats() {
+            seatMap.innerHTML = '';
+            let currentIndex = 0;
+            let rowNum = 1;
 
-            let zoneCount = 0;
-            while (zoneCount < zone.count && currentIndex < allSeats.length) {
-                const rowDiv = document.createElement('div');
-                rowDiv.className = 'd-flex gap-2 justify-content-center';
+            for (const zone of zones) {
+                if (zone.count <= 0) continue;
 
-                for (let j = 0; j < zone.cols && zoneCount < zone.count && currentIndex < allSeats.length; j++, currentIndex++, zoneCount++) {
-                    if (j === zone.aisle) {
-                        const spacer = document.createElement('div');
-                        spacer.style.width = '28px';
-                        rowDiv.appendChild(spacer);
+                const sectionWrapper = document.createElement('div');
+                sectionWrapper.className = 'w-full max-w-md mb-8';
+
+                const header = document.createElement('div');
+                header.className = 'flex justify-between items-center mb-4 px-4';
+                header.innerHTML = `<span class="font-label-sm text-[13px] text-[#44474c] uppercase tracking-widest">${zone.name}</span>`;
+                sectionWrapper.appendChild(header);
+
+                let zoneCount = 0;
+                while (zoneCount < zone.count && currentIndex < allSeats.length) {
+                    const rowDiv = document.createElement('div');
+                    rowDiv.className = 'flex justify-between items-center w-full mb-3 px-4';
+
+                    // Group left seats
+                    const leftGroup = document.createElement('div');
+                    leftGroup.className = 'flex gap-2';
+                    // Group right seats
+                    const rightGroup = document.createElement('div');
+                    rightGroup.className = 'flex gap-2';
+
+                    for (let j = 0; j < zone.cols && zoneCount < zone.count && currentIndex < allSeats.length; j++, currentIndex++, zoneCount++) {
+                        const seatLabel = allSeats[currentIndex];
+                        
+                        if (j < zone.aisle) {
+                            createSeatBtn(seatLabel, leftGroup, zone);
+                        } else {
+                            createSeatBtn(seatLabel, rightGroup, zone);
+                        }
                     }
-                    createSeatBtn(allSeats[currentIndex], rowDiv, zone);
+
+                    rowDiv.appendChild(leftGroup);
+                    
+                    const aisleSpan = document.createElement('div');
+                    aisleSpan.className = 'w-10 text-center font-headline-md text-xl text-[#44474c]';
+                    aisleSpan.textContent = rowNum++;
+                    rowDiv.appendChild(aisleSpan);
+                    
+                    rowDiv.appendChild(rightGroup);
+
+                    sectionWrapper.appendChild(rowDiv);
                 }
-                seatMap.appendChild(rowDiv);
+                
+                seatMap.appendChild(sectionWrapper);
+                
+                // Add separator after zone if not last
+                if (currentIndex < allSeats.length) {
+                    const sep = document.createElement('div');
+                    sep.className = 'w-full h-px bg-[#e2e2e2] my-6 max-w-md';
+                    seatMap.appendChild(sep);
+                }
             }
         }
-    }
 
-    function createSeatBtn(seat, rowDiv, zone) {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.textContent = seat;
-        btn.style.width = '38px';
-        btn.style.height = '38px';
-        btn.style.fontSize = '9px';
-        btn.style.borderRadius = '8px';
-        btn.style.fontWeight = '700';
-        btn.style.border = 'none';
-        btn.style.transition = 'all 0.2s ease';
+        function createSeatBtn(seat, groupDiv, zone) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.title = seat;
+            btn.className = `seat-item w-12 h-14 rounded-md flex items-center justify-center relative ${zone.borderClass}`;
+            
+            // Extract letter from e.g. "4A"
+            const letter = seat.replace(/[0-9]/g, '');
 
-        if (bookedSeats.has(seat)) {
-            btn.style.backgroundColor = '#64748b';
-            btn.style.color = '#fff';
-            btn.style.opacity = '0.5';
-            btn.style.cursor = 'not-allowed';
-            btn.disabled = true;
-        } else if (selectedSeats.has(seat)) {
-            btn.style.backgroundColor = '#22c55e';
-            btn.style.color = '#fff';
-            btn.style.cursor = 'pointer';
-            btn.addEventListener('click', () => toggleSeat(seat, btn, zone));
-        } else {
-            btn.style.backgroundColor = zone.color;
-            btn.style.color = '#fff';
-            btn.style.cursor = 'pointer';
-            btn.addEventListener('click', () => toggleSeat(seat, btn, zone));
-        }
-        rowDiv.appendChild(btn);
-    }
+            const span = document.createElement('span');
+            span.className = 'font-label-sm text-[13px] absolute top-1 left-2 font-bold';
 
-    function toggleSeat(seat, btn, zone) {
-        if (selectedSeats.has(seat)) {
-            selectedSeats.delete(seat);
-            btn.style.backgroundColor = zone.color;
-            btn.style.transform = 'scale(1)';
-        } else {
-            if (selectedSeats.size >= targetSeatCount) {
-                // If selection limit reached, don't select more
-                return;
+            if (bookedSeats.has(seat)) {
+                btn.className += ' occupied bg-[#c6c6c6] border-[#c4c6cc] cursor-not-allowed opacity-70';
+                span.className += ' material-symbols-outlined text-[#44474c] text-[18px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2';
+                span.textContent = 'close';
+                btn.disabled = true;
+            } else {
+                span.className += ' text-white';
+                span.textContent = letter;
+                
+                if (selectedSeats.has(seat)) {
+                    btn.className += ` bg-[#22c55e] border-[#16a34a] ring-2 ring-[#0f1c2c] ring-offset-2 shadow-md`;
+                } else {
+                    btn.className += ` ${zone.bgClass} shadow-sm border`;
+                }
+                
+                btn.addEventListener('click', () => toggleSeat(seat, btn, zone, span));
             }
-            selectedSeats.add(seat);
-            btn.style.backgroundColor = '#22c55e';
-            btn.style.transform = 'scale(1.08)';
+            
+            btn.appendChild(span);
+            groupDiv.appendChild(btn);
         }
+
+        function toggleSeat(seat, btn, zone, span) {
+            if (selectedSeats.has(seat)) {
+                selectedSeats.delete(seat);
+                btn.className = `seat-item w-12 h-14 rounded-md flex items-center justify-center relative ${zone.bgClass} ${zone.borderClass} shadow-sm border`;
+            } else {
+                if (selectedSeats.size >= targetSeatCount) return;
+                selectedSeats.add(seat);
+                btn.className = `seat-item w-12 h-14 rounded-md flex items-center justify-center relative bg-[#22c55e] border-[#16a34a] ring-2 ring-[#0f1c2c] ring-offset-2 shadow-md`;
+            }
+            updateSummary();
+        }
+
+        function updateSummary() {
+            seatForm.querySelectorAll('input[name="selectedSeats"]').forEach(el => el.remove());
+            if (selectedSeats.size === 0) {
+                selectedSeatDisplay.textContent = 'None';
+                confirmBtn.disabled = true;
+            } else {
+                const arr = [...selectedSeats];
+                selectedSeatDisplay.textContent = arr.join(', ');
+                confirmBtn.disabled = (arr.length !== targetSeatCount);
+
+                arr.forEach(s => {
+                    const inp = document.createElement('input');
+                    inp.type  = 'hidden';
+                    inp.name  = 'selectedSeats';
+                    inp.value = s;
+                    seatForm.appendChild(inp);
+                });
+            }
+        }
+
+        renderSeats();
         updateSummary();
-    }
-
-    function updateSummary() {
-        seatForm.querySelectorAll('input[name="selectedSeats"]').forEach(el => el.remove());
-        if (selectedSeats.size === 0) {
-            selectedSeatDisplay.textContent = 'None';
-            confirmBtn.disabled = true;
-        } else {
-            const arr = [...selectedSeats];
-            selectedSeatDisplay.textContent = arr.join(', ');
-            confirmBtn.disabled = (arr.length !== targetSeatCount);
-
-            arr.forEach(s => {
-                const inp = document.createElement('input');
-                inp.type  = 'hidden';
-                inp.name  = 'selectedSeats';
-                inp.value = s;
-                seatForm.appendChild(inp);
-            });
-        }
-    }
-
-    renderSeats();
-    updateSummary();
-</script>
-<div th:replace="~{layout :: footer}"></div>
-<div th:replace="~{layout :: html_scripts}"></div>
+    </script>
 </body>
 </html>

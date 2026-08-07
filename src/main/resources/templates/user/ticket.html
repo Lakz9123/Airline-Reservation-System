@@ -1,235 +1,211 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{layout :: html_head('E-Ticket')}"></head>
-<style>
-    .ticket-page { min-height: 80vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem 1rem; }
-
-    .ticket-card {
-        background: #fff;
-        border-radius: var(--radius);
-        max-width: 860px;
-        width: 100%;
-        box-shadow: var(--shadow-lg);
-        overflow: hidden;
-        position: relative;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    .ticket-card::before {
-        content: '';
-        position: absolute;
-        left: 0; top: 0; bottom: 0;
-        width: 10px;
-        background: linear-gradient(180deg, var(--sky-light), var(--sky-dark));
-    }
-
-    .ticket-header {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-        padding: 2rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 1.5rem;
-    }
-    .airline-name { font-size: 1.5rem; font-weight: 800; color: #fff; letter-spacing: -.5px; font-family: 'Space Grotesk', sans-serif; }
-    .bp-label     { font-size: .75rem; color: var(--sky-light); letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; font-weight: 700; }
-    .ref-label    { font-size: .7rem; color: #94a3b8; letter-spacing: 2px; text-align: right; }
-    .ref-value    { font-size: 1.3rem; font-weight: 800; color: var(--sky-light); text-align: right; letter-spacing: 1px; }
-
-    .ticket-route {
-        padding: 2.5rem 2.5rem 1.5rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 1.5rem;
-    }
-    .city-code { font-size: 3.5rem; font-weight: 900; color: #0f172a; line-height: 1; font-family: 'Space Grotesk', sans-serif; }
-    .city-name { font-size: .8rem; color: #64748b; margin-top: 2px; font-weight: 600; text-uppercase: true; }
-    .city-time { font-size: 1.1rem; color: var(--sky-dark); font-weight: 700; }
-    .route-arrow { flex: 1; text-align: center; }
-    .arrow-line  { display: flex; align-items: center; gap: 6px; justify-content: center; }
-    .arrow-line hr { flex: 1; border-top: 2px dashed #cbd5e1; margin: 0; }
-    .plane-icon  { font-size: 1.6rem; color: var(--sky-light); }
-    .duration    { font-size: .78rem; color: #94a3b8; margin-top: 4px; font-weight: 600; }
-
-    .perforation {
-        position: relative;
-        display: flex;
-        align-items: center;
-        padding: 0 2rem;
-        margin: .5rem 0;
-    }
-    .perforation::before,
-    .perforation::after {
-        content: '';
-        position: absolute;
-        width: 24px; height: 24px;
-        background: #0f172a;
-        border-radius: 50%;
-    }
-    .perforation::before { left: -12px; }
-    .perforation::after  { right: -12px; }
-    .perf-line { flex: 1; border: none; border-top: 2px dashed #e2e8f0; margin: 0; }
-    .scissors  { font-size: .9rem; color: #94a3b8; margin-left: .5rem; }
-
-    .ticket-details {
-        padding: 1.5rem 2.5rem 2rem;
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 1.5rem 1rem;
-    }
-    .detail-label { font-size: .68rem; color: #94a3b8; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 3px; font-weight: 700; }
-    .detail-value { font-size: 1rem; font-weight: 700; color: #0f172a; }
-    .status-confirmed { color: #16a34a !important; }
-    .status-cancelled { color: #dc2626 !important; }
-
-    .barcode-strip {
-        background: #f8fafc;
-        border-top: 1px solid #e2e8f0;
-        padding: 1.5rem 2.5rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        font-size: .72rem;
-        color: #94a3b8;
-        gap: 1.5rem;
-    }
-
-    .ticket-actions { max-width: 860px; width: 100%; display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem; flex-wrap: wrap; }
-
-    @media (max-width: 768px) {
-        .ticket-details { grid-template-columns: repeat(2, 1fr); }
-        .ticket-route { flex-direction: column; text-align: center; }
-    }
-    @media print {
-        body { background: #fff !important; }
-        .ticket-page { padding: 0; min-height: auto; }
-        .ticket-actions, nav, footer { display: none !important; }
-        .ticket-card { box-shadow: none; max-width: 100%; }
-        .perforation::before,
-        .perforation::after { background: #e2e8f0; }
-    }
-</style>
-<body>
-<div th:replace="~{layout :: user_navbar}"></div>
-
-<div class="ticket-page">
-    <div class="ticket-card" id="ticketCard">
-        <!-- Header -->
-        <div class="ticket-header">
-            <div>
-                <div class="airline-name"><i class="bi bi-airplane-fill me-2 text-info"></i>SkyFly Elite</div>
-                <div class="bp-label">E-Ticket & Boarding Pass</div>
-            </div>
-            <div>
-                <div class="ref-label">BOOKING REFERENCE</div>
-                <div class="ref-value" th:text="${bookingRef}">SKY-00001</div>
-            </div>
-        </div>
-
-        <!-- Route -->
-        <div class="ticket-route">
-            <div class="text-center">
-                <div class="city-code" th:text="${originCode}">NYC</div>
-                <div class="city-name" th:text="${originFull}">NEW YORK</div>
-                <div class="city-time" th:text="${#temporals.format(booking.flight.departureDateTime, 'HH:mm')}">08:30</div>
-                <div class="city-name" th:text="${#temporals.format(booking.flight.departureDateTime, 'dd MMM yyyy')}">01 Jan 2025</div>
-            </div>
-
-            <div class="route-arrow">
-                <div class="arrow-line">
-                    <hr/><span class="plane-icon"><i class="bi bi-airplane-fill" style="transform: rotate(90deg); display: inline-block;"></i></span><hr/>
-                </div>
-                <div class="duration" th:text="${booking.flight.durationMinutes + ' min flight'}">120 min flight</div>
-            </div>
-
-            <div class="text-center">
-                <div class="city-code" th:text="${destCode}">LHR</div>
-                <div class="city-name" th:text="${destFull}">LONDON</div>
-                <div class="city-time" th:text="${#temporals.format(booking.flight.arrivalDateTime, 'HH:mm')}">20:30</div>
-                <div class="city-name" th:text="${#temporals.format(booking.flight.arrivalDateTime, 'dd MMM yyyy')}">01 Jan 2025</div>
-            </div>
-        </div>
-
-        <!-- Perforation -->
-        <div class="perforation">
-            <hr class="perf-line"/><span class="scissors"><i class="bi bi-scissors"></i></span>
-        </div>
-
-        <!-- Details grid -->
-        <div class="ticket-details">
-            <div>
-                <div class="detail-label">Passenger</div>
-                <div class="detail-value" th:text="${#strings.toUpperCase(booking.user.name)}">JOHN DOE</div>
-            </div>
-            <div>
-                <div class="detail-label">Flight</div>
-                <div class="detail-value" th:text="${booking.flight.flightNumber}">FL-101</div>
-            </div>
-            <div>
-                <div class="detail-label">Airline</div>
-                <div class="detail-value" th:text="${booking.flight.airline.airlineName}">SkyFly</div>
-            </div>
-            <div>
-                <div class="detail-label">Aircraft</div>
-                <div class="detail-value" th:text="${booking.flight.aircraft.model}">Model</div>
-            </div>
-            <div>
-                <div class="detail-label">Class</div>
-                <div class="detail-value" th:text="${booking.cabinClass}">Economy</div>
-            </div>
-            <div>
-                <div class="detail-label">Seat(s)</div>
-                <div class="detail-value" th:text="${booking.seatNumbers}">A1, A2</div>
-            </div>
-            <div>
-                <div class="detail-label">Booked On</div>
-                <div class="detail-value" th:text="${#temporals.format(booking.bookingDate, 'dd MMM yyyy HH:mm')}">01 Jan 2025</div>
-            </div>
-            <div>
-                <div class="detail-label">Total Fare</div>
-                <div class="detail-value text-primary">₹<span th:text="${#numbers.formatDecimal(booking.totalFare, 1, 2)}">0.00</span></div>
-            </div>
-            <div>
-                <div class="detail-label">Status</div>
-                <div class="detail-value"
-                     th:classappend="${booking.status == 'CONFIRMED'} ? 'status-confirmed' : 'status-cancelled'"
-                     th:text="${booking.status}">CONFIRMED</div>
-            </div>
-            <div>
-                <div class="detail-label">Baggage</div>
-                <div class="detail-value">
-                    <span th:if="${booking.baggage != null and (booking.baggage.extraCheckedBagCount > 0 or booking.baggage.extraWeightKg > 0)}"
-                          th:text="'+' + ${booking.baggage.extraCheckedBagCount} + ' bag, +' + ${booking.baggage.extraWeightKg} + ' kg'"></span>
-                    <span th:if="${booking.baggage == null or (booking.baggage.extraCheckedBagCount == 0 and booking.baggage.extraWeightKg == 0)}">Included</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Barcode strip -->
-        <div class="barcode-strip">
-            <img th:if="${qrBase64 != null}" th:src="${qrBase64}" alt="QR Code" style="width: 80px; height: 80px; mix-blend-mode: multiply;" />
-            <span class="small">This is an official SkyFly Elite e-ticket. Present at airport check-in counter.</span>
-            <span class="fw-bold font-monospace" th:text="'*' + ${bookingRef} + '*'">*SKY-00001*</span>
+<head>
+    <th:block th:replace="~{layout :: html_head('E-Ticket')}"></th:block>
+    <!-- Tailwind CSS for specific design -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Montserrat:wght@600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary-container": "#0f1c2c",
+                        "on-primary-container": "#778598",
+                        "secondary": "#005cab",
+                        "secondary-container": "#0075d6",
+                        "on-secondary-container": "#fefcff",
+                        "on-surface-variant": "#44474c",
+                        "surface": "#f6faff",
+                        "surface-container": "#e3effb",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#c4c6cc",
+                        "inverse-surface": "#26323b",
+                        "on-primary": "#ffffff",
+                        "outline": "#74777d"
+                    },
+                    fontFamily: {
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Montserrat"],
+                        "display-lg": ["Montserrat"],
+                        "display-lg-mobile": ["Montserrat"]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Print Styles */
+        @media print {
+            body { background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .no-print { display: none !important; }
+            .print-break-inside-avoid { break-inside: avoid; }
+            header.bg-surface\/60 { display: none !important; }
+            nav { display: none !important; }
+        }
+        /* Dashboard Ambient Shadow for Container */
+        .ambient-shadow { box-shadow: 0px 4px 20px rgba(0,0,0,0.05); }
+        .tw-scope { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface font-body-md text-on-surface antialiased min-h-screen flex flex-col items-center py-margin-desktop md:py-20 px-4 md:px-16 tw-scope">
+    
+    <!-- Action Bar (Hidden on Print) -->
+    <div class="no-print w-full max-w-[800px] flex justify-between items-center mb-8 pt-8">
+        <a class="text-secondary hover:text-secondary-fixed-dim transition-colors flex items-center gap-2 font-label-sm text-[13px]" th:href="@{/user/bookings}" style="text-decoration: none;">
+            <span class="material-symbols-outlined">arrow_back</span>
+            Back to Bookings
+        </a>
+        <div class="flex gap-4">
+            <button class="bg-primary-container text-white hover:bg-inverse-surface transition-colors duration-300 rounded-lg px-6 py-3 font-label-sm text-[13px] flex items-center gap-2" onclick="window.print()">
+                <span class="material-symbols-outlined">print</span>
+                Print Ticket
+            </button>
+            <a th:href="@{/user/ticket/{id}/download(id=${booking.id})}" class="bg-[#005cab] text-white hover:bg-[#004786] transition-colors duration-300 rounded-lg px-6 py-3 font-label-sm text-[13px] flex items-center gap-2" style="text-decoration: none;">
+                <span class="material-symbols-outlined">download</span>
+                Download PDF
+            </a>
         </div>
     </div>
 
-    <!-- Action Buttons -->
-    <div class="ticket-actions">
-        <a th:href="@{/user/bookings}" class="btn-outline-theme py-2.5 px-4 text-white" style="border-color: rgba(255,255,255,0.3) !important;">
-            <i class="bi bi-arrow-left"></i> My Bookings
-        </a>
-        <button onclick="window.print()" class="btn-outline-theme py-2.5 px-4 text-white" style="border-color: rgba(255,255,255,0.3) !important;">
-            <i class="bi bi-printer-fill"></i> Print Ticket
-        </button>
-        <a th:href="@{/user/ticket/{id}/download(id=${booking.id})}" class="btn-primary-theme py-2.5 px-4">
-            <i class="bi bi-file-earmark-pdf-fill"></i> Download PDF
-        </a>
-    </div>
-</div>
+    <!-- Ticket Container -->
+    <main class="w-full max-w-[800px] bg-white ambient-shadow rounded-xl border border-surface-variant overflow-hidden print:shadow-none print:border-none">
+        
+        <!-- Ticket Header -->
+        <header class="bg-secondary p-8 flex justify-between items-center text-white" style="background-color: #005cab;">
+            <div>
+                <h1 class="font-display-lg text-2xl tracking-tighter mb-1">SkyFly Elite</h1>
+                <p class="font-label-sm text-[13px] opacity-80 uppercase tracking-widest">E-Ticket Receipt</p>
+            </div>
+            <div class="text-right">
+                <p class="font-label-sm text-[13px] opacity-80 uppercase mb-1">Booking Reference</p>
+                <p class="font-headline-md text-2xl tracking-widest" th:text="${bookingRef}">SFX982</p>
+            </div>
+        </header>
 
-<div th:replace="~{layout :: footer}"></div>
-<div th:replace="~{layout :: html_scripts}"></div>
+        <!-- Passenger & PNR Details -->
+        <section class="p-8 border-b border-surface-variant grid grid-cols-1 md:grid-cols-2 gap-8 print-break-inside-avoid">
+            <div>
+                <h2 class="font-label-sm text-[13px] text-on-surface-variant uppercase mb-2">Passenger Name</h2>
+                <p class="font-headline-md text-2xl text-primary-container" th:text="${booking.user.name}">Mr. Alexander Wright</p>
+            </div>
+            <div class="flex md:justify-end gap-8">
+                <div>
+                    <h2 class="font-label-sm text-[13px] text-on-surface-variant uppercase mb-2">Status</h2>
+                    <span class="inline-block px-3 py-1 rounded-full font-label-sm text-[13px]" 
+                          th:classappend="${booking.status == 'CONFIRMED'} ? 'bg-[#d6e4f9] text-[#3a4859]' : 'bg-[#ffdad6] text-[#93000a]'"
+                          th:text="${booking.status}">Confirmed</span>
+                </div>
+                <div>
+                    <h2 class="font-label-sm text-[13px] text-on-surface-variant uppercase mb-2">Issue Date</h2>
+                    <p class="font-body-md text-base text-primary-container" th:text="${#temporals.format(booking.bookingDate, 'dd MMM yyyy')}">12 Oct 2024</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Flight Details -->
+        <section class="p-8 border-b border-surface-variant print-break-inside-avoid">
+            <div class="flex items-center gap-4 mb-6">
+                <span class="material-symbols-outlined text-secondary text-2xl">flight_takeoff</span>
+                <h2 class="font-headline-md text-2xl text-primary-container">Outbound Flight</h2>
+            </div>
+            
+            <div class="bg-surface rounded-lg p-6 border border-surface-variant flex flex-col md:flex-row justify-between items-center relative">
+                <!-- Flight Timeline Graphic (Desktop) -->
+                <div class="hidden md:block absolute left-[50%] top-1/2 -translate-y-1/2 -translate-x-1/2 w-32 h-[2px] bg-[#d4e3ff]">
+                    <span class="material-symbols-outlined absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 text-secondary bg-surface px-2">flight</span>
+                </div>
+                
+                <!-- Departure -->
+                <div class="w-full md:w-auto text-left mb-6 md:mb-0">
+                    <p class="font-display-lg text-5xl text-primary-container mb-1" th:text="${originCode}">JFK</p>
+                    <p class="font-headline-md text-2xl text-primary-container mb-2" th:text="${#temporals.format(booking.flight.departureDateTime, 'HH:mm')}">08:30</p>
+                    <p class="font-body-md text-base text-on-surface-variant" th:text="${originFull}">New York (JFK)</p>
+                    <p class="font-body-md text-base text-on-surface-variant" th:text="'Terminal ' + ${booking.flight.terminal}">Terminal 4</p>
+                    <p class="font-label-sm text-[13px] text-on-surface-variant mt-2" th:text="${#temporals.format(booking.flight.departureDateTime, 'EEE, dd MMM yyyy')}">Mon, 15 Nov 2024</p>
+                </div>
+                
+                <!-- Mobile Timeline -->
+                <div class="md:hidden w-full h-[2px] bg-[#d4e3ff] my-6 relative flex justify-center items-center">
+                    <span class="material-symbols-outlined text-secondary bg-surface px-2 rotate-90">flight</span>
+                </div>
+                
+                <!-- Arrival -->
+                <div class="w-full md:w-auto text-left md:text-right">
+                    <p class="font-display-lg text-5xl text-primary-container mb-1" th:text="${destCode}">LHR</p>
+                    <p class="font-headline-md text-2xl text-primary-container mb-2" th:text="${#temporals.format(booking.flight.arrivalDateTime, 'HH:mm')}">20:45</p>
+                    <p class="font-body-md text-base text-on-surface-variant" th:text="${destFull}">London (LHR)</p>
+                    <p class="font-body-md text-base text-on-surface-variant">Arrival</p>
+                    <p class="font-label-sm text-[13px] text-on-surface-variant mt-2" th:text="${#temporals.format(booking.flight.arrivalDateTime, 'EEE, dd MMM yyyy')}">Mon, 15 Nov 2024</p>
+                </div>
+            </div>
+            
+            <!-- Flight Meta -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mt-6 p-4 bg-[#ebf5ff] rounded-lg border border-surface-variant">
+                <div>
+                    <h3 class="font-label-sm text-[13px] text-on-surface-variant uppercase mb-1">Flight</h3>
+                    <p class="font-body-md text-base font-semibold text-primary-container" th:text="${booking.flight.flightNumber}">SF 102</p>
+                </div>
+                <div>
+                    <h3 class="font-label-sm text-[13px] text-on-surface-variant uppercase mb-1">Class</h3>
+                    <p class="font-body-md text-base font-semibold text-primary-container" th:text="${booking.cabinClass}">First Class</p>
+                </div>
+                <div>
+                    <h3 class="font-label-sm text-[13px] text-on-surface-variant uppercase mb-1">Seat</h3>
+                    <p class="font-body-md text-base font-semibold text-primary-container" th:text="${booking.seatNumbers != null and !booking.seatNumbers.isEmpty() ? booking.seatNumbers : 'Unassigned'}">02A</p>
+                </div>
+                <div>
+                    <h3 class="font-label-sm text-[13px] text-on-surface-variant uppercase mb-1">Duration</h3>
+                    <p class="font-body-md text-base font-semibold text-primary-container" th:text="${booking.flight.durationMinutes / 60} + 'h ' + ${booking.flight.durationMinutes % 60} + 'm'">7h 15m</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Fare Breakdown & QR -->
+        <section class="p-8 grid grid-cols-1 md:grid-cols-3 gap-8 print-break-inside-avoid">
+            <div class="md:col-span-2">
+                <h2 class="font-label-sm text-[13px] text-on-surface-variant uppercase mb-6">Payment Summary</h2>
+                
+                <div class="space-y-4 font-body-md text-base text-primary-container">
+                    <div class="flex justify-between border-b border-surface-variant border-dashed pb-2">
+                        <span>Airfare (85%)</span>
+                        <span th:text="${'&#8377;' + #numbers.formatDecimal(booking.totalFare * 0.85, 1, 2)}">$4,250.00</span>
+                    </div>
+                    <div class="flex justify-between border-b border-surface-variant border-dashed pb-2">
+                        <span>Taxes &amp; Fees (15%)</span>
+                        <span th:text="${'&#8377;' + #numbers.formatDecimal(booking.totalFare * 0.15, 1, 2)}">$385.50</span>
+                    </div>
+                    <div class="flex justify-between border-b border-surface-variant border-dashed pb-2">
+                        <span>Extra Baggage</span>
+                        <span th:if="${booking.baggage != null and (booking.baggage.extraCheckedBagCount > 0 or booking.baggage.extraWeightKg > 0)}"
+                              th:text="'+' + ${booking.baggage.extraCheckedBagCount} + ' bag, +' + ${booking.baggage.extraWeightKg} + ' kg'"></span>
+                        <span th:if="${booking.baggage == null or (booking.baggage.extraCheckedBagCount == 0 and booking.baggage.extraWeightKg == 0)}">Included</span>
+                    </div>
+                    <div class="flex justify-between pt-2 font-headline-md text-2xl text-primary-container">
+                        <span>Total Paid</span>
+                        <span th:text="${'&#8377;' + #numbers.formatDecimal(booking.totalFare, 1, 2)}">$4,635.50</span>
+                    </div>
+                    <p class="font-label-sm text-[13px] text-on-surface-variant mt-4" th:text="${booking.paymentStatus == 'PAID' ? 'Payment Completed' : 'Payment Pending'}">Paid via Visa</p>
+                </div>
+            </div>
+            
+            <!-- QR Code Area -->
+            <div class="flex flex-col items-center justify-center bg-[#e3effb] p-6 rounded-lg border border-surface-variant">
+                <img th:if="${qrBase64 != null}" th:src="${qrBase64}" alt="QR Code" class="w-32 h-32 object-cover mb-4 mix-blend-multiply opacity-80" />
+                <p class="font-label-sm text-[13px] text-center text-on-surface-variant">Scan at Kiosk or Gate</p>
+                <p class="font-label-sm text-[13px] text-center text-primary-container mt-1" th:text="${bookingRef}">Ticket # 998 2381 293</p>
+            </div>
+        </section>
+
+        <!-- Footer / Legal -->
+        <footer class="bg-[#d8e4f0] p-6 text-center border-t border-surface-variant print-break-inside-avoid">
+            <p class="font-label-sm text-[13px] text-on-surface-variant mb-2">Important Information</p>
+            <p class="font-body-md text-sm text-on-surface-variant">Please arrive at the airport at least 3 hours before departure. Check-in closes 60 minutes prior to scheduled departure. This ticket is subject to SkyFly Elite's Conditions of Carriage. Government issued photo ID is required.</p>
+        </footer>
+    </main>
 </body>
 </html>
