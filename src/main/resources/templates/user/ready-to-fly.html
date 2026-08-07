@@ -1,100 +1,139 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{layout :: html_head('Ready to Fly')}"></head>
-<body>
-<div th:replace="~{layout :: user_navbar}"></div>
-
-<main class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            <div class="card border-0 mb-4 overflow-hidden">
-                <div class="bg-success text-white text-center py-5 px-4" style="background: linear-gradient(135deg, #22c55e, #16a34a) !important;">
-                    <i class="bi bi-check-circle-fill display-3 mb-3 d-block"></i>
-                    <h2 class="mt-2 mb-1 fw-bold">You're Checked In!</h2>
-                    <p class="mb-0 text-white-50 small">Ready to fly with <span th:text="${booking.flight.airline.airlineName}">Airline</span></p>
-                </div>
-                
-                <div class="card-body p-4 p-md-5">
-                    <span class="eyebrow-label text-center mb-2">Pre-Departure Summary</span>
-                    <h4 class="fw-bold mb-4 text-center section-title">Flight Summary</h4>
-                    
-                    <div class="row mb-4 g-3 text-center">
-                        <div class="col-6 border-end" style="border-color: var(--border) !important;">
-                            <div class="text-muted small text-uppercase tracking-wider">Flight</div>
-                            <div class="fs-5 fw-bold text-dark dark:text-white mt-1">
-                                <span th:text="${booking.flight.flightNumber}">FL-101</span>
-                                <span th:with="s=${booking.flight.flightStatus ?: T(com.airline.reservation.entity.FlightStatus).SCHEDULED}"
-                                      th:class="|badge ms-1 align-middle ${s.badgeClass}|"
-                                      th:text="${s.label}">SCHEDULED</span>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="text-muted small text-uppercase tracking-wider">Departure Date</div>
-                            <div class="fs-5 fw-bold text-dark dark:text-white mt-1" th:text="${#temporals.format(booking.flight.departureDateTime, 'dd MMM yyyy')}">Date</div>
-                        </div>
+<head>
+    <th:block th:replace="~{layout :: html_head('Ready to Fly')}"></th:block>
+    <!-- Tailwind CSS for specific design -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Montserrat:wght@600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary-container": "#0f1c2c",
+                        "on-primary-container": "#778598",
+                        "secondary": "#005cab",
+                        "secondary-container": "#0075d6",
+                        "on-secondary-container": "#fefcff",
+                        "on-surface-variant": "#44474c",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#c4c6cc",
+                        "inverse-surface": "#26323b",
+                        "on-primary": "#ffffff"
+                    },
+                    fontFamily: {
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Montserrat"],
+                        "display-lg": ["Montserrat"],
+                        "display-lg-mobile": ["Montserrat"]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .tw-scope {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background antialiased min-h-screen flex flex-col">
+    <!-- Navbar from layout -->
+    <div th:replace="~{layout :: user_navbar}"></div>
+    
+    <!-- Main Content Canvas -->
+    <main class="tw-scope flex-grow pt-32 pb-24 px-4 md:px-16 max-w-[1280px] mx-auto w-full flex flex-col items-center justify-center">
+        <!-- Ready to Fly Status Banner -->
+        <div class="w-full max-w-2xl mb-12 flex flex-col items-center text-center animate-[fadeInUp_0.8s_ease-out]">
+            <div class="inline-flex items-center gap-3 bg-[#d4e3ff]/30 text-[#0075d6] px-6 py-3 rounded-full mb-6">
+                <span class="material-symbols-outlined text-2xl">check_circle</span>
+                <span class="font-headline-md text-lg text-[#0075d6]">Ready to Fly</span>
+            </div>
+            <h1 class="font-display-lg-mobile md:font-display-lg text-3xl md:text-5xl text-primary-container mb-4" th:text="'You\'re all set, ' + ${#strings.arraySplit(booking.user.name, ' ')[0]} + '.'">You're all set, Alexander.</h1>
+            <p class="font-body-lg text-lg text-on-surface-variant max-w-lg">Your boarding pass is ready. Please proceed to security and make your way to the gate.</p>
+        </div>
+        
+        <!-- Post-Check-in Summary Card -->
+        <div class="w-full max-w-3xl bg-white rounded-[16px] shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-outline-variant/30 overflow-hidden relative group">
+            <!-- Atmospheric Header in Card -->
+            <div class="h-32 bg-secondary-container relative overflow-hidden flex items-center px-8">
+                <div class="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
+                <div class="relative z-10 w-full flex justify-between items-center text-white">
+                    <div>
+                        <div class="font-label-sm text-[13px] opacity-80 uppercase tracking-widest mb-1">Flight</div>
+                        <div class="font-headline-md text-2xl" th:text="${booking.flight.flightNumber}">SFE 409</div>
                     </div>
-                    
-                    <div class="card bg-light border-0 p-4 mb-4">
-                        <div class="row text-center align-items-center">
-                            <div class="col-4">
-                                <div class="fs-3 fw-bold text-primary" th:text="${booking.flight.originAirport.airportCode}">DEL</div>
-                                <div class="text-muted small font-monospace" th:text="${#temporals.format(booking.flight.departureDateTime, 'HH:mm')}">08:00</div>
-                            </div>
-                            <div class="col-4 position-relative">
-                                <div style="border-top: 2px dashed rgba(14, 165, 233, 0.2); position: relative;">
-                                    <i class="bi bi-airplane-fill text-primary" style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%) rotate(90deg); font-size: 0.9rem;"></i>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="fs-3 fw-bold text-primary" th:text="${booking.flight.destinationAirport.airportCode}">BOM</div>
-                                <div class="text-muted small font-monospace" th:text="${#temporals.format(booking.flight.arrivalDateTime, 'HH:mm')}">10:30</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="row g-3 mb-4">
-                        <div class="col-6">
-                            <div class="card bg-light border-0 p-3 text-center h-100">
-                                <div class="text-muted small">Seat(s)</div>
-                                <div class="fs-5 fw-bold text-primary mt-1" th:text="${booking.seatNumbers}">12A</div>
-                                <div class="small text-muted" th:text="${booking.cabinClass}">Economy</div>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="card bg-light border-0 p-3 text-center h-100">
-                                <div class="text-muted small">Boarding Time</div>
-                                <div class="fs-5 fw-bold text-danger mt-1" th:text="${booking.flight.boardingTime != null ? #temporals.format(booking.flight.boardingTime, 'HH:mm') : 'TBA'}">07:15</div>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="card bg-light border-0 p-3 text-center h-100">
-                                <div class="text-muted small">Gate</div>
-                                <div class="fs-5 fw-bold text-dark dark:text-white mt-1" th:text="${booking.flight.gateNumber != null ? booking.flight.gateNumber : 'TBA'}">G12</div>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="card bg-light border-0 p-3 text-center h-100">
-                                <div class="text-muted small">Terminal</div>
-                                <div class="fs-5 fw-bold text-dark dark:text-white mt-1" th:text="${booking.flight.terminal != null ? booking.flight.terminal : 'TBA'}">T2</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="d-grid gap-3 mt-4">
-                        <a th:href="@{/user/boarding-pass/{id}(id=${booking.id})}" class="btn-primary-theme py-3 text-uppercase">
-                            <i class="bi bi-file-earmark-check"></i> View Boarding Pass
-                        </a>
-                        <a th:href="@{/user/bookings}" class="btn-outline-theme py-2.5">
-                            Back to My Bookings
-                        </a>
+                    <div class="text-right">
+                        <div class="font-label-sm text-[13px] opacity-80 uppercase tracking-widest mb-1">Class</div>
+                        <div class="font-headline-md text-2xl" th:text="${booking.cabinClass}">First Class</div>
                     </div>
                 </div>
             </div>
+            
+            <div class="p-8 md:p-12">
+                <!-- Route Information -->
+                <div class="flex items-center justify-between mb-12 relative">
+                    <!-- Departure -->
+                    <div class="text-center w-1/3">
+                        <div class="font-display-lg text-4xl md:text-5xl text-primary-container mb-2" th:text="${booking.flight.originAirport.airportCode}">JFK</div>
+                        <div class="font-body-md text-base text-on-surface-variant" th:text="${booking.flight.originAirport.city}">New York</div>
+                        <div class="font-label-sm text-[13px] text-on-surface-variant mt-2" th:text="${#temporals.format(booking.flight.departureDateTime, 'hh:mm a')}">08:30 AM</div>
+                    </div>
+                    <!-- Flight Path Graphic -->
+                    <div class="w-1/3 flex flex-col items-center relative">
+                        <div class="font-label-sm text-[13px] text-secondary mb-2" th:text="${booking.flight.durationMinutes / 60} + 'h ' + ${booking.flight.durationMinutes % 60} + 'm'">5h 45m</div>
+                        <div class="w-full h-px bg-outline-variant relative flex items-center justify-center">
+                            <span class="material-symbols-outlined text-secondary absolute bg-white px-2 transform -rotate-45" style="font-variation-settings: 'FILL' 1;">flight</span>
+                        </div>
+                        <div class="font-label-sm text-[13px] text-on-surface-variant mt-2">Direct</div>
+                    </div>
+                    <!-- Arrival -->
+                    <div class="text-center w-1/3">
+                        <div class="font-display-lg text-4xl md:text-5xl text-primary-container mb-2" th:text="${booking.flight.destinationAirport.airportCode}">LHR</div>
+                        <div class="font-body-md text-base text-on-surface-variant" th:text="${booking.flight.destinationAirport.city}">London</div>
+                        <div class="font-label-sm text-[13px] text-on-surface-variant mt-2" th:text="${#temporals.format(booking.flight.arrivalDateTime, 'hh:mm a')}">20:15 PM</div>
+                    </div>
+                </div>
+                
+                <hr class="border-outline-variant/30 mb-8"/>
+                
+                <!-- Boarding Details Grid -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+                    <div class="flex flex-col gap-1">
+                        <span class="font-label-sm text-[13px] text-on-surface-variant uppercase tracking-wider">Terminal</span>
+                        <span class="font-headline-md text-2xl text-primary-container" th:text="${booking.flight.terminal}">4</span>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <span class="font-label-sm text-[13px] text-on-surface-variant uppercase tracking-wider">Gate</span>
+                        <span class="font-headline-md text-2xl text-primary-container" th:text="${booking.flight.gateNumber}">B12</span>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <span class="font-label-sm text-[13px] text-on-surface-variant uppercase tracking-wider">Boarding</span>
+                        <span class="font-headline-md text-2xl text-primary-container" th:text="${#temporals.format(booking.flight.departureDateTime.minusMinutes(45), 'hh:mm a')}">07:45 AM</span>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <span class="font-label-sm text-[13px] text-on-surface-variant uppercase tracking-wider">Seat</span>
+                        <span class="font-headline-md text-2xl text-primary-container" th:text="${booking.seatNumbers}">2A</span>
+                    </div>
+                </div>
+                
+                <!-- Action Button -->
+                <div class="flex justify-center">
+                    <a th:href="@{/user/boarding-pass/{id}(id=${booking.id})}" class="bg-primary-container text-white font-label-sm text-[13px] px-8 py-4 rounded-lg flex items-center gap-3 hover:bg-inverse-surface transition-all duration-300 shadow-md" style="text-decoration: none;">
+                        <span class="material-symbols-outlined">qr_code_2</span>
+                        View Boarding Pass
+                    </a>
+                </div>
+            </div>
         </div>
-    </div>
-</main>
-
-<div th:replace="~{layout :: footer}"></div>
-<div th:replace="~{layout :: html_scripts}"></div>
+    </main>
 </body>
 </html>
