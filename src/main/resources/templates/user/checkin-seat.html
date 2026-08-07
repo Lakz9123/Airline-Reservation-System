@@ -227,8 +227,12 @@
                     const rightGroup = document.createElement('div');
                     rightGroup.className = 'flex gap-2';
 
+                    let rowLetter = '';
+
                     for (let j = 0; j < zone.cols && zoneCount < zone.count && currentIndex < allSeats.length; j++, currentIndex++, zoneCount++) {
                         const seatLabel = allSeats[currentIndex];
+                        
+                        if (j === 0) rowLetter = seatLabel.replace(/[0-9]/g, '');
                         
                         if (j < zone.aisle) {
                             createSeatBtn(seatLabel, leftGroup, zone);
@@ -241,7 +245,7 @@
                     
                     const aisleSpan = document.createElement('div');
                     aisleSpan.className = 'w-10 text-center font-headline-md text-xl text-[#44474c]';
-                    aisleSpan.textContent = rowNum++;
+                    aisleSpan.textContent = rowLetter;
                     rowDiv.appendChild(aisleSpan);
                     
                     rowDiv.appendChild(rightGroup);
@@ -266,8 +270,8 @@
             btn.title = seat;
             btn.className = `seat-item w-12 h-14 rounded-md flex items-center justify-center relative ${zone.borderClass}`;
             
-            // Extract letter from e.g. "4A"
-            const letter = seat.replace(/[0-9]/g, '');
+            // Backend generates A1, A2... so extract number for seat button
+            const colNum = seat.replace(/[A-Za-z]/g, '');
 
             const span = document.createElement('span');
             span.className = 'font-label-sm text-[13px] absolute top-1 left-2 font-bold';
@@ -279,7 +283,7 @@
                 btn.disabled = true;
             } else {
                 span.className += ' text-white';
-                span.textContent = letter;
+                span.textContent = colNum;
                 
                 if (selectedSeats.has(seat)) {
                     btn.className += ` bg-[#22c55e] border-[#16a34a] ring-2 ring-[#0f1c2c] ring-offset-2 shadow-md`;
