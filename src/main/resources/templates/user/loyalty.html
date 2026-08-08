@@ -185,7 +185,7 @@
                 <div class="absolute inset-0 bg-gradient-to-br from-surface-variant/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
                 <div class="relative z-10">
                     <span class="font-label-sm text-label-sm text-secondary-container uppercase tracking-widest mb-4 inline-block" th:text="${wallet.tier} + ' Member'">Tier Member</span>
-                    <h2 class="font-display-lg text-[40px] font-bold text-primary-container leading-none" th:text="${wallet.user.name}">Member Name</h2>
+                    <h2 class="font-display-lg text-3xl md:text-[40px] font-bold text-primary-container leading-none break-words" th:text="${wallet.user.name}">Member Name</h2>
                 </div>
                 <div class="relative z-10 flex-grow flex items-center justify-center py-6">
                     <img th:src="@{'/images/' + ${#strings.toLowerCase(wallet.tier.name())} + '_badge.png'}" alt="Elite Tier Badge" class="w-48 h-48 object-contain drop-shadow-2xl animate-float" />
@@ -209,7 +209,7 @@
                     <div class="flex items-baseline justify-between mb-8">
                         <h3 class="font-display-lg text-display-lg-mobile md:text-display-lg text-primary-container" th:text="${#numbers.formatInteger(wallet.totalMiles, 1, 'COMMA')}">0</h3>
                     </div>
-                    <div class="flex space-x-4">
+                    <div class="flex flex-col sm:flex-row gap-4">
                         <button class="bg-primary-container text-on-primary px-6 py-3 rounded-lg font-label-sm text-label-sm hover:bg-on-background transition-colors active:scale-95 shadow-md">Redeem Miles</button>
                         <button class="border border-outline text-primary-container px-6 py-3 rounded-lg font-label-sm text-label-sm hover:bg-surface-variant transition-colors active:scale-95">Transfer</button>
                     </div>
