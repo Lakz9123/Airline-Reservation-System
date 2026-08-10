@@ -274,7 +274,7 @@
 <span th:if="${flight.flightStatus == T(com.airline.reservation.entity.FlightStatus).SCHEDULED}" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-surface-container-high text-on-surface">Scheduled</span>
 <span th:if="${flight.flightStatus == T(com.airline.reservation.entity.FlightStatus).BOARDING}" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-secondary/10 text-secondary">Boarding</span>
 <span th:if="${flight.flightStatus == T(com.airline.reservation.entity.FlightStatus).DEPARTED}" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-surface-variant text-on-surface-variant">Departed</span>
-<span th:if="${flight.flightStatus == T(com.airline.reservation.entity.FlightStatus).ARRIVED}" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-surface-container-high text-on-surface">Arrived</span>
+<span th:if="${flight.flightStatus == T(com.airline.reservation.entity.FlightStatus).LANDED}" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-surface-container-high text-on-surface">Arrived</span>
 <span th:if="${flight.flightStatus == T(com.airline.reservation.entity.FlightStatus).DELAYED}" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-error/10 text-error">Delayed</span>
 <span th:if="${flight.flightStatus == T(com.airline.reservation.entity.FlightStatus).CANCELLED}" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-error/10 text-error">Cancelled</span>
 </td>
