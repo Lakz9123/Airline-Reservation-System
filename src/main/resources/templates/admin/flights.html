@@ -291,9 +291,11 @@
 <a th:href="@{/admin/flights/edit/{id}(id=${flight.id})}" class="p-1.5 rounded-md text-on-surface-variant hover:text-secondary hover:bg-surface-container transition-colors" title="Edit">
 <span class="material-symbols-outlined text-[18px]">edit</span>
 </a>
-<a th:href="@{/admin/flights/delete/{id}(id=${flight.id})}" class="p-1.5 rounded-md text-on-surface-variant hover:text-error hover:bg-error-container/20 transition-colors" title="Delete" onclick="return confirm('Are you sure?');">
-<span class="material-symbols-outlined text-[18px]">delete</span>
-</a>
+<form th:action="@{/admin/flights/delete/{id}(id=${flight.id})}" method="post" class="inline">
+    <button type="submit" class="p-1.5 rounded-md text-on-surface-variant hover:text-error hover:bg-error-container/20 transition-colors" title="Delete" onclick="return confirm('Are you sure?');">
+        <span class="material-symbols-outlined text-[18px]">delete</span>
+    </button>
+</form>
 </div>
 </td>
 </tr>

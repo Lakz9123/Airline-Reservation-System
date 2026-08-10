@@ -350,7 +350,7 @@
 <input th:field="*{firstClassFare}" class="w-full pl-7 pr-3 py-2 bg-surface border border-outline-variant rounded-lg focus:border-secondary focus:ring-1 focus:ring-secondary outline-none font-body-md text-on-surface" type="number" step="0.01"/>
 </div>
 <div class="flex gap-2">
-<button type="submit" formaction="@{/admin/flights/details/{id}/fares(id=${flight.id})}" class="flex-1 py-1.5 bg-secondary text-on-secondary rounded-md font-label-sm text-label-sm hover:bg-secondary-container transition-colors">Save</button>
+<button type="submit" th:formaction="@{/admin/flights/details/{id}/fares(id=${flight.id})}" class="flex-1 py-1.5 bg-secondary text-on-secondary rounded-md font-label-sm text-label-sm hover:bg-secondary-container transition-colors">Save</button>
 <button type="button" class="flex-1 py-1.5 bg-surface-container-high text-on-surface-variant rounded-md font-label-sm text-label-sm hover:bg-surface-variant transition-colors" onclick="toggleEdit('card-first')">Cancel</button>
 </div>
 </div>
@@ -388,7 +388,7 @@
 <input th:field="*{businessFare}" class="w-full pl-7 pr-3 py-2 bg-surface border border-outline-variant rounded-lg focus:border-secondary focus:ring-1 focus:ring-secondary outline-none font-body-md text-on-surface" type="number" step="0.01"/>
 </div>
 <div class="flex gap-2">
-<button type="submit" formaction="@{/admin/flights/details/{id}/fares(id=${flight.id})}" class="flex-1 py-1.5 bg-secondary text-on-secondary rounded-md font-label-sm text-label-sm hover:bg-secondary-container transition-colors">Save</button>
+<button type="submit" th:formaction="@{/admin/flights/details/{id}/fares(id=${flight.id})}" class="flex-1 py-1.5 bg-secondary text-on-secondary rounded-md font-label-sm text-label-sm hover:bg-secondary-container transition-colors">Save</button>
 <button type="button" class="flex-1 py-1.5 bg-surface-container-high text-on-surface-variant rounded-md font-label-sm text-label-sm hover:bg-surface-variant transition-colors" onclick="toggleEdit('card-business')">Cancel</button>
 </div>
 </div>
@@ -426,7 +426,7 @@
 <input th:field="*{premiumEconomyFare}" class="w-full pl-7 pr-3 py-2 bg-surface border border-outline-variant rounded-lg focus:border-secondary focus:ring-1 focus:ring-secondary outline-none font-body-md text-on-surface" type="number" step="0.01"/>
 </div>
 <div class="flex gap-2">
-<button type="submit" formaction="@{/admin/flights/details/{id}/fares(id=${flight.id})}" class="flex-1 py-1.5 bg-secondary text-on-secondary rounded-md font-label-sm text-label-sm hover:bg-secondary-container transition-colors">Save</button>
+<button type="submit" th:formaction="@{/admin/flights/details/{id}/fares(id=${flight.id})}" class="flex-1 py-1.5 bg-secondary text-on-secondary rounded-md font-label-sm text-label-sm hover:bg-secondary-container transition-colors">Save</button>
 <button type="button" class="flex-1 py-1.5 bg-surface-container-high text-on-surface-variant rounded-md font-label-sm text-label-sm hover:bg-surface-variant transition-colors" onclick="toggleEdit('card-premiumecon')">Cancel</button>
 </div>
 </div>
@@ -464,7 +464,7 @@
 <input th:field="*{economyFare}" class="w-full pl-7 pr-3 py-2 bg-surface border border-outline-variant rounded-lg focus:border-secondary focus:ring-1 focus:ring-secondary outline-none font-body-md text-on-surface" type="number" step="0.01"/>
 </div>
 <div class="flex gap-2">
-<button type="submit" formaction="@{/admin/flights/details/{id}/fares(id=${flight.id})}" class="flex-1 py-1.5 bg-secondary text-on-secondary rounded-md font-label-sm text-label-sm hover:bg-secondary-container transition-colors">Save</button>
+<button type="submit" th:formaction="@{/admin/flights/details/{id}/fares(id=${flight.id})}" class="flex-1 py-1.5 bg-secondary text-on-secondary rounded-md font-label-sm text-label-sm hover:bg-secondary-container transition-colors">Save</button>
 <button type="button" class="flex-1 py-1.5 bg-surface-container-high text-on-surface-variant rounded-md font-label-sm text-label-sm hover:bg-surface-variant transition-colors" onclick="toggleEdit('card-econ')">Cancel</button>
 </div>
 </div>
