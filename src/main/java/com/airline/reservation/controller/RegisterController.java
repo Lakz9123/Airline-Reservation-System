@@ -30,7 +30,7 @@ public class RegisterController {
         if (authentication != null && authentication.isAuthenticated()) {
             for (GrantedAuthority authority : authentication.getAuthorities()) {
                 if ("ROLE_ADMIN".equals(authority.getAuthority())) {
-                    return "redirect:/admin/dashboard";
+                    return "redirect:/admin/flights";
                 }
             }
             return "redirect:/user/dashboard";

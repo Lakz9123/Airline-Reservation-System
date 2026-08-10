@@ -39,7 +39,7 @@ public class AuthController {
     private String getDashboardRedirect(Authentication authentication) {
         for (GrantedAuthority authority : authentication.getAuthorities()) {
             if ("ROLE_ADMIN".equals(authority.getAuthority())) {
-                return "redirect:/admin/dashboard";
+                return "redirect:/admin/flights";
             } else if ("ROLE_USER".equals(authority.getAuthority())) {
                 return "redirect:/user/dashboard";
             }
