@@ -3,7 +3,7 @@
 <html class="light" lang="en" xmlns:th="http://www.thymeleaf.org"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title th:text="'Flight Details - ' + ">Flight Details - SF-102</title>
+<title th:text="'Flight Details - ' + ${flight.flightNumber}">Flight Details - SF-102</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Montserrat:wght@600;700&amp;display=swap" rel="stylesheet"/>
@@ -228,13 +228,13 @@
 </div>
 <div>
 <div class="flex items-center gap-3 mb-1">
-<h1 class="font-display-lg text-display-lg text-on-surface" th:text="">SF-102</h1>
-<span class="bg-surface-container-high text-on-surface-variant px-3 py-1 rounded-full font-label-sm text-label-sm border border-outline-variant" th:text="">Active</span>
+<h1 class="font-display-lg text-display-lg text-on-surface" th:text="${flight.flightNumber}">SF-102</h1>
+<span class="bg-surface-container-high text-on-surface-variant px-3 py-1 rounded-full font-label-sm text-label-sm border border-outline-variant" th:text="${flight.flightStatus}">Active</span>
 </div>
 <div class="flex items-center gap-2 text-on-surface-variant font-body-lg text-body-lg">
-<span th:text="">San Francisco (SFO)</span>
+<span th:text="${flight.originAirport.city + ' (' + flight.originAirport.airportCode + ')'}">San Francisco (SFO)</span>
 <span class="material-symbols-outlined text-outline">arrow_right_alt</span>
-<span th:text="">New York (JFK)</span>
+<span th:text="${flight.destinationAirport.city + ' (' + flight.destinationAirport.airportCode + ')'}">New York (JFK)</span>
 </div>
 </div>
 </div>
@@ -242,7 +242,7 @@
 <button class="px-6 py-2.5 rounded-lg border border-outline-variant text-on-surface font-label-sm text-label-sm hover:bg-surface-variant/50 transition-colors shadow-sm bg-surface-container-lowest">
                             View Manifest
                         </button>
-<a th:href="@{/admin/flights/edit/{id}(id=)}" class="px-6 py-2.5 rounded-lg bg-secondary text-on-secondary font-label-sm text-label-sm hover:bg-secondary-container transition-colors shadow-sm inline-block">
+<a th:href="@{/admin/flights/edit/{id}(id=${flight.id})}" class="px-6 py-2.5 rounded-lg bg-secondary text-on-secondary font-label-sm text-label-sm hover:bg-secondary-container transition-colors shadow-sm inline-block">
                             Manage Flight
                         </a>
 </div>
@@ -275,7 +275,7 @@
 </div>
 <div>
 <p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Total Capacity</p>
-<p class="font-headline-md text-headline-md text-on-surface" th:text="">320</p>
+<p class="font-headline-md text-headline-md text-on-surface" th:text="${flight.totalSeats}">320</p>
 </div>
 </div>
 <!-- Available Seats -->
@@ -285,7 +285,7 @@
 </div>
 <div>
 <p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Available Seats</p>
-<p class="font-headline-md text-headline-md text-on-surface" th:text="">84</p>
+<p class="font-headline-md text-headline-md text-on-surface" th:text="${flight.availableSeats}">84</p>
 </div>
 </div>
 <!-- Occupied Seats -->
@@ -295,7 +295,7 @@
 </div>
 <div>
 <p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Occupied Seats</p>
-<p class="font-headline-md text-headline-md text-on-surface" th:text="">236</p>
+<p class="font-headline-md text-headline-md text-on-surface" th:text="${flight.totalSeats - flight.availableSeats}">236</p>
 </div>
 </div>
 
@@ -324,8 +324,8 @@
 <h2 class="font-headline-md text-headline-md text-on-surface">Cabin Configuration &amp; Pricing</h2>
 <span class="font-body-md text-body-md text-on-surface-variant">Base fares in USD</span>
 </div>
-<form th:action="@{/admin/flights/details/{id}(id=)}" th:object="" method="post">
-<div th:if="" class="p-4 mb-4 text-sm text-on-secondary rounded-lg bg-secondary/80" role="alert"><span th:text=""></span></div>
+<form th:action="@{/admin/flights/details/{id}(id=${flight.id})}" th:object="${flight}" method="post">
+<div th:if="${successMessage}" class="p-4 mb-4 text-sm text-on-secondary rounded-lg bg-secondary/80" role="alert"><span th:text="${successMessage}"></span></div>
 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
 <!-- First Class -->
 <div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-[0_4px_20px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col price-card" id="card-first">
@@ -338,7 +338,7 @@
 <p class="font-label-sm text-label-sm text-on-surface-variant mb-2">Current Base Fare</p>
 <!-- Display Mode -->
 <div class="display-value flex items-center justify-between group">
-<span class="font-headline-md text-headline-md text-on-surface text-3xl">$2,450</span>
+<span class="font-headline-md text-headline-md text-on-surface text-3xl" th:text="'$' + ${flight.firstClassFare}">$2,450</span>
 <button type="button" class="w-8 h-8 rounded-full flex items-center justify-center text-outline hover:text-secondary hover:bg-surface-container transition-all" onclick="toggleEdit('card-first')">
 <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
 </button>
@@ -350,7 +350,7 @@
 <input th:field="*{firstClassFare}" class="w-full pl-7 pr-3 py-2 bg-surface border border-outline-variant rounded-lg focus:border-secondary focus:ring-1 focus:ring-secondary outline-none font-body-md text-on-surface" type="number" step="0.01"/>
 </div>
 <div class="flex gap-2">
-<button type="submit" class="flex-1 py-1.5 bg-secondary text-on-secondary rounded-md font-label-sm text-label-sm hover:bg-secondary-container transition-colors">Save</button>
+<button type="submit" formaction="@{/admin/flights/details/{id}/fares(id=${flight.id})}" class="flex-1 py-1.5 bg-secondary text-on-secondary rounded-md font-label-sm text-label-sm hover:bg-secondary-container transition-colors">Save</button>
 <button type="button" class="flex-1 py-1.5 bg-surface-container-high text-on-surface-variant rounded-md font-label-sm text-label-sm hover:bg-surface-variant transition-colors" onclick="toggleEdit('card-first')">Cancel</button>
 </div>
 </div>
@@ -377,7 +377,7 @@
 <div class="mb-6">
 <p class="font-label-sm text-label-sm text-on-surface-variant mb-2">Current Base Fare</p>
 <div class="display-value flex items-center justify-between group">
-<span class="font-headline-md text-headline-md text-on-surface text-3xl">$1,280</span>
+<span class="font-headline-md text-headline-md text-on-surface text-3xl" th:text="'$' + ${flight.businessFare}">$1,280</span>
 <button type="button" class="w-8 h-8 rounded-full flex items-center justify-center text-outline hover:text-secondary hover:bg-surface-container transition-all" onclick="toggleEdit('card-business')">
 <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
 </button>
@@ -388,7 +388,7 @@
 <input th:field="*{businessFare}" class="w-full pl-7 pr-3 py-2 bg-surface border border-outline-variant rounded-lg focus:border-secondary focus:ring-1 focus:ring-secondary outline-none font-body-md text-on-surface" type="number" step="0.01"/>
 </div>
 <div class="flex gap-2">
-<button type="submit" class="flex-1 py-1.5 bg-secondary text-on-secondary rounded-md font-label-sm text-label-sm hover:bg-secondary-container transition-colors">Save</button>
+<button type="submit" formaction="@{/admin/flights/details/{id}/fares(id=${flight.id})}" class="flex-1 py-1.5 bg-secondary text-on-secondary rounded-md font-label-sm text-label-sm hover:bg-secondary-container transition-colors">Save</button>
 <button type="button" class="flex-1 py-1.5 bg-surface-container-high text-on-surface-variant rounded-md font-label-sm text-label-sm hover:bg-surface-variant transition-colors" onclick="toggleEdit('card-business')">Cancel</button>
 </div>
 </div>
@@ -415,7 +415,7 @@
 <div class="mb-6">
 <p class="font-label-sm text-label-sm text-on-surface-variant mb-2">Current Base Fare</p>
 <div class="display-value flex items-center justify-between group">
-<span class="font-headline-md text-headline-md text-on-surface text-3xl">$850</span>
+<span class="font-headline-md text-headline-md text-on-surface text-3xl" th:text="'$' + ${flight.premiumEconomyFare}">$850</span>
 <button type="button" class="w-8 h-8 rounded-full flex items-center justify-center text-outline hover:text-secondary hover:bg-surface-container transition-all" onclick="toggleEdit('card-premiumecon')">
 <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
 </button>
@@ -426,7 +426,7 @@
 <input th:field="*{premiumEconomyFare}" class="w-full pl-7 pr-3 py-2 bg-surface border border-outline-variant rounded-lg focus:border-secondary focus:ring-1 focus:ring-secondary outline-none font-body-md text-on-surface" type="number" step="0.01"/>
 </div>
 <div class="flex gap-2">
-<button type="submit" class="flex-1 py-1.5 bg-secondary text-on-secondary rounded-md font-label-sm text-label-sm hover:bg-secondary-container transition-colors">Save</button>
+<button type="submit" formaction="@{/admin/flights/details/{id}/fares(id=${flight.id})}" class="flex-1 py-1.5 bg-secondary text-on-secondary rounded-md font-label-sm text-label-sm hover:bg-secondary-container transition-colors">Save</button>
 <button type="button" class="flex-1 py-1.5 bg-surface-container-high text-on-surface-variant rounded-md font-label-sm text-label-sm hover:bg-surface-variant transition-colors" onclick="toggleEdit('card-premiumecon')">Cancel</button>
 </div>
 </div>
@@ -453,7 +453,7 @@
 <div class="mb-6">
 <p class="font-label-sm text-label-sm text-on-surface-variant mb-2">Current Base Fare</p>
 <div class="display-value flex items-center justify-between group">
-<span class="font-headline-md text-headline-md text-on-surface text-3xl">$420</span>
+<span class="font-headline-md text-headline-md text-on-surface text-3xl" th:text="'$' + ${flight.economyFare}">$420</span>
 <button type="button" class="w-8 h-8 rounded-full flex items-center justify-center text-outline hover:text-secondary hover:bg-surface-container transition-all" onclick="toggleEdit('card-econ')">
 <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
 </button>
@@ -464,7 +464,7 @@
 <input th:field="*{economyFare}" class="w-full pl-7 pr-3 py-2 bg-surface border border-outline-variant rounded-lg focus:border-secondary focus:ring-1 focus:ring-secondary outline-none font-body-md text-on-surface" type="number" step="0.01"/>
 </div>
 <div class="flex gap-2">
-<button type="submit" class="flex-1 py-1.5 bg-secondary text-on-secondary rounded-md font-label-sm text-label-sm hover:bg-secondary-container transition-colors">Save</button>
+<button type="submit" formaction="@{/admin/flights/details/{id}/fares(id=${flight.id})}" class="flex-1 py-1.5 bg-secondary text-on-secondary rounded-md font-label-sm text-label-sm hover:bg-secondary-container transition-colors">Save</button>
 <button type="button" class="flex-1 py-1.5 bg-surface-container-high text-on-surface-variant rounded-md font-label-sm text-label-sm hover:bg-surface-variant transition-colors" onclick="toggleEdit('card-econ')">Cancel</button>
 </div>
 </div>
