@@ -1,225 +1,283 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{layout :: html_head('Flight Details')}"></head>
-<body>
-<div th:replace="~{layout :: navbar}"></div>
+<head th:replace="~{admin/admin-layout :: admin_head('Flight Details')}"></head>
+<body class="bg-admin-bg text-admin-text font-sans antialiased min-h-screen flex">
+    
+    <!-- Sidebar -->
+    <div th:replace="~{admin/admin-layout :: admin_sidebar('flights')}"></div>
+    
+    <!-- Topbar -->
+    <div th:replace="~{admin/admin-layout :: admin_topbar}"></div>
 
-<main class="container my-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold text-dark"><i class="bi bi-info-circle-fill text-primary"></i> Flight Details</h2>
-        <a th:href="@{/admin/flights}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Back to Flights</a>
-    </div>
-
-    <!-- Feedback alerts -->
-    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
-        <span th:text="${success}">Success message.</span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-        <span th:text="${error}">Error message.</span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-
-    <div class="row g-4">
-        <!-- Flight Info Card -->
-        <div class="col-md-6">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-header bg-dark text-white fw-bold">
-                    <i class="bi bi-airplane"></i> General Information
+    <!-- Main Content -->
+    <main class="flex-1 ml-64 mt-16 p-8">
+        
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+            <div class="flex items-center gap-6">
+                <!-- Flight Icon -->
+                <div class="w-16 h-16 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 overflow-hidden shadow-inner">
+                    <img th:if="${flight.airline.logo != null && !flight.airline.logo.isEmpty()}" th:src="${flight.airline.logo}" alt="Logo" class="w-10 h-10 object-contain">
+                    <span th:if="${flight.airline.logo == null || flight.airline.logo.isEmpty()}" class="material-symbols-outlined text-admin-accent text-3xl">flight</span>
                 </div>
-                <div class="card-body">
-                    <table class="table table-borderless">
-                        <tbody>
-                            <tr>
-                                <th class="w-25 text-muted">Flight Number</th>
-                                <td>
-                                    <span class="fw-bold fs-5" th:text="${flight.flightNumber}"></span>
-                                    <span th:with="s=${flight.flightStatus ?: T(com.airline.reservation.entity.FlightStatus).SCHEDULED}"
-                                          th:class="|badge ms-2 ${s.badgeClass}|"
-                                          th:text="${s.label}"
-                                          th:style="${s.name() == 'DEPARTED' ? 'background-color: #6f42c1 !important' : ''}">SCHEDULED</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="text-muted">Airline</th>
-                                <td>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <img th:if="${flight.airline.logo != null && !flight.airline.logo.isEmpty()}" 
-                                             th:src="${flight.airline.logo}" 
-                                             alt="Logo" class="img-thumbnail" 
-                                             style="width: 50px; height: auto; max-height: 30px; object-fit: contain;">
-                                        <span th:text="${flight.airline.airlineName}"></span>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="text-muted">Route</th>
-                                <td>
-                                    <span class="fw-semibold text-uppercase" th:text="${flight.originAirport.airportCode}"></span> 
-                                    <i class="bi bi-arrow-right text-muted mx-1"></i>
-                                    <span class="fw-semibold text-uppercase" th:text="${flight.destinationAirport.airportCode}"></span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="text-muted">Departure</th>
-                                <td th:text="${#temporals.format(flight.departureDateTime, 'dd MMM yyyy, HH:mm')}"></td>
-                            </tr>
-                            <tr>
-                                <th class="text-muted">Arrival</th>
-                                <td th:text="${#temporals.format(flight.arrivalDateTime, 'dd MMM yyyy, HH:mm')}"></td>
-                            </tr>
-                            <tr>
-                                <th class="text-muted">Aircraft</th>
-                                <td th:text="${flight.aircraft != null ? flight.aircraft.model + ' (' + flight.aircraft.aircraftNumber + ')' : 'Unknown'}"></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                
+                <div>
+                    <div class="flex items-center gap-3 mb-1">
+                        <h2 class="font-display font-bold text-3xl text-admin-text" th:text="${flight.flightNumber}">AA-101</h2>
+                        <span th:with="status=${flight.flightStatus != null ? flight.flightStatus.name() : 'SCHEDULED'}"
+                              th:classappend="${status == 'SCHEDULED' ? 'bg-slate-100 text-slate-700 border-slate-200' : 
+                                              (status == 'DELAYED' ? 'bg-red-50 text-red-700 border-red-200' : 
+                                              (status == 'BOARDING' ? 'bg-teal-50 text-teal-700 border-teal-200' : 
+                                              (status == 'DEPARTED' ? 'bg-purple-50 text-purple-700 border-purple-200' : 
+                                              (status == 'LANDED' ? 'bg-gray-100 text-gray-700 border-gray-200' : 
+                                              (status == 'CANCELLED' ? 'bg-red-100 text-red-800 border-red-300' : 'bg-slate-100 text-slate-700 border-slate-200'))))))}"
+                              class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border uppercase tracking-wider"
+                              th:text="${flight.flightStatus != null ? flight.flightStatus.label : 'Scheduled'}">
+                              Active
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-2 text-admin-textMuted font-medium">
+                        <span th:text="${flight.originAirport.city} + ' (' + ${flight.originAirport.airportCode} + ')'">New York (JFK)</span>
+                        <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+                        <span th:text="${flight.destinationAirport.city} + ' (' + ${flight.destinationAirport.airportCode} + ')'">Los Angeles (LAX)</span>
+                    </div>
                 </div>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <a th:href="@{/admin/flights}" class="px-5 py-2.5 bg-white border border-slate-300 text-slate-700 font-medium text-sm rounded-lg hover:bg-slate-50 transition-colors shadow-sm">
+                    Back to Flights
+                </a>
+                <button class="px-5 py-2.5 bg-admin-accent hover:bg-blue-600 text-white font-medium text-sm rounded-lg transition-colors shadow-sm flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">manage_accounts</span> View Manifest
+                </button>
             </div>
         </div>
 
-        <!-- Seat Info Card -->
-        <div class="col-md-6">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-header bg-primary text-white fw-bold">
-                    <i class="bi bi-person-fill"></i> Seat Occupancy Summary
+        <!-- Feedback alerts -->
+        <div th:if="${success}" class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6 flex justify-between items-center shadow-sm">
+            <span th:text="${success}">Success message.</span>
+        </div>
+        <div th:if="${error}" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 flex justify-between items-center shadow-sm">
+            <span th:text="${error}">Error message.</span>
+        </div>
+
+        <!-- 3-Column Stat Row -->
+        <div th:with="total=${flight.totalSeats != null ? flight.totalSeats : 0}, avail=${flight.availableSeats != null ? flight.availableSeats : 0}, occ=${total - avail}" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <!-- Total Capacity -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex items-center gap-5 relative overflow-hidden">
+                <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 z-10">
+                    <span class="material-symbols-outlined">airline_seat_recline_normal</span>
                 </div>
-                <div class="card-body text-center d-flex flex-column justify-content-center">
-                    <div class="row g-3">
-                        <div class="col-4">
-                            <div class="p-3 border rounded bg-light">
-                                <h2 class="mb-0 text-primary fw-bold" th:text="${flight.totalSeats}">0</h2>
-                                <small class="text-muted text-uppercase fw-semibold">Total Seats</small>
+                <div class="z-10">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Total Capacity</p>
+                    <h3 class="font-display text-3xl font-bold text-admin-text" th:text="${total}">0</h3>
+                </div>
+                <span class="material-symbols-outlined absolute -right-6 -bottom-6 text-[100px] text-slate-50 z-0" style="font-variation-settings: 'FILL' 1;">airline_seat_recline_normal</span>
+            </div>
+            
+            <!-- Available Seats -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex items-center gap-5 relative overflow-hidden">
+                <div class="w-12 h-12 rounded-full bg-teal-50 flex items-center justify-center text-teal-600 z-10">
+                    <span class="material-symbols-outlined">check_circle</span>
+                </div>
+                <div class="z-10">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Available Seats</p>
+                    <h3 class="font-display text-3xl font-bold text-admin-text" th:text="${avail}">0</h3>
+                </div>
+                <span class="material-symbols-outlined absolute -right-6 -bottom-6 text-[100px] text-teal-50/50 z-0" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+            </div>
+            
+            <!-- Occupied Seats -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex items-center gap-5 relative overflow-hidden">
+                <div class="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center text-amber-600 z-10">
+                    <span class="material-symbols-outlined">group</span>
+                </div>
+                <div class="z-10">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Occupied Seats</p>
+                    <h3 class="font-display text-3xl font-bold text-admin-text" th:text="${occ}">0</h3>
+                </div>
+                <span class="material-symbols-outlined absolute -right-6 -bottom-6 text-[100px] text-amber-50/50 z-0" style="font-variation-settings: 'FILL' 1;">group</span>
+            </div>
+        </div>
+
+        <!-- Cabin Configuration & Pricing -->
+        <div class="mb-6 flex justify-between items-end">
+            <div>
+                <h3 class="font-display font-bold text-xl text-admin-text">Cabin Configuration & Pricing</h3>
+                <p class="text-sm text-admin-textMuted mt-1">Base fares in USD (*Requires save to apply changes)</p>
+            </div>
+        </div>
+
+        <form th:action="@{/admin/flights/details/{id}/fares(id=${flight.id})}" method="post" id="faresForm">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                
+                <!-- First Class -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col group">
+                    <div class="bg-admin-sidebar text-white p-4 flex items-center justify-between">
+                        <h4 class="font-bold tracking-wide">First Class</h4>
+                        <span class="material-symbols-outlined text-white/50">star</span>
+                    </div>
+                    <div class="p-5 flex-1 flex flex-col">
+                        <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-2">Current Base Fare</p>
+                        <div class="flex items-center gap-2 mb-4 group-hover:bg-slate-50 p-2 -mx-2 rounded-lg transition-colors border border-transparent group-hover:border-slate-200 cursor-text" onclick="document.getElementById('firstClassFare').focus()">
+                            <span class="font-display text-2xl font-bold text-admin-text">$</span>
+                            <input type="number" step="0.01" id="firstClassFare" name="firstClassFare" th:value="${flight.firstClassFare}" class="font-display text-2xl font-bold text-admin-text bg-transparent border-none p-0 focus:ring-0 w-full outline-none" required>
+                            <span class="material-symbols-outlined text-slate-400 text-sm opacity-0 group-hover:opacity-100 transition-opacity">edit</span>
+                        </div>
+                        <div class="mt-auto">
+                            <div class="h-px w-full bg-slate-100 mb-4"></div>
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-500 font-medium">Capacity</span>
+                                <span class="font-bold text-admin-text">12 <span class="text-slate-400 font-normal">seats</span></span>
                             </div>
                         </div>
-                        <div class="col-4">
-                            <div class="p-3 border rounded bg-light">
-                                <h2 class="mb-0 text-success fw-bold" th:text="${flight.availableSeats}">0</h2>
-                                <small class="text-muted text-uppercase fw-semibold">Available</small>
+                    </div>
+                </div>
+                
+                <!-- Business Class -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col group">
+                    <div class="bg-blue-600 text-white p-4 flex items-center justify-between">
+                        <h4 class="font-bold tracking-wide">Business</h4>
+                        <span class="material-symbols-outlined text-white/50">work</span>
+                    </div>
+                    <div class="p-5 flex-1 flex flex-col">
+                        <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-2">Current Base Fare</p>
+                        <div class="flex items-center gap-2 mb-4 group-hover:bg-slate-50 p-2 -mx-2 rounded-lg transition-colors border border-transparent group-hover:border-slate-200 cursor-text" onclick="document.getElementById('businessFare').focus()">
+                            <span class="font-display text-2xl font-bold text-admin-text">$</span>
+                            <input type="number" step="0.01" id="businessFare" name="businessFare" th:value="${flight.businessFare}" class="font-display text-2xl font-bold text-admin-text bg-transparent border-none p-0 focus:ring-0 w-full outline-none" required>
+                            <span class="material-symbols-outlined text-slate-400 text-sm opacity-0 group-hover:opacity-100 transition-opacity">edit</span>
+                        </div>
+                        <div class="mt-auto">
+                            <div class="h-px w-full bg-slate-100 mb-4"></div>
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-500 font-medium">Capacity</span>
+                                <span class="font-bold text-admin-text">36 <span class="text-slate-400 font-normal">seats</span></span>
                             </div>
                         </div>
-                        <div class="col-4">
-                            <div class="p-3 border rounded bg-light">
-                                <h2 class="mb-0 text-danger fw-bold" th:text="${flight.totalSeats - flight.availableSeats}">0</h2>
-                                <small class="text-muted text-uppercase fw-semibold">Occupied</small>
+                    </div>
+                </div>
+
+                <!-- Premium Economy -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col group">
+                    <div class="bg-sky-500 text-white p-4 flex items-center justify-between">
+                        <h4 class="font-bold tracking-wide">Prem. Economy</h4>
+                        <span class="material-symbols-outlined text-white/50">event_seat</span>
+                    </div>
+                    <div class="p-5 flex-1 flex flex-col">
+                        <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-2">Current Base Fare</p>
+                        <div class="flex items-center gap-2 mb-4 group-hover:bg-slate-50 p-2 -mx-2 rounded-lg transition-colors border border-transparent group-hover:border-slate-200 cursor-text" onclick="document.getElementById('premiumEconomyFare').focus()">
+                            <span class="font-display text-2xl font-bold text-admin-text">$</span>
+                            <input type="number" step="0.01" id="premiumEconomyFare" name="premiumEconomyFare" th:value="${flight.premiumEconomyFare}" class="font-display text-2xl font-bold text-admin-text bg-transparent border-none p-0 focus:ring-0 w-full outline-none" required>
+                            <span class="material-symbols-outlined text-slate-400 text-sm opacity-0 group-hover:opacity-100 transition-opacity">edit</span>
+                        </div>
+                        <div class="mt-auto">
+                            <div class="h-px w-full bg-slate-100 mb-4"></div>
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-500 font-medium">Capacity</span>
+                                <span class="font-bold text-admin-text">48 <span class="text-slate-400 font-normal">seats</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Economy Class -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col group">
+                    <div class="bg-slate-500 text-white p-4 flex items-center justify-between">
+                        <h4 class="font-bold tracking-wide">Economy</h4>
+                        <span class="material-symbols-outlined text-white/50">chair</span>
+                    </div>
+                    <div class="p-5 flex-1 flex flex-col">
+                        <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-2">Current Base Fare</p>
+                        <div class="flex items-center gap-2 mb-4 group-hover:bg-slate-50 p-2 -mx-2 rounded-lg transition-colors border border-transparent group-hover:border-slate-200 cursor-text" onclick="document.getElementById('economyFare').focus()">
+                            <span class="font-display text-2xl font-bold text-admin-text">$</span>
+                            <input type="number" step="0.01" id="economyFare" name="economyFare" th:value="${flight.economyFare}" class="font-display text-2xl font-bold text-admin-text bg-transparent border-none p-0 focus:ring-0 w-full outline-none" required>
+                            <span class="material-symbols-outlined text-slate-400 text-sm opacity-0 group-hover:opacity-100 transition-opacity">edit</span>
+                        </div>
+                        <div class="mt-auto">
+                            <div class="h-px w-full bg-slate-100 mb-4"></div>
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-500 font-medium">Capacity</span>
+                                <span class="font-bold text-admin-text">144 <span class="text-slate-400 font-normal">seats</span></span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Fares Editor Card -->
-        <div class="col-12">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-success text-white fw-bold">
-                    <i class="bi bi-cash-stack"></i> Cabin Class Fares
-                </div>
-                <div class="card-body">
-                    <form th:action="@{/admin/flights/details/{id}/fares(id=${flight.id})}" method="post">
-                        <div class="row g-4">
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold">Economy Fare (₹)</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light">₹</span>
-                                    <input type="number" step="0.01" class="form-control" name="economyFare" th:value="${flight.economyFare}" required>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold">Premium Economy (₹)</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light">₹</span>
-                                    <input type="number" step="0.01" class="form-control" name="premiumEconomyFare" th:value="${flight.premiumEconomyFare}" required>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold">Business Fare (₹)</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light">₹</span>
-                                    <input type="number" step="0.01" class="form-control" name="businessFare" th:value="${flight.businessFare}" required>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold">First Class Fare (₹)</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light">₹</span>
-                                    <input type="number" step="0.01" class="form-control" name="firstClassFare" th:value="${flight.firstClassFare}" required>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mt-4 text-end">
-                            <button type="submit" class="btn btn-success px-4 fw-bold"><i class="bi bi-save"></i> Save Fares</button>
-                        </div>
-                    </form>
-                </div>
+            
+            <div class="flex justify-end mb-12">
+                <button type="submit" class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors shadow-sm flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[20px]">save</span> Save All Fares
+                </button>
             </div>
-        </div>
+        </form>
 
-        <!-- Boarding Info Card -->
-        <div class="col-12">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-info text-white fw-bold">
-                    <i class="bi bi-door-open"></i> Boarding Information
+        <!-- Keep Boarding Info and Status Cards but Restyle to Match -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Boarding Info Card -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="border-b border-slate-100 px-6 py-4 flex items-center gap-3">
+                    <span class="material-symbols-outlined text-admin-accent bg-blue-50 p-2 rounded-lg">door_open</span>
+                    <h3 class="font-display font-bold text-lg text-admin-text">Boarding Information</h3>
                 </div>
-                <div class="card-body">
+                <div class="p-6">
                     <form th:action="@{/admin/flights/details/{id}/boarding(id=${flight.id})}" method="post">
-                        <div class="row g-4">
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold">Gate Number</label>
-                                <input type="text" class="form-control" name="gateNumber" th:value="${flight.gateNumber}" placeholder="e.g. G12">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Gate Number</label>
+                                <input type="text" name="gateNumber" th:value="${flight.gateNumber}" placeholder="e.g. G12" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:bg-white focus:border-admin-accent focus:ring-1 focus:ring-admin-accent outline-none transition-all">
                             </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold">Terminal</label>
-                                <input type="text" class="form-control" name="terminal" th:value="${flight.terminal}" placeholder="e.g. T2">
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Terminal</label>
+                                <input type="text" name="terminal" th:value="${flight.terminal}" placeholder="e.g. T2" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:bg-white focus:border-admin-accent focus:ring-1 focus:ring-admin-accent outline-none transition-all">
                             </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold">Boarding Zone</label>
-                                <input type="text" class="form-control" name="boardingZone" th:value="${flight.boardingZone}" placeholder="e.g. Zone A">
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Boarding Zone</label>
+                                <input type="text" name="boardingZone" th:value="${flight.boardingZone}" placeholder="e.g. Zone A" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:bg-white focus:border-admin-accent focus:ring-1 focus:ring-admin-accent outline-none transition-all">
                             </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold">Boarding Time (auto)</label>
-                                <input type="text" class="form-control" th:value="${flight.boardingTime != null ? #temporals.format(flight.boardingTime, 'dd MMM yyyy, HH:mm') : 'N/A'}" disabled>
-                                <small class="text-muted">Departure − 45 min</small>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1.5 flex justify-between">
+                                    <span>Boarding Time</span>
+                                    <span class="text-slate-400 font-normal text-xs">(Auto-calculated)</span>
+                                </label>
+                                <input type="text" th:value="${flight.boardingTime != null ? #temporals.format(flight.boardingTime, 'dd MMM yyyy, HH:mm') : 'N/A'}" disabled class="w-full bg-slate-100 border border-slate-200 rounded-lg px-4 py-2.5 text-sm text-slate-500 cursor-not-allowed">
                             </div>
                         </div>
-                        <div class="mt-4 text-end">
-                            <button type="submit" class="btn btn-info text-white px-4 fw-bold"><i class="bi bi-save"></i> Save Boarding Info</button>
+                        <div class="mt-6 flex justify-end">
+                            <button type="submit" class="px-5 py-2.5 bg-admin-accent hover:bg-blue-600 text-white font-medium rounded-lg transition-colors shadow-sm flex items-center gap-2 text-sm">
+                                <span class="material-symbols-outlined text-[18px]">update</span> Save Boarding Info
+                            </button>
                         </div>
                     </form>
                 </div>
             </div>
-        </div>
 
-        <!-- Flight Status Card -->
-        <div class="col-12">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-secondary text-white fw-bold">
-                    <i class="bi bi-activity"></i> Flight Status
+            <!-- Flight Status Card -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden h-fit">
+                <div class="border-b border-slate-100 px-6 py-4 flex items-center gap-3">
+                    <span class="material-symbols-outlined text-slate-600 bg-slate-100 p-2 rounded-lg">activity</span>
+                    <h3 class="font-display font-bold text-lg text-admin-text">Flight Status Control</h3>
                 </div>
-                <div class="card-body">
-                    <form th:action="@{/admin/flights/details/{id}/status(id=${flight.id})}" method="post" class="row g-3 align-items-center">
-                        <div class="col-md-4">
-                            <label class="form-label fw-semibold mb-0">Current Status</label>
-                        </div>
-                        <div class="col-md-5">
-                            <select class="form-select" name="flightStatus">
+                <div class="p-6">
+                    <form th:action="@{/admin/flights/details/{id}/status(id=${flight.id})}" method="post">
+                        <div class="mb-5">
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Update Current Status</label>
+                            <select name="flightStatus" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-sm focus:bg-white focus:border-admin-accent focus:ring-1 focus:ring-admin-accent outline-none transition-all cursor-pointer">
                                 <option th:each="status : ${T(com.airline.reservation.entity.FlightStatus).values()}"
                                         th:value="${status}"
                                         th:text="${status.label}"
                                         th:selected="${flight.flightStatus == status}"></option>
                             </select>
                         </div>
-                        <div class="col-md-3 text-end">
-                            <button type="submit" class="btn btn-secondary fw-bold w-100"><i class="bi bi-arrow-repeat"></i> Update Status</button>
-                        </div>
+                        <button type="submit" class="w-full px-5 py-3 bg-slate-800 hover:bg-slate-900 text-white font-medium rounded-lg transition-colors shadow-sm flex items-center justify-center gap-2 text-sm">
+                            <span class="material-symbols-outlined text-[18px]">published_with_changes</span> Confirm Status Change
+                        </button>
                     </form>
                 </div>
             </div>
         </div>
-    </div>
-</main>
 
-<div th:replace="~{layout :: footer}"></div>
-<div th:replace="~{layout :: html_scripts}"></div>
+    </main>
+
 </body>
 </html>

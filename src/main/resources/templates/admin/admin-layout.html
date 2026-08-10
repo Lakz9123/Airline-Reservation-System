@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="en">
+<head th:fragment="admin_head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} + ' - SkyFly Admin Console'"></title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Montserrat', 'sans-serif'],
+                    },
+                    colors: {
+                        admin: {
+                            sidebar: '#0a192f',
+                            sidebarHover: '#112240',
+                            sidebarActive: '#1e3a8a',
+                            accent: '#3b82f6',
+                            bg: '#f8fafc',
+                            text: '#0f172a',
+                            textMuted: '#64748b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        /* Hide scrollbar for nav but allow scrolling */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-admin-bg text-admin-text font-sans antialiased min-h-screen flex">
+    
+    <!-- Sidebar Fragment -->
+    <aside th:fragment="admin_sidebar(activePage)" class="w-64 bg-admin-sidebar text-white fixed h-full z-20 flex flex-col transition-all duration-300 shadow-xl">
+        <!-- Logo Area -->
+        <div class="h-16 flex items-center px-6 border-b border-white/10 shrink-0">
+            <span class="material-symbols-outlined text-admin-accent mr-3 text-3xl" style="font-variation-settings: 'FILL' 1;">flight_takeoff</span>
+            <div>
+                <h1 class="font-display font-bold text-xl tracking-tight leading-none text-white">SkyFly Elite</h1>
+                <p class="text-[10px] text-admin-accent font-semibold uppercase tracking-widest mt-1">Admin Console</p>
+            </div>
+        </div>
+
+        <!-- Primary Action -->
+        <div class="p-4 shrink-0">
+            <a th:href="@{/admin/flights/new}" class="flex items-center justify-center gap-2 w-full bg-admin-accent hover:bg-blue-600 text-white font-medium py-2.5 rounded-lg transition-colors shadow-sm">
+                <span class="material-symbols-outlined text-sm">add</span> New Flight
+            </a>
+        </div>
+
+        <!-- Navigation Links -->
+        <nav class="flex-1 overflow-y-auto py-2 px-3 space-y-1 custom-scrollbar">
+            <a th:href="@{/admin}" th:class="${activePage == 'dashboard' ? 'bg-admin-sidebarActive border-l-4 border-admin-accent text-white shadow-sm' : 'text-gray-400 hover:bg-admin-sidebarHover hover:text-white border-l-4 border-transparent'} + ' flex items-center gap-3 px-3 py-2.5 rounded-r-lg transition-all group'">
+                <span class="material-symbols-outlined text-[20px]" th:style="${activePage == 'dashboard' ? 'font-variation-settings: ''FILL'' 1;' : ''}">dashboard</span>
+                <span class="font-medium text-sm">Dashboard</span>
+            </a>
+            
+            <a th:href="@{/admin/flights}" th:class="${activePage == 'flights' ? 'bg-admin-sidebarActive border-l-4 border-admin-accent text-white shadow-sm' : 'text-gray-400 hover:bg-admin-sidebarHover hover:text-white border-l-4 border-transparent'} + ' flex items-center gap-3 px-3 py-2.5 rounded-r-lg transition-all group'">
+                <span class="material-symbols-outlined text-[20px]" th:style="${activePage == 'flights' ? 'font-variation-settings: ''FILL'' 1;' : ''}">airlines</span>
+                <span class="font-medium text-sm">Flights</span>
+            </a>
+
+            <a th:href="@{/admin/bookings}" th:class="${activePage == 'bookings' ? 'bg-admin-sidebarActive border-l-4 border-admin-accent text-white shadow-sm' : 'text-gray-400 hover:bg-admin-sidebarHover hover:text-white border-l-4 border-transparent'} + ' flex items-center gap-3 px-3 py-2.5 rounded-r-lg transition-all group'">
+                <span class="material-symbols-outlined text-[20px]" th:style="${activePage == 'bookings' ? 'font-variation-settings: ''FILL'' 1;' : ''}">airplane_ticket</span>
+                <span class="font-medium text-sm">Bookings</span>
+            </a>
+            
+            <a th:href="@{/admin/users}" th:class="${activePage == 'users' ? 'bg-admin-sidebarActive border-l-4 border-admin-accent text-white shadow-sm' : 'text-gray-400 hover:bg-admin-sidebarHover hover:text-white border-l-4 border-transparent'} + ' flex items-center gap-3 px-3 py-2.5 rounded-r-lg transition-all group'">
+                <span class="material-symbols-outlined text-[20px]" th:style="${activePage == 'users' ? 'font-variation-settings: ''FILL'' 1;' : ''}">group</span>
+                <span class="font-medium text-sm">Users</span>
+            </a>
+
+            <a th:href="@{/admin/airlines}" th:class="${activePage == 'airlines' ? 'bg-admin-sidebarActive border-l-4 border-admin-accent text-white shadow-sm' : 'text-gray-400 hover:bg-admin-sidebarHover hover:text-white border-l-4 border-transparent'} + ' flex items-center gap-3 px-3 py-2.5 rounded-r-lg transition-all group'">
+                <span class="material-symbols-outlined text-[20px]" th:style="${activePage == 'airlines' ? 'font-variation-settings: ''FILL'' 1;' : ''}">corporate_fare</span>
+                <span class="font-medium text-sm">Airlines</span>
+            </a>
+
+            <a th:href="@{/admin/airports}" th:class="${activePage == 'airports' ? 'bg-admin-sidebarActive border-l-4 border-admin-accent text-white shadow-sm' : 'text-gray-400 hover:bg-admin-sidebarHover hover:text-white border-l-4 border-transparent'} + ' flex items-center gap-3 px-3 py-2.5 rounded-r-lg transition-all group'">
+                <span class="material-symbols-outlined text-[20px]" th:style="${activePage == 'airports' ? 'font-variation-settings: ''FILL'' 1;' : ''}">location_on</span>
+                <span class="font-medium text-sm">Airports</span>
+            </a>
+
+            <a th:href="@{/admin/aircrafts}" th:class="${activePage == 'aircrafts' ? 'bg-admin-sidebarActive border-l-4 border-admin-accent text-white shadow-sm' : 'text-gray-400 hover:bg-admin-sidebarHover hover:text-white border-l-4 border-transparent'} + ' flex items-center gap-3 px-3 py-2.5 rounded-r-lg transition-all group'">
+                <span class="material-symbols-outlined text-[20px]" th:style="${activePage == 'aircrafts' ? 'font-variation-settings: ''FILL'' 1;' : ''}">flight</span>
+                <span class="font-medium text-sm">Aircraft</span>
+            </a>
+
+            <a th:href="@{/admin/baggage}" th:class="${activePage == 'baggage' ? 'bg-admin-sidebarActive border-l-4 border-admin-accent text-white shadow-sm' : 'text-gray-400 hover:bg-admin-sidebarHover hover:text-white border-l-4 border-transparent'} + ' flex items-center gap-3 px-3 py-2.5 rounded-r-lg transition-all group'">
+                <span class="material-symbols-outlined text-[20px]" th:style="${activePage == 'baggage' ? 'font-variation-settings: ''FILL'' 1;' : ''}">luggage</span>
+                <span class="font-medium text-sm">Baggage</span>
+            </a>
+
+            <a th:href="@{/admin/coupons}" th:class="${activePage == 'coupons' ? 'bg-admin-sidebarActive border-l-4 border-admin-accent text-white shadow-sm' : 'text-gray-400 hover:bg-admin-sidebarHover hover:text-white border-l-4 border-transparent'} + ' flex items-center gap-3 px-3 py-2.5 rounded-r-lg transition-all group'">
+                <span class="material-symbols-outlined text-[20px]" th:style="${activePage == 'coupons' ? 'font-variation-settings: ''FILL'' 1;' : ''}">local_offer</span>
+                <span class="font-medium text-sm">Coupons</span>
+            </a>
+
+            <a th:href="@{/admin/wallets}" th:class="${activePage == 'wallets' ? 'bg-admin-sidebarActive border-l-4 border-admin-accent text-white shadow-sm' : 'text-gray-400 hover:bg-admin-sidebarHover hover:text-white border-l-4 border-transparent'} + ' flex items-center gap-3 px-3 py-2.5 rounded-r-lg transition-all group'">
+                <span class="material-symbols-outlined text-[20px]" th:style="${activePage == 'wallets' ? 'font-variation-settings: ''FILL'' 1;' : ''}">account_balance_wallet</span>
+                <span class="font-medium text-sm">Wallets</span>
+            </a>
+            
+            <a th:href="@{/admin/logs}" th:class="${activePage == 'logs' ? 'bg-admin-sidebarActive border-l-4 border-admin-accent text-white shadow-sm' : 'text-gray-400 hover:bg-admin-sidebarHover hover:text-white border-l-4 border-transparent'} + ' flex items-center gap-3 px-3 py-2.5 rounded-r-lg transition-all group'">
+                <span class="material-symbols-outlined text-[20px]" th:style="${activePage == 'logs' ? 'font-variation-settings: ''FILL'' 1;' : ''}">receipt_long</span>
+                <span class="font-medium text-sm">System Logs</span>
+            </a>
+        </nav>
+
+        <!-- Bottom Actions -->
+        <div class="p-4 border-t border-white/10 space-y-1 shrink-0">
+            <a href="#" class="flex items-center gap-3 px-3 py-2 text-gray-400 hover:text-white hover:bg-admin-sidebarHover rounded-lg transition-colors group">
+                <span class="material-symbols-outlined text-[20px]">help</span>
+                <span class="font-medium text-sm">Support</span>
+            </a>
+            <a href="#" class="flex items-center gap-3 px-3 py-2 text-gray-400 hover:text-white hover:bg-admin-sidebarHover rounded-lg transition-colors group">
+                <span class="material-symbols-outlined text-[20px]">settings</span>
+                <span class="font-medium text-sm">Settings</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Top Bar Fragment -->
+    <header th:fragment="admin_topbar" class="h-16 bg-white border-b border-slate-200 fixed top-0 right-0 left-64 z-10 flex items-center justify-between px-8 shadow-sm">
+        
+        <!-- Search -->
+        <div class="relative w-96 hidden md:block">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg">search</span>
+            <input type="text" placeholder="Search flights, bookings..." class="w-full pl-10 pr-4 py-2 bg-slate-100 border-transparent rounded-lg text-sm focus:bg-white focus:border-admin-accent focus:ring-2 focus:ring-admin-accent/20 transition-all outline-none">
+        </div>
+        <div class="md:hidden flex-1"></div> <!-- Spacer for mobile -->
+
+        <!-- Right Side Actions -->
+        <div class="flex items-center gap-6">
+            <!-- Notifications -->
+            <button class="relative text-gray-500 hover:text-admin-text transition-colors">
+                <span class="material-symbols-outlined">notifications</span>
+                <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+            </button>
+            
+            <div class="w-px h-6 bg-slate-200"></div>
+            
+            <!-- User Profile Dropdown Placeholder -->
+            <div class="flex items-center gap-3 cursor-pointer group">
+                <div class="text-right hidden sm:block">
+                    <p class="text-sm font-semibold text-admin-text leading-tight" sec:authentication="name">Admin User</p>
+                    <p class="text-[11px] text-gray-500 font-medium">Administrator</p>
+                </div>
+                <div class="w-9 h-9 rounded-full bg-admin-accent text-white flex items-center justify-center font-bold text-sm shadow-sm">
+                    <span th:text="${#strings.substring(#authentication.name, 0, 1).toUpperCase()}">A</span>
+                </div>
+                <span class="material-symbols-outlined text-gray-400 group-hover:text-admin-text transition-colors">arrow_drop_down</span>
+            </div>
+
+            <div class="w-px h-6 bg-slate-200"></div>
+
+            <!-- Logout -->
+            <form th:action="@{/logout}" method="post" class="m-0">
+                <button type="submit" class="text-gray-500 hover:text-red-500 transition-colors flex items-center gap-2 text-sm font-medium">
+                    <span class="material-symbols-outlined text-[18px]">logout</span>
+                    <span class="hidden sm:inline">Logout</span>
+                </button>
+            </form>
+        </div>
+    </header>
+
+</body>
+</html>
