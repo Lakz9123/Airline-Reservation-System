@@ -1,85 +1,188 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{layout :: html_head('My Profile')}"></head>
-<body>
-<div th:replace="~{layout :: user_navbar}"></div>
+<head th:replace="~{layout :: html_head('Profile Settings')}">
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md">
+    <!-- Inline style to ensure we can use focus ring nicely without Tailwind config changes -->
+    <style>
+        .input-glow:focus {
+            box-shadow: 0 0 0 4px rgba(0, 92, 171, 0.15);
+            border-color: #005cab;
+            outline: none;
+        }
+    </style>
+    
+    <div th:replace="~{layout :: user_navbar}"></div>
 
-<main class="container">
-    <div class="row mb-4">
-        <div class="col-12">
-            <span class="eyebrow-label">Personal Settings</span>
-            <h1 class="section-title mb-1">My Profile</h1>
-            <p class="text-muted small">Update your name or secure your account credentials.</p>
-        </div>
-    </div>
+    <main class="flex-grow pt-[120px] pb-24 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto w-full">
+        <div class="max-w-2xl mx-auto">
+            
+            <!-- Header Section -->
+            <div class="mb-12 text-center md:text-left">
+                <h1 class="font-display-lg-mobile md:font-display-lg text-primary-container mb-2">Profile Settings</h1>
+                <p class="font-body-md text-on-surface-variant">Manage your personal information and security preferences.</p>
+            </div>
 
-    <div class="row g-4">
-        <!-- Profile Info Card -->
-        <div class="col-md-6">
-            <div class="card border-0 h-100 p-3">
-                <div class="card-body">
-                    <span class="eyebrow-label mb-2">Details</span>
-                    <h5 class="fw-bold section-title mb-4"><i class="bi bi-person-lines-fill text-primary me-1"></i>Account Information</h5>
-                    
-                    <div th:if="${nameSuccess}" class="alert alert-success border-0 rounded-4 p-3 mb-4 small" th:text="${nameSuccess}"></div>
-                    <div th:if="${nameError}" class="alert alert-danger border-0 rounded-4 p-3 mb-4 small" th:text="${nameError}"></div>
-                    
-                    <div class="mb-4">
-                        <span class="text-muted small d-block">Email Address</span>
-                        <span class="fw-bold fs-5 text-dark dark:text-white" th:text="${currentUser.email}">email@example.com</span>
-                    </div>
-
-                    <div class="mb-4 d-flex align-items-center flex-wrap gap-2">
-                        <span class="text-muted small">Loyalty Status:</span>
-                        <span class="badge bg-secondary-subtle text-secondary border px-2.5 py-1.5 fw-bold" th:if="${wallet.tier.name() == 'SILVER'}">SILVER MEMBER</span>
-                        <span class="badge bg-warning-subtle text-warning border px-2.5 py-1.5 fw-bold" th:if="${wallet.tier.name() == 'GOLD'}">GOLD MEMBER</span>
-                        <span class="badge bg-dark-subtle text-dark border px-2.5 py-1.5 fw-bold" th:if="${wallet.tier.name() == 'PLATINUM'}">PLATINUM MEMBER</span>
-                        <a th:href="@{/user/loyalty}" class="small ms-2 fw-semibold text-decoration-none">View Details <i class="bi bi-arrow-right"></i></a>
-                    </div>
-
-                    <form th:action="@{/user/profile/update-name}" method="post">
-                        <div class="mb-4">
-                            <label for="name" class="form-label fw-bold text-uppercase small text-muted">Full Name</label>
-                            <input type="text" class="form-control" id="name" name="name" th:value="${currentUser.name}" required>
+            <!-- Single White Card Container -->
+            <div class="bg-surface-container-lowest rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-outline-variant/30 p-8 md:p-12">
+                
+                <!-- Personal Information Form -->
+                <form th:action="@{/user/profile/update-name}" method="POST" class="mb-10">
+                    <section>
+                        <h2 class="font-headline-md text-primary-container mb-6 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">person</span>
+                            Personal Information
+                        </h2>
+                        
+                        <!-- Alerts -->
+                        <div th:if="${nameSuccess}" class="bg-[#f0fdf4] text-[#166534] border border-[#bbf7d0] p-4 rounded-lg mb-6 font-label-sm" th:text="${nameSuccess}"></div>
+                        <div th:if="${nameError}" class="bg-[#fef2f2] text-[#991b1b] border border-[#fecaca] p-4 rounded-lg mb-6 font-label-sm" th:text="${nameError}"></div>
+                        
+                        <div class="space-y-6">
+                            <!-- Full Name Field -->
+                            <div>
+                                <label class="block font-label-sm text-on-surface-variant mb-2" for="name">
+                                    Full Name <span class="text-error">*</span>
+                                </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <span class="material-symbols-outlined text-outline-variant">badge</span>
+                                    </div>
+                                    <input class="w-full pl-12 pr-4 py-3 bg-surface border border-outline-variant/50 rounded-lg text-on-surface font-body-md placeholder:text-outline-variant/70 transition-all input-glow" 
+                                           id="name" name="name" th:value="${currentUser.name}" required type="text"/>
+                                </div>
+                            </div>
+                            
+                            <!-- Email Field (Read Only) -->
+                            <div>
+                                <label class="block font-label-sm text-on-surface-variant mb-2" for="email">
+                                    Email Address
+                                </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <span class="material-symbols-outlined text-outline-variant">mail</span>
+                                    </div>
+                                    <input class="w-full pl-12 pr-4 py-3 bg-surface-variant/50 border border-outline-variant/30 rounded-lg text-on-surface-variant font-body-md cursor-not-allowed" 
+                                           disabled id="email" th:value="${currentUser.email}" type="email"/>
+                                </div>
+                                <p class="mt-2 text-xs text-outline font-body-md">Your email address cannot be changed. Contact support for assistance.</p>
+                            </div>
                         </div>
-                        <button type="submit" class="btn-primary-theme w-100 py-3"><i class="bi bi-save me-1"></i> Update Name</button>
-                    </form>
+
+                        <!-- Form Actions for Personal Info -->
+                        <div class="pt-6 mt-6 flex justify-end">
+                            <button class="w-full md:w-auto bg-primary-container hover:bg-primary text-on-primary font-label-sm px-6 py-3 rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2" type="submit">
+                                Update Information
+                                <span class="material-symbols-outlined text-[18px]">save</span>
+                            </button>
+                        </div>
+                    </section>
+                </form>
+
+                <!-- Divider -->
+                <div class="h-px w-full bg-outline-variant/30 my-10 relative">
+                    <div class="absolute left-1/2 -translate-x-1/2 -top-3 bg-surface-container-lowest px-4 text-outline-variant">
+                        <span class="material-symbols-outlined text-xl">more_horiz</span>
+                    </div>
                 </div>
+
+                <!-- Security Form -->
+                <form th:action="@{/user/profile/change-password}" method="POST">
+                    <section>
+                        <h2 class="font-headline-md text-primary-container mb-6 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">lock</span>
+                            Security
+                        </h2>
+                        
+                        <!-- Alerts -->
+                        <div th:if="${passwordSuccess}" class="bg-[#f0fdf4] text-[#166534] border border-[#bbf7d0] p-4 rounded-lg mb-6 font-label-sm" th:text="${passwordSuccess}"></div>
+                        <div th:if="${passwordError}" class="bg-[#fef2f2] text-[#991b1b] border border-[#fecaca] p-4 rounded-lg mb-6 font-label-sm" th:text="${passwordError}"></div>
+
+                        <div class="space-y-6">
+                            <!-- Current Password -->
+                            <div>
+                                <label class="block font-label-sm text-on-surface-variant mb-2" for="currentPassword">
+                                    Current Password <span class="text-error">*</span>
+                                </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <span class="material-symbols-outlined text-outline-variant">key</span>
+                                    </div>
+                                    <input class="w-full pl-12 pr-12 py-3 bg-surface border border-outline-variant/50 rounded-lg text-on-surface font-body-md placeholder:text-outline-variant/70 transition-all input-glow" 
+                                           id="currentPassword" name="currentPassword" required type="password"/>
+                                    <button type="button" class="absolute inset-y-0 right-0 pr-4 flex items-center text-outline-variant hover:text-secondary transition-colors" onclick="togglePassword('currentPassword', 'eyeIcon1')">
+                                        <span class="material-symbols-outlined" id="eyeIcon1">visibility</span>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- New Password -->
+                                <div>
+                                    <label class="block font-label-sm text-on-surface-variant mb-2" for="newPassword">
+                                        New Password <span class="text-error">*</span>
+                                    </label>
+                                    <div class="relative">
+                                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                            <span class="material-symbols-outlined text-outline-variant">lock_reset</span>
+                                        </div>
+                                        <input class="w-full pl-12 pr-12 py-3 bg-surface border border-outline-variant/50 rounded-lg text-on-surface font-body-md placeholder:text-outline-variant/70 transition-all input-glow" 
+                                               id="newPassword" name="newPassword" required type="password"/>
+                                        <button type="button" class="absolute inset-y-0 right-0 pr-4 flex items-center text-outline-variant hover:text-secondary transition-colors" onclick="togglePassword('newPassword', 'eyeIcon2')">
+                                            <span class="material-symbols-outlined" id="eyeIcon2">visibility</span>
+                                        </button>
+                                    </div>
+                                    <p class="mt-2 text-xs text-outline font-body-md">Must be at least 6 characters long.</p>
+                                </div>
+                                
+                                <!-- Confirm Password -->
+                                <div>
+                                    <label class="block font-label-sm text-on-surface-variant mb-2" for="confirmPassword">
+                                        Confirm New Password <span class="text-error">*</span>
+                                    </label>
+                                    <div class="relative">
+                                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                            <span class="material-symbols-outlined text-outline-variant">verified_user</span>
+                                        </div>
+                                        <input class="w-full pl-12 pr-12 py-3 bg-surface border border-outline-variant/50 rounded-lg text-on-surface font-body-md placeholder:text-outline-variant/70 transition-all input-glow" 
+                                               id="confirmPassword" name="confirmPassword" required type="password"/>
+                                        <button type="button" class="absolute inset-y-0 right-0 pr-4 flex items-center text-outline-variant hover:text-secondary transition-colors" onclick="togglePassword('confirmPassword', 'eyeIcon3')">
+                                            <span class="material-symbols-outlined" id="eyeIcon3">visibility</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions for Security -->
+                        <div class="pt-6 mt-6 flex justify-end">
+                            <button class="w-full md:w-auto bg-secondary hover:bg-secondary-container text-on-secondary font-label-sm px-8 py-3 rounded-lg shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2" type="submit">
+                                Update Password
+                                <span class="material-symbols-outlined text-[18px]">security</span>
+                            </button>
+                        </div>
+                    </section>
+                </form>
+                
             </div>
         </div>
+    </main>
 
-        <!-- Change Password Card -->
-        <div class="col-md-6">
-            <div class="card border-0 h-100 p-3">
-                <div class="card-body">
-                    <span class="eyebrow-label mb-2">Security</span>
-                    <h5 class="fw-bold section-title mb-4"><i class="bi bi-key-fill text-warning me-1"></i>Change Password</h5>
-                    
-                    <div th:if="${passwordSuccess}" class="alert alert-success border-0 rounded-4 p-3 mb-4 small" th:text="${passwordSuccess}"></div>
-                    <div th:if="${passwordError}" class="alert alert-danger border-0 rounded-4 p-3 mb-4 small" th:text="${passwordError}"></div>
-                    
-                    <form th:action="@{/user/profile/change-password}" method="post">
-                        <div class="mb-3">
-                            <label for="currentPassword" class="form-label fw-bold text-uppercase small text-muted">Current Password</label>
-                            <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="newPassword" class="form-label fw-bold text-uppercase small text-muted">New Password <span class="text-muted">(min 6 characters)</span></label>
-                            <input type="password" class="form-control" id="newPassword" name="newPassword" required>
-                        </div>
-                        <div class="mb-4">
-                            <label for="confirmPassword" class="form-label fw-bold text-uppercase small text-muted">Confirm New Password</label>
-                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
-                        </div>
-                        <button type="submit" class="btn-primary-theme w-100 py-3" style="background: linear-gradient(135deg, #f59e0b, #d97706) !important; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2);"><i class="bi bi-lock-fill me-1"></i> Change Password</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</main>
-
-<div th:replace="~{layout :: footer}"></div>
-<div th:replace="~{layout :: html_scripts}"></div>
+    <div th:replace="~{layout :: footer}"></div>
+    <div th:replace="~{layout :: html_scripts}"></div>
+    
+    <script>
+        function togglePassword(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.textContent = 'visibility_off';
+            } else {
+                input.type = 'password';
+                icon.textContent = 'visibility';
+            }
+        }
+    </script>
 </body>
 </html>

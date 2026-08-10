@@ -1,140 +1,105 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{layout :: html_head('My Notifications')}"></head>
-<style>
-    .notif-card {
-        border-left: 4px solid transparent;
-        transition: all 0.2s ease;
-        cursor: pointer;
-    }
-    .notif-card.unread {
-        background: var(--sky-glow) !important;
-        border-left-color: var(--sky-light);
-    }
-    .notif-card:hover {
-        transform: translateY(-1px);
-        box-shadow: var(--shadow-md) !important;
-    }
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md">
+    <div th:replace="~{layout :: user_navbar}"></div>
 
-    .notif-icon {
-        width: 44px;
-        height: 44px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.2rem;
-        flex-shrink: 0;
-    }
-    .icon-FLIGHT_DELAYED    { background: #fff7ed; color: #f97316; }
-    .icon-GATE_CHANGED      { background: #eff6ff; color: #3b82f6; }
-    .icon-BOARDING_STARTED  { background: #f0fdf4; color: #22c55e; }
-    .icon-FLIGHT_CANCELLED  { background: #fef2f2; color: #ef4444; }
-    .icon-DEPARTURE_REMINDER{ background: #faf5ff; color: #a855f7; }
-
-    .notif-type-badge {
-        font-size: 0.65rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        padding: 2px 8px;
-        border-radius: 999px;
-    }
-    .badge-FLIGHT_DELAYED    { background: #fff7ed; color: #ea580c; border: 1px solid #fdba74; }
-    .badge-GATE_CHANGED      { background: #eff6ff; color: #2563eb; border: 1px solid #93c5fd; }
-    .badge-BOARDING_STARTED  { background: #f0fdf4; color: #16a34a; border: 1px solid #86efac; }
-    .badge-FLIGHT_CANCELLED  { background: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; }
-    .badge-DEPARTURE_REMINDER{ background: #faf5ff; color: #9333ea; border: 1px solid #d8b4fe; }
-
-    .empty-state { padding: 80px 20px; text-align: center; color: #94a3b8; }
-    .empty-state .bi { font-size: 4rem; display: block; margin-bottom: 16px; }
-</style>
-<body>
-<div th:replace="~{layout :: user_navbar}"></div>
-
-<main class="container">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <!-- Header -->
-            <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
-                <div>
-                    <span class="eyebrow-label">Inbox Updates</span>
-                    <h1 class="section-title mb-1">My Notifications</h1>
-                    <p class="text-muted small"
-                       th:text="${unreadCount > 0} ? ${unreadCount} + ' unread notification(s)' : 'All caught up!'">
-                    </p>
-                </div>
-                <form th:if="${!notifications.isEmpty()}" th:action="@{/user/notifications/read-all}" method="post" class="m-0">
-                    <button type="submit" class="btn-outline-theme btn-sm py-2 px-3">
-                        <i class="bi bi-check2-all"></i> Mark All Read
-                    </button>
-                </form>
+    <main class="flex-grow pt-[120px] pb-24 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto w-full">
+        <!-- Header -->
+        <div class="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+                <h1 class="font-display-lg-mobile md:font-display-lg text-primary mb-4">Notifications</h1>
+                <p class="font-body-lg text-on-surface-variant">
+                    <span th:text="${unreadCount > 0} ? ${unreadCount} + ' unread notification(s)' : 'All caught up!'">Stay updated on your flights, upgrades, and exclusive offers.</span>
+                </p>
             </div>
+            
+            <form th:if="${!notifications.isEmpty()}" th:action="@{/user/notifications/read-all}" method="post" class="m-0">
+                <button type="submit" class="border border-secondary text-secondary font-label-sm text-label-sm px-6 py-2 rounded-lg hover:bg-secondary/5 transition-colors">
+                    Mark All Read
+                </button>
+            </form>
+        </div>
 
-            <!-- Alert Flash -->
-            <div th:if="${error}" class="alert alert-danger border-0 rounded-4 p-3 mb-4 small text-center" th:text="${error}"></div>
+        <!-- Alert Flash -->
+        <div th:if="${error}" class="bg-error-container text-on-error-container p-4 rounded-lg mb-8 text-center font-label-sm" th:text="${error}"></div>
 
-            <!-- Notifications List -->
-            <div th:if="${notifications.isEmpty()}" class="card border-0">
-                <div class="card-body empty-state">
-                    <i class="bi bi-bell-slash text-muted mb-3 fs-1"></i>
-                    <h5 class="fw-bold section-title mb-2">No notifications yet</h5>
-                    <p class="text-muted small mb-4">You'll be notified here when there are flight updates.</p>
-                    <a th:href="@{/user/bookings}" class="btn-primary-theme py-2 px-4">
-                        <i class="bi bi-journal-check"></i> View My Bookings
-                    </a>
-                </div>
-            </div>
+        <!-- Empty State -->
+        <div th:if="${notifications.isEmpty()}" class="bg-surface-container-low rounded-xl p-12 text-center shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-transparent">
+            <span class="material-symbols-outlined text-[64px] text-outline-variant mb-4" style="font-variation-settings: 'FILL' 0;">notifications_off</span>
+            <h4 class="font-headline-md text-primary mb-2">No notifications yet</h4>
+            <p class="font-body-md text-on-surface-variant mb-6">You'll be notified here when there are flight updates.</p>
+            <a th:href="@{/user/bookings}" class="inline-block bg-primary text-on-primary px-6 py-3 rounded-lg font-label-sm hover:bg-primary-container transition-colors shadow-sm" style="text-decoration:none;">View My Bookings</a>
+        </div>
 
-            <div th:if="${!notifications.isEmpty()}" class="d-flex flex-column gap-3">
-                <div th:each="n : ${notifications}"
-                     th:classappend="${!n.read} ? 'unread' : ''"
-                     class="card border-0 notif-card p-4">
-                    <div class="d-flex align-items-start gap-3">
-                        <!-- Icon -->
-                        <div th:class="'notif-icon icon-' + ${n.type.name()}">
-                            <span th:text="${n.type.name() == 'FLIGHT_DELAYED'} ? '⏰' :
-                                           (n.type.name() == 'GATE_CHANGED' ? '🚪' :
-                                           (n.type.name() == 'BOARDING_STARTED' ? '🛫' :
-                                           (n.type.name() == 'FLIGHT_CANCELLED' ? '❌' : '🔔')))">🔔</span>
+        <div class="flex flex-col gap-4" th:if="${!notifications.isEmpty()}">
+            <div th:each="n : ${notifications}" 
+                 th:class="${!n.read ? 'bg-surface-container-low border-transparent shadow-[0_4px_20px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)]' : 'bg-surface-container-lowest border-outline-variant/30 shadow-[0_4px_20px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)]'} + ' rounded-xl p-6 border relative transition-all cursor-pointer group'"
+                 th:onclick="${!n.read ? 'document.getElementById(''read-form-' + n.id + ''').submit();' : ''}">
+                
+                <!-- Unread Indicator Dot -->
+                <div th:if="${!n.read}" class="absolute top-8 left-6 w-3 h-3 bg-secondary rounded-full"></div>
+                
+                <div th:class="${!n.read ? 'ml-8' : ''} + ' flex gap-6 items-start'">
+                    
+                    <!-- Dynamic Icon Based on Notification Type -->
+                    <!-- FLIGHT_DELAYED -->
+                    <div th:if="${n.type.name() == 'FLIGHT_DELAYED'}" class="w-12 h-12 rounded-full flex items-center justify-center shrink-0" th:classappend="${!n.read ? 'bg-[#fff7ed]' : 'bg-surface-variant'}">
+                        <span class="material-symbols-outlined" th:classappend="${!n.read ? 'text-[#f97316]' : 'text-on-surface-variant'}" style="font-variation-settings: 'FILL' 1;">schedule</span>
+                    </div>
+                    
+                    <!-- GATE_CHANGED -->
+                    <div th:if="${n.type.name() == 'GATE_CHANGED'}" class="w-12 h-12 rounded-full flex items-center justify-center shrink-0" th:classappend="${!n.read ? 'bg-[#eff6ff]' : 'bg-surface-variant'}">
+                        <span class="material-symbols-outlined" th:classappend="${!n.read ? 'text-[#3b82f6]' : 'text-on-surface-variant'}" style="font-variation-settings: 'FILL' 1;">meeting_room</span>
+                    </div>
+                    
+                    <!-- BOARDING_STARTED -->
+                    <div th:if="${n.type.name() == 'BOARDING_STARTED'}" class="w-12 h-12 rounded-full flex items-center justify-center shrink-0" th:classappend="${!n.read ? 'bg-[#f0fdf4]' : 'bg-surface-variant'}">
+                        <span class="material-symbols-outlined" th:classappend="${!n.read ? 'text-[#22c55e]' : 'text-on-surface-variant'}" style="font-variation-settings: 'FILL' 1;">flight_takeoff</span>
+                    </div>
+
+                    <!-- FLIGHT_CANCELLED -->
+                    <div th:if="${n.type.name() == 'FLIGHT_CANCELLED'}" class="w-12 h-12 rounded-full flex items-center justify-center shrink-0" th:classappend="${!n.read ? 'bg-[#fef2f2]' : 'bg-surface-variant'}">
+                        <span class="material-symbols-outlined" th:classappend="${!n.read ? 'text-[#ef4444]' : 'text-on-surface-variant'}" style="font-variation-settings: 'FILL' 1;">cancel</span>
+                    </div>
+                    
+                    <!-- DEPARTURE_REMINDER -->
+                    <div th:if="${n.type.name() == 'DEPARTURE_REMINDER'}" class="w-12 h-12 rounded-full flex items-center justify-center shrink-0" th:classappend="${!n.read ? 'bg-[#faf5ff]' : 'bg-surface-variant'}">
+                        <span class="material-symbols-outlined" th:classappend="${!n.read ? 'text-[#a855f7]' : 'text-on-surface-variant'}" style="font-variation-settings: 'FILL' 1;">campaign</span>
+                    </div>
+                    
+                    <!-- Fallback / Default -->
+                    <div th:if="${n.type.name() != 'FLIGHT_DELAYED' and n.type.name() != 'GATE_CHANGED' and n.type.name() != 'BOARDING_STARTED' and n.type.name() != 'FLIGHT_CANCELLED' and n.type.name() != 'DEPARTURE_REMINDER'}" class="w-12 h-12 rounded-full flex items-center justify-center shrink-0" th:classappend="${!n.read ? 'bg-secondary-container/20' : 'bg-surface-variant'}">
+                        <span class="material-symbols-outlined" th:classappend="${!n.read ? 'text-secondary' : 'text-on-surface-variant'}" style="font-variation-settings: 'FILL' 1;">notifications</span>
+                    </div>
+
+                    <div class="flex-grow">
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-1 gap-1 sm:gap-4">
+                            <h3 th:class="${!n.read ? 'font-headline-md text-primary group-hover:text-secondary transition-colors' : 'font-headline-md text-on-background group-hover:text-secondary transition-colors'}" 
+                                th:text="${n.type.name() == 'FLIGHT_DELAYED'} ? 'Flight Delayed' :
+                                         (n.type.name() == 'GATE_CHANGED' ? 'Gate Changed' :
+                                         (n.type.name() == 'BOARDING_STARTED' ? 'Boarding Started' :
+                                         (n.type.name() == 'FLIGHT_CANCELLED' ? 'Flight Cancelled' : 'Departure Reminder')))">
+                                Notification Title
+                            </h3>
+                            <span class="font-label-sm text-outline shrink-0" th:text="${#temporals.format(n.sentAt, 'MMM dd, HH:mm')}">Just now</span>
                         </div>
-
-                        <!-- Content -->
-                        <div class="flex-grow-1">
-                            <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
-                                <span th:class="'notif-type-badge badge-' + ${n.type.name()}"
-                                      th:text="${n.type.name() == 'FLIGHT_DELAYED'} ? 'Delayed' :
-                                               (n.type.name() == 'GATE_CHANGED' ? 'Gate Change' :
-                                               (n.type.name() == 'BOARDING_STARTED' ? 'Boarding' :
-                                               (n.type.name() == 'FLIGHT_CANCELLED' ? 'Cancelled' : 'Departure Reminder')))">Type</span>
-                                <span class="text-muted small" style="font-size: 0.75rem;"
-                                      th:text="${#temporals.format(n.sentAt, 'dd MMM yyyy, HH:mm')}">date</span>
-                                <span th:if="${!n.read}" class="badge bg-primary ms-auto small" style="font-size:.65rem; padding: 0.25em 0.5em;">NEW</span>
-                            </div>
-                            <p class="mb-2 text-dark dark:text-white fw-semibold small" th:text="${n.message}">Notification message.</p>
-                            <small class="text-muted" style="font-size: 0.75rem;">
-                                Flight: <strong class="text-dark dark:text-white" th:text="${n.booking.flight.flightNumber}">FL-101</strong>
-                                · Booking: <strong class="text-dark dark:text-white" th:text="${'SKY-' + #strings.padLeft('' + n.booking.id, 5, '0')}">SKY-00001</strong>
-                            </small>
-                        </div>
-
-                        <!-- Mark Read -->
-                        <div th:if="${!n.read}">
-                            <form th:action="@{/user/notifications/read/{id}(id=${n.id})}" method="post" class="m-0">
-                                <button type="submit" class="btn btn-outline-secondary btn-sm rounded-pill p-2"
-                                        title="Mark as read">
-                                    <i class="bi bi-check2"></i>
-                                </button>
-                            </form>
-                        </div>
+                        <p class="font-body-md text-on-surface-variant mb-2" th:text="${n.message}">Your notification description goes here.</p>
+                        
+                        <p class="font-label-sm text-outline" style="font-size: 11px;">
+                            Flight: <strong class="text-on-surface-variant" th:text="${n.booking.flight.flightNumber}">FL-101</strong>
+                            &bull; Booking: <strong class="text-on-surface-variant" th:text="${'SKY-' + #strings.padLeft('' + n.booking.id, 5, '0')}">SKY-00001</strong>
+                        </p>
                     </div>
                 </div>
+
+                <!-- Hidden form to mark as read when clicked -->
+                <form th:if="${!n.read}" th:id="'read-form-' + ${n.id}" th:action="@{/user/notifications/read/{id}(id=${n.id})}" method="post" class="hidden"></form>
             </div>
         </div>
-    </div>
-</main>
+    </main>
 
-<div th:replace="~{layout :: footer}"></div>
-<div th:replace="~{layout :: html_scripts}"></div>
+    <div th:replace="~{layout :: footer}"></div>
+    <div th:replace="~{layout :: html_scripts}"></div>
 </body>
 </html>
