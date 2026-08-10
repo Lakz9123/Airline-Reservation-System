@@ -177,19 +177,66 @@
     </style>
 
     <main class="flex-grow pt-[120px] pb-24 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto w-full">
-        <div class="max-w-2xl mx-auto">
+        <div class="max-w-3xl mx-auto">
             
             <!-- Header Section -->
-            <div class="mb-12 text-center md:text-left">
-                <h1 class="font-display-lg-mobile md:font-display-lg text-primary-container mb-2">Profile Settings</h1>
-                <p class="font-body-md text-on-surface-variant">Manage your personal information and security preferences.</p>
+            <div class="mb-8 text-center md:text-left">
+                <h1 class="font-display-lg-mobile md:font-display-lg text-primary mb-2">Profile Settings</h1>
+                <p class="font-body-md text-on-surface-variant">Manage your personal information, security preferences, and communications.</p>
             </div>
 
             <!-- Single White Card Container -->
-            <div class="bg-surface-container-lowest rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-outline-variant/30 p-8 md:p-12">
+            <div class="bg-surface-container-lowest rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-outline-variant/30 overflow-hidden">
                 
-                <!-- Personal Information Form -->
-                <form th:action="@{/user/profile/update-name}" method="POST" class="mb-10">
+                <!-- Premium Hero Banner -->
+                <div class="relative h-48 bg-primary overflow-hidden">
+                    <!-- Subtle Pattern/Gradient Overlay -->
+                    <div class="absolute inset-0 bg-gradient-to-r from-primary-container to-secondary opacity-90"></div>
+                    <svg class="absolute inset-0 w-full h-full object-cover opacity-20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+                        <path fill="#ffffff" fill-opacity="1" d="M0,192L48,181.3C96,171,192,149,288,144C384,139,480,149,576,149.3C672,149,768,139,864,133.3C960,128,1056,128,1152,144C1248,160,1344,192,1392,208L1440,224L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+                    </svg>
+                    <!-- Simulated Tier Badge -->
+                    <div class="absolute top-6 right-6 bg-surface-container-lowest/20 backdrop-blur-md border border-surface-container-lowest/30 rounded-full px-4 py-1.5 flex items-center gap-1.5 shadow-sm">
+                        <span class="material-symbols-outlined text-[#ffd700] text-[18px]" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+                        <span class="font-label-sm text-on-primary">Gold Tier</span>
+                    </div>
+                </div>
+
+                <!-- Avatar & Stats Header -->
+                <div class="px-8 md:px-12 relative pb-8 border-b border-outline-variant/20">
+                    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 -mt-16 relative z-10">
+                        <div class="flex flex-col md:flex-row items-center md:items-end gap-6">
+                            <!-- Avatar -->
+                            <div class="w-32 h-32 rounded-full border-4 border-surface-container-lowest bg-surface-container shadow-sm flex items-center justify-center text-4xl font-headline-md text-primary overflow-hidden shrink-0">
+                                <span th:text="${#strings.substring(currentUser.name, 0, 1).toUpperCase()}">S</span>
+                            </div>
+                            <!-- Name Summary -->
+                            <div class="text-center md:text-left mb-2">
+                                <h2 class="font-display-lg-mobile text-primary mb-1" th:text="${currentUser.name}">User Name</h2>
+                                <p class="font-body-md text-on-surface-variant" th:text="${currentUser.email}">email@example.com</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Simulated Quick Stats -->
+                        <div class="flex items-center justify-center gap-6 mb-2">
+                            <div class="text-center">
+                                <p class="font-label-sm text-outline uppercase tracking-wider mb-1">Flights</p>
+                                <p class="font-headline-md text-primary">12</p>
+                            </div>
+                            <div class="w-px h-8 bg-outline-variant/30"></div>
+                            <div class="text-center">
+                                <p class="font-label-sm text-outline uppercase tracking-wider mb-1">Miles</p>
+                                <p class="font-headline-md text-primary">24.5k</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Main Content Area with padding -->
+                <div class="p-8 md:p-12">
+                    
+                    <!-- Personal Information Form -->
+                    <form th:action="@{/user/profile/update-name}" method="POST" class="mb-10">
                     <section>
                         <h2 class="font-headline-md text-primary-container mb-6 flex items-center gap-2">
                             <span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">person</span>
@@ -249,7 +296,7 @@
                 </div>
 
                 <!-- Security Form -->
-                <form th:action="@{/user/profile/change-password}" method="POST">
+                <form th:action="@{/user/profile/change-password}" method="POST" class="mb-10">
                     <section>
                         <h2 class="font-headline-md text-primary-container mb-6 flex items-center gap-2">
                             <span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">lock</span>
@@ -318,14 +365,57 @@
 
                         <!-- Form Actions for Security -->
                         <div class="pt-6 mt-6 flex justify-end">
-                            <button class="w-full md:w-auto bg-secondary hover:bg-secondary-container text-on-secondary font-label-sm px-8 py-3 rounded-lg shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2" type="submit">
+                            <button class="w-full md:w-auto bg-primary-container hover:bg-primary text-on-primary font-label-sm px-6 py-3 rounded-lg shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2" type="submit">
                                 Update Password
                                 <span class="material-symbols-outlined text-[18px]">security</span>
                             </button>
                         </div>
                     </section>
                 </form>
+
+                <!-- Divider -->
+                <div class="h-px w-full bg-outline-variant/30 my-10 relative">
+                    <div class="absolute left-1/2 -translate-x-1/2 -top-3 bg-surface-container-lowest px-4 text-outline-variant">
+                        <span class="material-symbols-outlined text-xl">more_horiz</span>
+                    </div>
+                </div>
+
+                <!-- Communication Preferences (Simulated) -->
+                <section>
+                    <h2 class="font-headline-md text-primary-container mb-2 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">notifications_active</span>
+                        Communication Preferences
+                    </h2>
+                    <p class="font-body-md text-on-surface-variant mb-6">Control how we communicate with you. These preferences take effect immediately.</p>
+                    
+                    <div class="space-y-4">
+                        <!-- Toggle 1 -->
+                        <div class="flex items-center justify-between p-4 border border-outline-variant/30 rounded-lg hover:bg-surface-container-low transition-colors group cursor-pointer" onclick="toggleSwitch('toggle-email')">
+                            <div>
+                                <h4 class="font-label-sm text-primary mb-1">Email Flight Updates</h4>
+                                <p class="text-xs text-on-surface-variant">Receive gate changes and delays via email.</p>
+                            </div>
+                            <div class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="toggle-email" class="sr-only peer" checked>
+                                <div class="w-11 h-6 bg-outline-variant/50 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+                            </div>
+                        </div>
+
+                        <!-- Toggle 2 -->
+                        <div class="flex items-center justify-between p-4 border border-outline-variant/30 rounded-lg hover:bg-surface-container-low transition-colors group cursor-pointer" onclick="toggleSwitch('toggle-promo')">
+                            <div>
+                                <h4 class="font-label-sm text-primary mb-1">Marketing & Promotions</h4>
+                                <p class="text-xs text-on-surface-variant">Exclusive deals, offers, and partner discounts.</p>
+                            </div>
+                            <div class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="toggle-promo" class="sr-only peer">
+                                <div class="w-11 h-6 bg-outline-variant/50 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
                 
+                </div> <!-- End Main Content Padding -->
             </div>
         </div>
     </main>
@@ -343,6 +433,13 @@
             } else {
                 input.type = 'password';
                 icon.textContent = 'visibility';
+            }
+        }
+
+        function toggleSwitch(id) {
+            const checkbox = document.getElementById(id);
+            if (checkbox) {
+                checkbox.checked = !checkbox.checked;
             }
         }
     </script>
