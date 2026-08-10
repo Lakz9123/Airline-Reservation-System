@@ -281,7 +281,7 @@
 <td class="py-4 px-6">
 <div class="flex items-center gap-2">
 <div class="w-16 h-1.5 bg-surface-variant rounded-full overflow-hidden">
-<div class="bg-secondary h-full" th:style="'width: ' + ((flight.totalSeats - flight.availableSeats) * 100 / flight.totalSeats) + '%'"></div>
+<div class="bg-secondary h-full" th:style="'width: ' + ${(flight.totalSeats - flight.availableSeats) * 100 / flight.totalSeats} + '%'"></div>
 </div>
 <span class="text-sm text-on-surface-variant" th:text="${(flight.totalSeats - flight.availableSeats)} + '/' + ${flight.totalSeats}">12/240</span>
 </div>
