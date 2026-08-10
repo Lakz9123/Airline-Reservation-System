@@ -239,12 +239,13 @@
 
                     <div class="flex-grow">
                         <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-1 gap-1 sm:gap-4">
-                            <h3 th:class="${!n.read ? 'font-headline-md text-primary group-hover:text-secondary transition-colors' : 'font-headline-md text-on-background group-hover:text-secondary transition-colors'}" 
-                                th:text="${n.type.name() == 'FLIGHT_DELAYED'} ? 'Flight Delayed' :
-                                         (n.type.name() == 'GATE_CHANGED' ? 'Gate Changed' :
-                                         (n.type.name() == 'BOARDING_STARTED' ? 'Boarding Started' :
-                                         (n.type.name() == 'FLIGHT_CANCELLED' ? 'Flight Cancelled' : 'Departure Reminder')))">
-                                Notification Title
+                            <h3 th:class="${!n.read ? 'font-headline-md text-primary group-hover:text-secondary transition-colors' : 'font-headline-md text-on-background group-hover:text-secondary transition-colors'}" th:switch="${n.type != null ? n.type.name() : ''}">
+                                <span th:case="'FLIGHT_DELAYED'">Flight Delayed</span>
+                                <span th:case="'GATE_CHANGED'">Gate Changed</span>
+                                <span th:case="'BOARDING_STARTED'">Boarding Started</span>
+                                <span th:case="'FLIGHT_CANCELLED'">Flight Cancelled</span>
+                                <span th:case="'DEPARTURE_REMINDER'">Departure Reminder</span>
+                                <span th:case="*">Notification</span>
                             </h3>
                             <span class="font-label-sm text-outline shrink-0" th:text="${#temporals.format(n.sentAt, 'MMM dd, HH:mm')}">Just now</span>
                         </div>
