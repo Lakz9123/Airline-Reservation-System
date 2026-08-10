@@ -1,36 +1,98 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
-      lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:fragment="admin_head(title)">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${title} + ' - SkyFly Admin Console'"></title>
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
-    <script>
+    <title th:text="${title} + ' - SkyFly Elite Admin Console'">SkyFly Elite Admin Console</title>
+    
+    <!-- Tailwind CSS (CDN for Development) -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Montserrat:wght@600;700&display=swap" rel="stylesheet" />
+
+    <!-- Tailwind Config injected from the user's generated design -->
+    <script id="tailwind-config">
         tailwind.config = {
+            darkMode: "class",
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        display: ['Montserrat', 'sans-serif'],
+                    "colors": {
+                            "on-primary-fixed-variant": "#3a4859",
+                            "tertiary-fixed": "#e2e2e2",
+                            "on-tertiary": "#ffffff",
+                            "on-error": "#ffffff",
+                            "on-primary": "#ffffff",
+                            "surface-variant": "#d8e4f0",
+                            "error": "#ba1a1a",
+                            "on-secondary-fixed-variant": "#004786",
+                            "surface-tint": "#525f71",
+                            "on-secondary-container": "#fefcff",
+                            "surface-container-low": "#ebf5ff",
+                            "primary-container": "#0f1c2c",
+                            "surface-container": "#e3effb",
+                            "on-tertiary-fixed": "#1a1c1c",
+                            "secondary": "#005cab",
+                            "on-tertiary-container": "#838484",
+                            "inverse-on-surface": "#e6f2fe",
+                            "surface-container-lowest": "#ffffff",
+                            "surface-container-highest": "#d8e4f0",
+                            "primary-fixed-dim": "#bac8dc",
+                            "on-error-container": "#93000a",
+                            "on-secondary": "#ffffff",
+                            "tertiary-fixed-dim": "#c6c6c6",
+                            "on-background": "#111d25",
+                            "on-tertiary-fixed-variant": "#454747",
+                            "on-surface": "#111d25",
+                            "tertiary": "#000000",
+                            "outline": "#74777d",
+                            "secondary-container": "#0075d6",
+                            "secondary-fixed-dim": "#a5c8ff",
+                            "outline-variant": "#c4c6cc",
+                            "on-primary-fixed": "#0f1c2c",
+                            "inverse-surface": "#26323b",
+                            "tertiary-container": "#1a1c1c",
+                            "primary-fixed": "#d6e4f9",
+                            "surface-container-high": "#ddeaf5",
+                            "secondary-fixed": "#d4e3ff",
+                            "error-container": "#ffdad6",
+                            "on-primary-container": "#778598",
+                            "on-secondary-fixed": "#001c3a",
+                            "surface-bright": "#f6faff",
+                            "primary": "#000000",
+                            "surface-dim": "#cfdce7",
+                            "surface": "#f6faff",
+                            "background": "#f6faff",
+                            "inverse-primary": "#bac8dc",
+                            "on-surface-variant": "#44474c"
                     },
-                    colors: {
-                        admin: {
-                            sidebar: '#0a192f',
-                            sidebarHover: '#112240',
-                            sidebarActive: '#1e3a8a',
-                            accent: '#3b82f6',
-                            bg: '#f8fafc',
-                            text: '#0f172a',
-                            textMuted: '#64748b'
-                        }
+                    "borderRadius": {
+                            "DEFAULT": "0.25rem",
+                            "lg": "0.5rem",
+                            "xl": "0.75rem",
+                            "full": "9999px"
+                    },
+                    "spacing": {
+                            "gutter": "24px",
+                            "unit": "8px",
+                            "margin-desktop": "64px",
+                            "margin-mobile": "20px",
+                            "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                            "headline-md": ["Montserrat"],
+                            "body-lg": ["Inter"],
+                            "label-sm": ["Inter"],
+                            "body-md": ["Inter"],
+                            "display-lg": ["Montserrat"],
+                            "display-lg-mobile": ["Montserrat"]
+                    },
+                    "fontSize": {
+                            "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                            "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                            "label-sm": ["13px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                            "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                            "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                            "display-lg-mobile": ["32px", {"lineHeight": "1.2", "fontWeight": "700"}]
                     }
                 }
             }
@@ -39,156 +101,149 @@
     <style>
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-            display: inline-block;
-            vertical-align: middle;
         }
-        /* Hide scrollbar for nav but allow scrolling */
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background-color: rgba(255,255,255,0.1);
-            border-radius: 4px;
-        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4, h5, h6, .font-headline-md, .font-display-lg, .font-display-lg-mobile { font-family: 'Montserrat', sans-serif; }
+        
+        /* Custom scrollbar for a cleaner look */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #d8e4f0; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #bac8dc; }
+        
+        .edit-form { display: none; }
+        .edit-mode .edit-form { display: flex; }
+        .edit-mode .display-value { display: none; }
     </style>
 </head>
-<body class="bg-admin-bg text-admin-text font-sans antialiased min-h-screen flex">
+<body class="bg-background text-on-background font-body-md text-body-md antialiased min-h-screen flex">
+
+<!-- Shared Sidebar Fragment -->
+<nav th:fragment="admin_sidebar(activePage)" class="fixed left-0 top-0 h-screen w-64 bg-primary-container dark:bg-primary-container border-r border-outline-variant shadow-sm flex flex-col z-50 overflow-y-auto">
+    <!-- Header -->
+    <div class="p-6 pb-8 border-b border-outline-variant/30 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg bg-surface-container-lowest flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
+             <span class="material-symbols-outlined text-secondary font-bold text-2xl">flight</span>
+        </div>
+        <div class="flex flex-col">
+            <span class="font-headline-md text-headline-md font-bold text-on-primary dark:text-primary-fixed leading-tight">SkyFly Elite</span>
+            <span class="font-label-sm text-label-sm text-on-primary-container">Admin Console</span>
+        </div>
+    </div>
     
-    <!-- Sidebar Fragment -->
-    <aside th:fragment="admin_sidebar(activePage)" class="w-64 bg-admin-sidebar text-white fixed h-full z-20 flex flex-col transition-all duration-300 shadow-xl">
-        <!-- Logo Area -->
-        <div class="h-16 flex items-center px-6 border-b border-white/10 shrink-0">
-            <span class="material-symbols-outlined text-admin-accent mr-3 text-3xl" style="font-variation-settings: 'FILL' 1;">flight_takeoff</span>
-            <div>
-                <h1 class="font-display font-bold text-xl tracking-tight leading-none text-white">SkyFly Elite</h1>
-                <p class="text-[10px] text-admin-accent font-semibold uppercase tracking-widest mt-1">Admin Console</p>
-            </div>
+    <div class="p-4">
+        <a th:href="@{/admin/flights/new}" class="w-full bg-secondary text-on-secondary rounded-lg py-3 px-4 font-label-sm text-label-sm flex items-center justify-center gap-2 hover:bg-secondary-container transition-colors duration-200 shadow-sm scale-95 active:scale-90 inline-flex">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 18px;">add</span>
+            New Flight
+        </a>
+    </div>
+
+    <!-- Main Nav Tabs -->
+    <div class="flex-1 py-2 flex flex-col gap-1">
+        <a th:href="@{/admin/dashboard}" 
+           th:class="${activePage == 'dashboard' ? 'flex items-center gap-3 px-6 py-3 text-secondary-fixed bg-secondary-container/10 border-r-4 border-secondary font-bold' : 'flex items-center gap-3 px-6 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200'}">
+            <span class="material-symbols-outlined" th:style="${activePage == 'dashboard' ? 'font-variation-settings: ''FILL'' 1;' : 'font-variation-settings: ''FILL'' 0;'}">dashboard</span>
+            <span class="font-label-sm text-label-sm">Dashboard</span>
+        </a>
+        <a th:href="@{/admin/flights}" 
+           th:class="${activePage == 'flights' ? 'flex items-center gap-3 px-6 py-3 text-secondary-fixed bg-secondary-container/10 border-r-4 border-secondary font-bold' : 'flex items-center gap-3 px-6 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200'}">
+            <span class="material-symbols-outlined" th:style="${activePage == 'flights' ? 'font-variation-settings: ''FILL'' 1;' : 'font-variation-settings: ''FILL'' 0;'}">flight_takeoff</span>
+            <span class="font-label-sm text-label-sm">Flights</span>
+        </a>
+        <a th:href="@{/admin/bookings}" 
+           th:class="${activePage == 'bookings' ? 'flex items-center gap-3 px-6 py-3 text-secondary-fixed bg-secondary-container/10 border-r-4 border-secondary font-bold' : 'flex items-center gap-3 px-6 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200'}">
+            <span class="material-symbols-outlined" th:style="${activePage == 'bookings' ? 'font-variation-settings: ''FILL'' 1;' : 'font-variation-settings: ''FILL'' 0;'}">confirmation_number</span>
+            <span class="font-label-sm text-label-sm">Bookings</span>
+        </a>
+        <a th:href="@{/admin/users}" 
+           th:class="${activePage == 'users' ? 'flex items-center gap-3 px-6 py-3 text-secondary-fixed bg-secondary-container/10 border-r-4 border-secondary font-bold' : 'flex items-center gap-3 px-6 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200'}">
+            <span class="material-symbols-outlined" th:style="${activePage == 'users' ? 'font-variation-settings: ''FILL'' 1;' : 'font-variation-settings: ''FILL'' 0;'}">group</span>
+            <span class="font-label-sm text-label-sm">Users</span>
+        </a>
+        <a th:href="@{/admin/airlines}" 
+           th:class="${activePage == 'airlines' ? 'flex items-center gap-3 px-6 py-3 text-secondary-fixed bg-secondary-container/10 border-r-4 border-secondary font-bold' : 'flex items-center gap-3 px-6 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200'}">
+            <span class="material-symbols-outlined" th:style="${activePage == 'airlines' ? 'font-variation-settings: ''FILL'' 1;' : 'font-variation-settings: ''FILL'' 0;'}">corporate_fare</span>
+            <span class="font-label-sm text-label-sm">Airlines</span>
+        </a>
+        <a th:href="@{/admin/airports}" 
+           th:class="${activePage == 'airports' ? 'flex items-center gap-3 px-6 py-3 text-secondary-fixed bg-secondary-container/10 border-r-4 border-secondary font-bold' : 'flex items-center gap-3 px-6 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200'}">
+            <span class="material-symbols-outlined" th:style="${activePage == 'airports' ? 'font-variation-settings: ''FILL'' 1;' : 'font-variation-settings: ''FILL'' 0;'}">connecting_airports</span>
+            <span class="font-label-sm text-label-sm">Airports</span>
+        </a>
+        <a th:href="@{/admin/aircraft}" 
+           th:class="${activePage == 'aircraft' ? 'flex items-center gap-3 px-6 py-3 text-secondary-fixed bg-secondary-container/10 border-r-4 border-secondary font-bold' : 'flex items-center gap-3 px-6 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200'}">
+            <span class="material-symbols-outlined" th:style="${activePage == 'aircraft' ? 'font-variation-settings: ''FILL'' 1;' : 'font-variation-settings: ''FILL'' 0;'}">flight_class</span>
+            <span class="font-label-sm text-label-sm">Aircraft</span>
+        </a>
+        <a th:href="@{/admin/baggage}" 
+           th:class="${activePage == 'baggage' ? 'flex items-center gap-3 px-6 py-3 text-secondary-fixed bg-secondary-container/10 border-r-4 border-secondary font-bold' : 'flex items-center gap-3 px-6 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200'}">
+            <span class="material-symbols-outlined" th:style="${activePage == 'baggage' ? 'font-variation-settings: ''FILL'' 1;' : 'font-variation-settings: ''FILL'' 0;'}">luggage</span>
+            <span class="font-label-sm text-label-sm">Baggage</span>
+        </a>
+        <a th:href="@{/admin/coupons}" 
+           th:class="${activePage == 'coupons' ? 'flex items-center gap-3 px-6 py-3 text-secondary-fixed bg-secondary-container/10 border-r-4 border-secondary font-bold' : 'flex items-center gap-3 px-6 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200'}">
+            <span class="material-symbols-outlined" th:style="${activePage == 'coupons' ? 'font-variation-settings: ''FILL'' 1;' : 'font-variation-settings: ''FILL'' 0;'}">sell</span>
+            <span class="font-label-sm text-label-sm">Coupons</span>
+        </a>
+        <a th:href="@{/admin/wallets}" 
+           th:class="${activePage == 'wallets' ? 'flex items-center gap-3 px-6 py-3 text-secondary-fixed bg-secondary-container/10 border-r-4 border-secondary font-bold' : 'flex items-center gap-3 px-6 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200'}">
+            <span class="material-symbols-outlined" th:style="${activePage == 'wallets' ? 'font-variation-settings: ''FILL'' 1;' : 'font-variation-settings: ''FILL'' 0;'}">account_balance_wallet</span>
+            <span class="font-label-sm text-label-sm">Wallets</span>
+        </a>
+        <a th:href="@{/admin/logs}" 
+           th:class="${activePage == 'logs' ? 'flex items-center gap-3 px-6 py-3 text-secondary-fixed bg-secondary-container/10 border-r-4 border-secondary font-bold' : 'flex items-center gap-3 px-6 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200'}">
+            <span class="material-symbols-outlined" th:style="${activePage == 'logs' ? 'font-variation-settings: ''FILL'' 1;' : 'font-variation-settings: ''FILL'' 0;'}">history</span>
+            <span class="font-label-sm text-label-sm">System Logs</span>
+        </a>
+    </div>
+
+    <!-- Footer Tabs -->
+    <div class="mt-auto border-t border-outline-variant/30 py-4">
+        <a href="#" class="flex items-center gap-3 px-6 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">help</span>
+            <span class="font-label-sm text-label-sm">Support</span>
+        </a>
+        <a href="#" class="flex items-center gap-3 px-6 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings</span>
+            <span class="font-label-sm text-label-sm">Settings</span>
+        </a>
+    </div>
+</nav>
+
+<!-- Shared Top App Bar Fragment -->
+<header th:fragment="admin_topbar" class="docked full-width top-0 sticky z-40 bg-surface dark:bg-surface-container shadow-sm border-b border-outline-variant flex justify-between items-center w-full px-gutter h-16">
+    <!-- Search Bar -->
+    <div class="flex-1 flex items-center max-w-md">
+        <div class="relative w-full">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+            <input class="w-full bg-surface-container-low border border-outline-variant rounded-full py-2 pl-10 pr-4 font-body-md text-body-md text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all" placeholder="Search flights, users..." type="text">
         </div>
+    </div>
 
-        <!-- Primary Action -->
-        <div class="p-4 shrink-0">
-            <a th:href="@{/admin/flights/new}" class="flex items-center justify-center gap-2 w-full bg-admin-accent hover:bg-blue-600 text-white font-medium py-2.5 rounded-lg transition-colors shadow-sm">
-                <span class="material-symbols-outlined text-sm">add</span> New Flight
-            </a>
-        </div>
-
-        <!-- Navigation Links -->
-        <nav class="flex-1 overflow-y-auto py-2 px-3 space-y-1 custom-scrollbar">
-            <a th:href="@{/admin}" th:class="${activePage == 'dashboard' ? 'bg-admin-sidebarActive border-l-4 border-admin-accent text-white shadow-sm' : 'text-gray-400 hover:bg-admin-sidebarHover hover:text-white border-l-4 border-transparent'} + ' flex items-center gap-3 px-3 py-2.5 rounded-r-lg transition-all group'">
-                <span class="material-symbols-outlined text-[20px]" th:style="${activePage == 'dashboard' ? 'font-variation-settings: ''FILL'' 1;' : ''}">dashboard</span>
-                <span class="font-medium text-sm">Dashboard</span>
-            </a>
-            
-            <a th:href="@{/admin/flights}" th:class="${activePage == 'flights' ? 'bg-admin-sidebarActive border-l-4 border-admin-accent text-white shadow-sm' : 'text-gray-400 hover:bg-admin-sidebarHover hover:text-white border-l-4 border-transparent'} + ' flex items-center gap-3 px-3 py-2.5 rounded-r-lg transition-all group'">
-                <span class="material-symbols-outlined text-[20px]" th:style="${activePage == 'flights' ? 'font-variation-settings: ''FILL'' 1;' : ''}">airlines</span>
-                <span class="font-medium text-sm">Flights</span>
-            </a>
-
-            <a th:href="@{/admin/bookings}" th:class="${activePage == 'bookings' ? 'bg-admin-sidebarActive border-l-4 border-admin-accent text-white shadow-sm' : 'text-gray-400 hover:bg-admin-sidebarHover hover:text-white border-l-4 border-transparent'} + ' flex items-center gap-3 px-3 py-2.5 rounded-r-lg transition-all group'">
-                <span class="material-symbols-outlined text-[20px]" th:style="${activePage == 'bookings' ? 'font-variation-settings: ''FILL'' 1;' : ''}">airplane_ticket</span>
-                <span class="font-medium text-sm">Bookings</span>
-            </a>
-            
-            <a th:href="@{/admin/users}" th:class="${activePage == 'users' ? 'bg-admin-sidebarActive border-l-4 border-admin-accent text-white shadow-sm' : 'text-gray-400 hover:bg-admin-sidebarHover hover:text-white border-l-4 border-transparent'} + ' flex items-center gap-3 px-3 py-2.5 rounded-r-lg transition-all group'">
-                <span class="material-symbols-outlined text-[20px]" th:style="${activePage == 'users' ? 'font-variation-settings: ''FILL'' 1;' : ''}">group</span>
-                <span class="font-medium text-sm">Users</span>
-            </a>
-
-            <a th:href="@{/admin/airlines}" th:class="${activePage == 'airlines' ? 'bg-admin-sidebarActive border-l-4 border-admin-accent text-white shadow-sm' : 'text-gray-400 hover:bg-admin-sidebarHover hover:text-white border-l-4 border-transparent'} + ' flex items-center gap-3 px-3 py-2.5 rounded-r-lg transition-all group'">
-                <span class="material-symbols-outlined text-[20px]" th:style="${activePage == 'airlines' ? 'font-variation-settings: ''FILL'' 1;' : ''}">corporate_fare</span>
-                <span class="font-medium text-sm">Airlines</span>
-            </a>
-
-            <a th:href="@{/admin/airports}" th:class="${activePage == 'airports' ? 'bg-admin-sidebarActive border-l-4 border-admin-accent text-white shadow-sm' : 'text-gray-400 hover:bg-admin-sidebarHover hover:text-white border-l-4 border-transparent'} + ' flex items-center gap-3 px-3 py-2.5 rounded-r-lg transition-all group'">
-                <span class="material-symbols-outlined text-[20px]" th:style="${activePage == 'airports' ? 'font-variation-settings: ''FILL'' 1;' : ''}">location_on</span>
-                <span class="font-medium text-sm">Airports</span>
-            </a>
-
-            <a th:href="@{/admin/aircrafts}" th:class="${activePage == 'aircrafts' ? 'bg-admin-sidebarActive border-l-4 border-admin-accent text-white shadow-sm' : 'text-gray-400 hover:bg-admin-sidebarHover hover:text-white border-l-4 border-transparent'} + ' flex items-center gap-3 px-3 py-2.5 rounded-r-lg transition-all group'">
-                <span class="material-symbols-outlined text-[20px]" th:style="${activePage == 'aircrafts' ? 'font-variation-settings: ''FILL'' 1;' : ''}">flight</span>
-                <span class="font-medium text-sm">Aircraft</span>
-            </a>
-
-            <a th:href="@{/admin/baggage}" th:class="${activePage == 'baggage' ? 'bg-admin-sidebarActive border-l-4 border-admin-accent text-white shadow-sm' : 'text-gray-400 hover:bg-admin-sidebarHover hover:text-white border-l-4 border-transparent'} + ' flex items-center gap-3 px-3 py-2.5 rounded-r-lg transition-all group'">
-                <span class="material-symbols-outlined text-[20px]" th:style="${activePage == 'baggage' ? 'font-variation-settings: ''FILL'' 1;' : ''}">luggage</span>
-                <span class="font-medium text-sm">Baggage</span>
-            </a>
-
-            <a th:href="@{/admin/coupons}" th:class="${activePage == 'coupons' ? 'bg-admin-sidebarActive border-l-4 border-admin-accent text-white shadow-sm' : 'text-gray-400 hover:bg-admin-sidebarHover hover:text-white border-l-4 border-transparent'} + ' flex items-center gap-3 px-3 py-2.5 rounded-r-lg transition-all group'">
-                <span class="material-symbols-outlined text-[20px]" th:style="${activePage == 'coupons' ? 'font-variation-settings: ''FILL'' 1;' : ''}">local_offer</span>
-                <span class="font-medium text-sm">Coupons</span>
-            </a>
-
-            <a th:href="@{/admin/wallets}" th:class="${activePage == 'wallets' ? 'bg-admin-sidebarActive border-l-4 border-admin-accent text-white shadow-sm' : 'text-gray-400 hover:bg-admin-sidebarHover hover:text-white border-l-4 border-transparent'} + ' flex items-center gap-3 px-3 py-2.5 rounded-r-lg transition-all group'">
-                <span class="material-symbols-outlined text-[20px]" th:style="${activePage == 'wallets' ? 'font-variation-settings: ''FILL'' 1;' : ''}">account_balance_wallet</span>
-                <span class="font-medium text-sm">Wallets</span>
-            </a>
-            
-            <a th:href="@{/admin/logs}" th:class="${activePage == 'logs' ? 'bg-admin-sidebarActive border-l-4 border-admin-accent text-white shadow-sm' : 'text-gray-400 hover:bg-admin-sidebarHover hover:text-white border-l-4 border-transparent'} + ' flex items-center gap-3 px-3 py-2.5 rounded-r-lg transition-all group'">
-                <span class="material-symbols-outlined text-[20px]" th:style="${activePage == 'logs' ? 'font-variation-settings: ''FILL'' 1;' : ''}">receipt_long</span>
-                <span class="font-medium text-sm">System Logs</span>
-            </a>
-        </nav>
-
-        <!-- Bottom Actions -->
-        <div class="p-4 border-t border-white/10 space-y-1 shrink-0">
-            <a href="#" class="flex items-center gap-3 px-3 py-2 text-gray-400 hover:text-white hover:bg-admin-sidebarHover rounded-lg transition-colors group">
-                <span class="material-symbols-outlined text-[20px]">help</span>
-                <span class="font-medium text-sm">Support</span>
-            </a>
-            <a href="#" class="flex items-center gap-3 px-3 py-2 text-gray-400 hover:text-white hover:bg-admin-sidebarHover rounded-lg transition-colors group">
-                <span class="material-symbols-outlined text-[20px]">settings</span>
-                <span class="font-medium text-sm">Settings</span>
-            </a>
-        </div>
-    </aside>
-
-    <!-- Top Bar Fragment -->
-    <header th:fragment="admin_topbar" class="h-16 bg-white border-b border-slate-200 fixed top-0 right-0 left-64 z-10 flex items-center justify-between px-8 shadow-sm">
+    <!-- Trailing Actions -->
+    <div class="flex items-center gap-4">
+        <button class="text-on-surface-variant hover:text-secondary transition-colors opacity-80 hover:opacity-100 flex items-center justify-center relative">
+            <span class="material-symbols-outlined">notifications</span>
+            <span class="absolute top-0 right-0 w-2 h-2 bg-error rounded-full"></span>
+        </button>
+        <button class="text-on-surface-variant hover:text-secondary transition-colors opacity-80 hover:opacity-100 flex items-center justify-center">
+            <span class="material-symbols-outlined">help_outline</span>
+        </button>
         
-        <!-- Search -->
-        <div class="relative w-96 hidden md:block">
-            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg">search</span>
-            <input type="text" placeholder="Search flights, bookings..." class="w-full pl-10 pr-4 py-2 bg-slate-100 border-transparent rounded-lg text-sm focus:bg-white focus:border-admin-accent focus:ring-2 focus:ring-admin-accent/20 transition-all outline-none">
-        </div>
-        <div class="md:hidden flex-1"></div> <!-- Spacer for mobile -->
-
-        <!-- Right Side Actions -->
-        <div class="flex items-center gap-6">
-            <!-- Notifications -->
-            <button class="relative text-gray-500 hover:text-admin-text transition-colors">
-                <span class="material-symbols-outlined">notifications</span>
-                <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
-            </button>
-            
-            <div class="w-px h-6 bg-slate-200"></div>
-            
-            <!-- User Profile Dropdown Placeholder -->
-            <div class="flex items-center gap-3 cursor-pointer group">
-                <div class="text-right hidden sm:block">
-                    <p class="text-sm font-semibold text-admin-text leading-tight" sec:authentication="name">Admin User</p>
-                    <p class="text-[11px] text-gray-500 font-medium">Administrator</p>
-                </div>
-                <div class="w-9 h-9 rounded-full bg-admin-accent text-white flex items-center justify-center font-bold text-sm shadow-sm">
-                    <span th:text="${#strings.substring(#authentication.name, 0, 1).toUpperCase()}">A</span>
-                </div>
-                <span class="material-symbols-outlined text-gray-400 group-hover:text-admin-text transition-colors">arrow_drop_down</span>
+        <div class="w-px h-6 bg-outline-variant mx-2"></div>
+        
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full overflow-hidden bg-surface-container-high border border-outline-variant shadow-sm flex items-center justify-center">
+                <span class="material-symbols-outlined text-on-surface-variant" style="font-size: 20px;">person</span>
             </div>
-
-            <div class="w-px h-6 bg-slate-200"></div>
-
-            <!-- Logout -->
-            <form th:action="@{/logout}" method="post" class="m-0">
-                <button type="submit" class="text-gray-500 hover:text-red-500 transition-colors flex items-center gap-2 text-sm font-medium">
-                    <span class="material-symbols-outlined text-[18px]">logout</span>
-                    <span class="hidden sm:inline">Logout</span>
+            <form th:action="@{/logout}" method="post" class="inline">
+                <button type="submit" class="font-label-sm text-label-sm text-primary dark:text-primary-fixed-dim hover:text-secondary transition-colors opacity-80 hover:opacity-100 font-bold">
+                    Logout
                 </button>
             </form>
         </div>
-    </header>
+    </div>
+</header>
 
 </body>
 </html>

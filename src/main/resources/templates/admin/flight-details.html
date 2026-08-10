@@ -1,283 +1,245 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{admin/admin-layout :: admin_head('Flight Details')}"></head>
-<body class="bg-admin-bg text-admin-text font-sans antialiased min-h-screen flex">
-    
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/admin-layout :: admin_head('Flight Details - ' + ${flight.flightNumber})}"></head>
+<body class="bg-background text-on-background font-body-md text-body-md antialiased min-h-screen flex">
+
     <!-- Sidebar -->
-    <div th:replace="~{admin/admin-layout :: admin_sidebar('flights')}"></div>
-    
-    <!-- Topbar -->
-    <div th:replace="~{admin/admin-layout :: admin_topbar}"></div>
+    <nav th:replace="~{admin/admin-layout :: admin_sidebar('flights')}"></nav>
 
-    <!-- Main Content -->
-    <main class="flex-1 ml-64 mt-16 p-8">
+    <!-- Main Content Wrapper -->
+    <div class="flex-1 ml-64 flex flex-col min-h-screen w-[calc(100%-16rem)]">
         
-        <!-- Header -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-            <div class="flex items-center gap-6">
-                <!-- Flight Icon -->
-                <div class="w-16 h-16 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 overflow-hidden shadow-inner">
-                    <img th:if="${flight.airline.logo != null && !flight.airline.logo.isEmpty()}" th:src="${flight.airline.logo}" alt="Logo" class="w-10 h-10 object-contain">
-                    <span th:if="${flight.airline.logo == null || flight.airline.logo.isEmpty()}" class="material-symbols-outlined text-admin-accent text-3xl">flight</span>
-                </div>
+        <!-- TopAppBar -->
+        <header th:replace="~{admin/admin-layout :: admin_topbar}"></header>
+
+        <!-- Page Canvas -->
+        <main class="flex-1 p-margin-desktop bg-surface overflow-x-hidden">
+            <div class="max-w-[container-max] mx-auto flex flex-col gap-10">
                 
-                <div>
-                    <div class="flex items-center gap-3 mb-1">
-                        <h2 class="font-display font-bold text-3xl text-admin-text" th:text="${flight.flightNumber}">AA-101</h2>
-                        <span th:with="status=${flight.flightStatus != null ? flight.flightStatus.name() : 'SCHEDULED'}"
-                              th:classappend="${status == 'SCHEDULED' ? 'bg-slate-100 text-slate-700 border-slate-200' : 
-                                              (status == 'DELAYED' ? 'bg-red-50 text-red-700 border-red-200' : 
-                                              (status == 'BOARDING' ? 'bg-teal-50 text-teal-700 border-teal-200' : 
-                                              (status == 'DEPARTED' ? 'bg-purple-50 text-purple-700 border-purple-200' : 
-                                              (status == 'LANDED' ? 'bg-gray-100 text-gray-700 border-gray-200' : 
-                                              (status == 'CANCELLED' ? 'bg-red-100 text-red-800 border-red-300' : 'bg-slate-100 text-slate-700 border-slate-200'))))))}"
-                              class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border uppercase tracking-wider"
-                              th:text="${flight.flightStatus != null ? flight.flightStatus.label : 'Scheduled'}">
-                              Active
-                        </span>
-                    </div>
-                    <div class="flex items-center gap-2 text-admin-textMuted font-medium">
-                        <span th:text="${flight.originAirport.city} + ' (' + ${flight.originAirport.airportCode} + ')'">New York (JFK)</span>
-                        <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
-                        <span th:text="${flight.destinationAirport.city} + ' (' + ${flight.destinationAirport.airportCode} + ')'">Los Angeles (LAX)</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="flex items-center gap-3">
-                <a th:href="@{/admin/flights}" class="px-5 py-2.5 bg-white border border-slate-300 text-slate-700 font-medium text-sm rounded-lg hover:bg-slate-50 transition-colors shadow-sm">
-                    Back to Flights
-                </a>
-                <button class="px-5 py-2.5 bg-admin-accent hover:bg-blue-600 text-white font-medium text-sm rounded-lg transition-colors shadow-sm flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[18px]">manage_accounts</span> View Manifest
-                </button>
-            </div>
-        </div>
-
-        <!-- Feedback alerts -->
-        <div th:if="${success}" class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6 flex justify-between items-center shadow-sm">
-            <span th:text="${success}">Success message.</span>
-        </div>
-        <div th:if="${error}" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 flex justify-between items-center shadow-sm">
-            <span th:text="${error}">Error message.</span>
-        </div>
-
-        <!-- 3-Column Stat Row -->
-        <div th:with="total=${flight.totalSeats != null ? flight.totalSeats : 0}, avail=${flight.availableSeats != null ? flight.availableSeats : 0}, occ=${total - avail}" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-            <!-- Total Capacity -->
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex items-center gap-5 relative overflow-hidden">
-                <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 z-10">
-                    <span class="material-symbols-outlined">airline_seat_recline_normal</span>
-                </div>
-                <div class="z-10">
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Total Capacity</p>
-                    <h3 class="font-display text-3xl font-bold text-admin-text" th:text="${total}">0</h3>
-                </div>
-                <span class="material-symbols-outlined absolute -right-6 -bottom-6 text-[100px] text-slate-50 z-0" style="font-variation-settings: 'FILL' 1;">airline_seat_recline_normal</span>
-            </div>
-            
-            <!-- Available Seats -->
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex items-center gap-5 relative overflow-hidden">
-                <div class="w-12 h-12 rounded-full bg-teal-50 flex items-center justify-center text-teal-600 z-10">
-                    <span class="material-symbols-outlined">check_circle</span>
-                </div>
-                <div class="z-10">
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Available Seats</p>
-                    <h3 class="font-display text-3xl font-bold text-admin-text" th:text="${avail}">0</h3>
-                </div>
-                <span class="material-symbols-outlined absolute -right-6 -bottom-6 text-[100px] text-teal-50/50 z-0" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-            </div>
-            
-            <!-- Occupied Seats -->
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex items-center gap-5 relative overflow-hidden">
-                <div class="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center text-amber-600 z-10">
-                    <span class="material-symbols-outlined">group</span>
-                </div>
-                <div class="z-10">
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Occupied Seats</p>
-                    <h3 class="font-display text-3xl font-bold text-admin-text" th:text="${occ}">0</h3>
-                </div>
-                <span class="material-symbols-outlined absolute -right-6 -bottom-6 text-[100px] text-amber-50/50 z-0" style="font-variation-settings: 'FILL' 1;">group</span>
-            </div>
-        </div>
-
-        <!-- Cabin Configuration & Pricing -->
-        <div class="mb-6 flex justify-between items-end">
-            <div>
-                <h3 class="font-display font-bold text-xl text-admin-text">Cabin Configuration & Pricing</h3>
-                <p class="text-sm text-admin-textMuted mt-1">Base fares in USD (*Requires save to apply changes)</p>
-            </div>
-        </div>
-
-        <form th:action="@{/admin/flights/details/{id}/fares(id=${flight.id})}" method="post" id="faresForm">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-                
-                <!-- First Class -->
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col group">
-                    <div class="bg-admin-sidebar text-white p-4 flex items-center justify-between">
-                        <h4 class="font-bold tracking-wide">First Class</h4>
-                        <span class="material-symbols-outlined text-white/50">star</span>
-                    </div>
-                    <div class="p-5 flex-1 flex flex-col">
-                        <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-2">Current Base Fare</p>
-                        <div class="flex items-center gap-2 mb-4 group-hover:bg-slate-50 p-2 -mx-2 rounded-lg transition-colors border border-transparent group-hover:border-slate-200 cursor-text" onclick="document.getElementById('firstClassFare').focus()">
-                            <span class="font-display text-2xl font-bold text-admin-text">$</span>
-                            <input type="number" step="0.01" id="firstClassFare" name="firstClassFare" th:value="${flight.firstClassFare}" class="font-display text-2xl font-bold text-admin-text bg-transparent border-none p-0 focus:ring-0 w-full outline-none" required>
-                            <span class="material-symbols-outlined text-slate-400 text-sm opacity-0 group-hover:opacity-100 transition-opacity">edit</span>
+                <!-- Page Header: Flight Summary -->
+                <section class="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-outline-variant">
+                    <div class="flex items-center gap-6">
+                        <div class="w-16 h-16 rounded-xl bg-surface-container-lowest border border-outline-variant shadow-sm flex items-center justify-center overflow-hidden shrink-0">
+                            <span class="material-symbols-outlined text-secondary font-bold text-4xl">flight</span>
                         </div>
-                        <div class="mt-auto">
-                            <div class="h-px w-full bg-slate-100 mb-4"></div>
-                            <div class="flex justify-between items-center text-sm">
-                                <span class="text-slate-500 font-medium">Capacity</span>
-                                <span class="font-bold text-admin-text">12 <span class="text-slate-400 font-normal">seats</span></span>
+                        <div>
+                            <div class="flex items-center gap-3 mb-1">
+                                <h1 class="font-display-lg text-display-lg text-on-surface" th:text="${flight.flightNumber}">SF-102</h1>
+                                <span class="bg-surface-container-high text-on-surface-variant px-3 py-1 rounded-full font-label-sm text-label-sm border border-outline-variant" th:text="${flight.flightStatus}">Active</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-on-surface-variant font-body-lg text-body-lg">
+                                <span th:text="${flight.originAirport.city + ' (' + flight.originAirport.airportCode + ')'}">San Francisco (SFO)</span>
+                                <span class="material-symbols-outlined text-outline">arrow_right_alt</span>
+                                <span th:text="${flight.destinationAirport.city + ' (' + flight.destinationAirport.airportCode + ')'}">New York (JFK)</span>
                             </div>
                         </div>
                     </div>
-                </div>
-                
-                <!-- Business Class -->
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col group">
-                    <div class="bg-blue-600 text-white p-4 flex items-center justify-between">
-                        <h4 class="font-bold tracking-wide">Business</h4>
-                        <span class="material-symbols-outlined text-white/50">work</span>
-                    </div>
-                    <div class="p-5 flex-1 flex flex-col">
-                        <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-2">Current Base Fare</p>
-                        <div class="flex items-center gap-2 mb-4 group-hover:bg-slate-50 p-2 -mx-2 rounded-lg transition-colors border border-transparent group-hover:border-slate-200 cursor-text" onclick="document.getElementById('businessFare').focus()">
-                            <span class="font-display text-2xl font-bold text-admin-text">$</span>
-                            <input type="number" step="0.01" id="businessFare" name="businessFare" th:value="${flight.businessFare}" class="font-display text-2xl font-bold text-admin-text bg-transparent border-none p-0 focus:ring-0 w-full outline-none" required>
-                            <span class="material-symbols-outlined text-slate-400 text-sm opacity-0 group-hover:opacity-100 transition-opacity">edit</span>
-                        </div>
-                        <div class="mt-auto">
-                            <div class="h-px w-full bg-slate-100 mb-4"></div>
-                            <div class="flex justify-between items-center text-sm">
-                                <span class="text-slate-500 font-medium">Capacity</span>
-                                <span class="font-bold text-admin-text">36 <span class="text-slate-400 font-normal">seats</span></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Premium Economy -->
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col group">
-                    <div class="bg-sky-500 text-white p-4 flex items-center justify-between">
-                        <h4 class="font-bold tracking-wide">Prem. Economy</h4>
-                        <span class="material-symbols-outlined text-white/50">event_seat</span>
-                    </div>
-                    <div class="p-5 flex-1 flex flex-col">
-                        <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-2">Current Base Fare</p>
-                        <div class="flex items-center gap-2 mb-4 group-hover:bg-slate-50 p-2 -mx-2 rounded-lg transition-colors border border-transparent group-hover:border-slate-200 cursor-text" onclick="document.getElementById('premiumEconomyFare').focus()">
-                            <span class="font-display text-2xl font-bold text-admin-text">$</span>
-                            <input type="number" step="0.01" id="premiumEconomyFare" name="premiumEconomyFare" th:value="${flight.premiumEconomyFare}" class="font-display text-2xl font-bold text-admin-text bg-transparent border-none p-0 focus:ring-0 w-full outline-none" required>
-                            <span class="material-symbols-outlined text-slate-400 text-sm opacity-0 group-hover:opacity-100 transition-opacity">edit</span>
-                        </div>
-                        <div class="mt-auto">
-                            <div class="h-px w-full bg-slate-100 mb-4"></div>
-                            <div class="flex justify-between items-center text-sm">
-                                <span class="text-slate-500 font-medium">Capacity</span>
-                                <span class="font-bold text-admin-text">48 <span class="text-slate-400 font-normal">seats</span></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Economy Class -->
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col group">
-                    <div class="bg-slate-500 text-white p-4 flex items-center justify-between">
-                        <h4 class="font-bold tracking-wide">Economy</h4>
-                        <span class="material-symbols-outlined text-white/50">chair</span>
-                    </div>
-                    <div class="p-5 flex-1 flex flex-col">
-                        <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-2">Current Base Fare</p>
-                        <div class="flex items-center gap-2 mb-4 group-hover:bg-slate-50 p-2 -mx-2 rounded-lg transition-colors border border-transparent group-hover:border-slate-200 cursor-text" onclick="document.getElementById('economyFare').focus()">
-                            <span class="font-display text-2xl font-bold text-admin-text">$</span>
-                            <input type="number" step="0.01" id="economyFare" name="economyFare" th:value="${flight.economyFare}" class="font-display text-2xl font-bold text-admin-text bg-transparent border-none p-0 focus:ring-0 w-full outline-none" required>
-                            <span class="material-symbols-outlined text-slate-400 text-sm opacity-0 group-hover:opacity-100 transition-opacity">edit</span>
-                        </div>
-                        <div class="mt-auto">
-                            <div class="h-px w-full bg-slate-100 mb-4"></div>
-                            <div class="flex justify-between items-center text-sm">
-                                <span class="text-slate-500 font-medium">Capacity</span>
-                                <span class="font-bold text-admin-text">144 <span class="text-slate-400 font-normal">seats</span></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="flex justify-end mb-12">
-                <button type="submit" class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors shadow-sm flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[20px]">save</span> Save All Fares
-                </button>
-            </div>
-        </form>
-
-        <!-- Keep Boarding Info and Status Cards but Restyle to Match -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- Boarding Info Card -->
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="border-b border-slate-100 px-6 py-4 flex items-center gap-3">
-                    <span class="material-symbols-outlined text-admin-accent bg-blue-50 p-2 rounded-lg">door_open</span>
-                    <h3 class="font-display font-bold text-lg text-admin-text">Boarding Information</h3>
-                </div>
-                <div class="p-6">
-                    <form th:action="@{/admin/flights/details/{id}/boarding(id=${flight.id})}" method="post">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                            <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Gate Number</label>
-                                <input type="text" name="gateNumber" th:value="${flight.gateNumber}" placeholder="e.g. G12" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:bg-white focus:border-admin-accent focus:ring-1 focus:ring-admin-accent outline-none transition-all">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Terminal</label>
-                                <input type="text" name="terminal" th:value="${flight.terminal}" placeholder="e.g. T2" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:bg-white focus:border-admin-accent focus:ring-1 focus:ring-admin-accent outline-none transition-all">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Boarding Zone</label>
-                                <input type="text" name="boardingZone" th:value="${flight.boardingZone}" placeholder="e.g. Zone A" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:bg-white focus:border-admin-accent focus:ring-1 focus:ring-admin-accent outline-none transition-all">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-1.5 flex justify-between">
-                                    <span>Boarding Time</span>
-                                    <span class="text-slate-400 font-normal text-xs">(Auto-calculated)</span>
-                                </label>
-                                <input type="text" th:value="${flight.boardingTime != null ? #temporals.format(flight.boardingTime, 'dd MMM yyyy, HH:mm') : 'N/A'}" disabled class="w-full bg-slate-100 border border-slate-200 rounded-lg px-4 py-2.5 text-sm text-slate-500 cursor-not-allowed">
-                            </div>
-                        </div>
-                        <div class="mt-6 flex justify-end">
-                            <button type="submit" class="px-5 py-2.5 bg-admin-accent hover:bg-blue-600 text-white font-medium rounded-lg transition-colors shadow-sm flex items-center gap-2 text-sm">
-                                <span class="material-symbols-outlined text-[18px]">update</span> Save Boarding Info
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Flight Status Card -->
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden h-fit">
-                <div class="border-b border-slate-100 px-6 py-4 flex items-center gap-3">
-                    <span class="material-symbols-outlined text-slate-600 bg-slate-100 p-2 rounded-lg">activity</span>
-                    <h3 class="font-display font-bold text-lg text-admin-text">Flight Status Control</h3>
-                </div>
-                <div class="p-6">
-                    <form th:action="@{/admin/flights/details/{id}/status(id=${flight.id})}" method="post">
-                        <div class="mb-5">
-                            <label class="block text-sm font-semibold text-slate-700 mb-2">Update Current Status</label>
-                            <select name="flightStatus" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-sm focus:bg-white focus:border-admin-accent focus:ring-1 focus:ring-admin-accent outline-none transition-all cursor-pointer">
-                                <option th:each="status : ${T(com.airline.reservation.entity.FlightStatus).values()}"
-                                        th:value="${status}"
-                                        th:text="${status.label}"
-                                        th:selected="${flight.flightStatus == status}"></option>
-                            </select>
-                        </div>
-                        <button type="submit" class="w-full px-5 py-3 bg-slate-800 hover:bg-slate-900 text-white font-medium rounded-lg transition-colors shadow-sm flex items-center justify-center gap-2 text-sm">
-                            <span class="material-symbols-outlined text-[18px]">published_with_changes</span> Confirm Status Change
+                    <div class="flex gap-3">
+                        <button class="px-6 py-2.5 rounded-lg border border-outline-variant text-on-surface font-label-sm text-label-sm hover:bg-surface-variant/50 transition-colors shadow-sm bg-surface-container-lowest">
+                            View Manifest
                         </button>
-                    </form>
+                        <a th:href="@{/admin/flights/edit/{id}(id=${flight.id})}" class="px-6 py-2.5 rounded-lg bg-secondary text-on-secondary font-label-sm text-label-sm hover:bg-secondary-container transition-colors shadow-sm inline-block">
+                            Manage Flight
+                        </a>
+                    </div>
+                </section>
+
+                <!-- Stat Cards Row -->
+                <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Total Seats -->
+                    <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-[0_4px_20px_rgba(0,0,0,0.02)] flex items-center gap-5">
+                        <div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-primary-container">
+                            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">airline_seat_recline_normal</span>
+                        </div>
+                        <div>
+                            <p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Total Capacity</p>
+                            <p class="font-headline-md text-headline-md text-on-surface" th:text="${flight.totalSeats}">320</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Available Seats -->
+                    <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-[0_4px_20px_rgba(0,0,0,0.02)] flex items-center gap-5">
+                        <div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center text-secondary">
+                            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">event_available</span>
+                        </div>
+                        <div>
+                            <p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Available Seats</p>
+                            <p class="font-headline-md text-headline-md text-on-surface" th:text="${flight.availableSeats}">84</p>
+                        </div>
+                    </div>
+
+                    <!-- Occupied Seats -->
+                    <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-[0_4px_20px_rgba(0,0,0,0.02)] flex items-center gap-5">
+                        <div class="w-12 h-12 rounded-full bg-inverse-on-surface flex items-center justify-center text-on-secondary-fixed-variant">
+                            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">how_to_reg</span>
+                        </div>
+                        <div>
+                            <p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Occupied Seats</p>
+                            <p class="font-headline-md text-headline-md text-on-surface" th:text="${flight.totalSeats - flight.availableSeats}">236</p>
+                        </div>
+                    </div>
+                </section>
+
+                <div th:if="${successMessage}" class="p-4 mb-4 text-sm text-on-secondary rounded-lg bg-secondary/80" role="alert">
+                    <span th:text="${successMessage}"></span>
                 </div>
+
+                <!-- Cabin Classes Section -->
+                <section>
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="font-headline-md text-headline-md text-on-surface">Cabin Configuration & Pricing</h2>
+                        <span class="font-body-md text-body-md text-on-surface-variant">Base fares in USD</span>
+                    </div>
+
+                    <form th:action="@{/admin/flights/details/{id}(id=${flight.id})}" th:object="${flight}" method="post">
+                        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+                            
+                            <!-- First Class -->
+                            <div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-[0_4px_20px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col price-card" id="card-first">
+                                <div class="p-4 bg-inverse-surface text-inverse-on-surface flex justify-between items-center">
+                                    <span class="font-label-sm text-label-sm uppercase tracking-wide">First Class</span>
+                                    <span class="material-symbols-outlined text-inverse-on-surface/80" style="font-size: 20px;">stars</span>
+                                </div>
+                                <div class="p-6 flex-1 flex flex-col justify-between">
+                                    <div class="mb-6">
+                                        <p class="font-label-sm text-label-sm text-on-surface-variant mb-2">Current Base Fare</p>
+                                        <div class="display-value flex items-center justify-between group">
+                                            <span class="font-headline-md text-headline-md text-on-surface text-3xl" th:text="'$' + ${flight.firstClassFare}">$2,450</span>
+                                            <button type="button" class="w-8 h-8 rounded-full flex items-center justify-center text-outline hover:text-secondary hover:bg-surface-container transition-all" onclick="toggleEdit('card-first')">
+                                                <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
+                                            </button>
+                                        </div>
+                                        <div class="edit-form flex-col gap-3">
+                                            <div class="relative">
+                                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant font-body-md">$</span>
+                                                <input th:field="*{firstClassFare}" class="w-full pl-7 pr-3 py-2 bg-surface border border-outline-variant rounded-lg focus:border-secondary focus:ring-1 focus:ring-secondary outline-none font-body-md text-on-surface" type="number" step="0.01">
+                                            </div>
+                                            <div class="flex gap-2">
+                                                <button type="submit" class="flex-1 py-1.5 bg-secondary text-on-secondary rounded-md font-label-sm text-label-sm hover:bg-secondary-container transition-colors">Save</button>
+                                                <button type="button" class="flex-1 py-1.5 bg-surface-container-high text-on-surface-variant rounded-md font-label-sm text-label-sm hover:bg-surface-variant transition-colors" onclick="toggleEdit('card-first')">Cancel</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Business Class -->
+                            <div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-[0_4px_20px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col price-card" id="card-business">
+                                <div class="p-4 bg-secondary text-on-secondary flex justify-between items-center">
+                                    <span class="font-label-sm text-label-sm uppercase tracking-wide">Business</span>
+                                    <span class="material-symbols-outlined text-on-secondary/80" style="font-size: 20px;">work</span>
+                                </div>
+                                <div class="p-6 flex-1 flex flex-col justify-between">
+                                    <div class="mb-6">
+                                        <p class="font-label-sm text-label-sm text-on-surface-variant mb-2">Current Base Fare</p>
+                                        <div class="display-value flex items-center justify-between group">
+                                            <span class="font-headline-md text-headline-md text-on-surface text-3xl" th:text="'$' + ${flight.businessFare}">$1,280</span>
+                                            <button type="button" class="w-8 h-8 rounded-full flex items-center justify-center text-outline hover:text-secondary hover:bg-surface-container transition-all" onclick="toggleEdit('card-business')">
+                                                <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
+                                            </button>
+                                        </div>
+                                        <div class="edit-form flex-col gap-3">
+                                            <div class="relative">
+                                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant font-body-md">$</span>
+                                                <input th:field="*{businessFare}" class="w-full pl-7 pr-3 py-2 bg-surface border border-outline-variant rounded-lg focus:border-secondary focus:ring-1 focus:ring-secondary outline-none font-body-md text-on-surface" type="number" step="0.01">
+                                            </div>
+                                            <div class="flex gap-2">
+                                                <button type="submit" class="flex-1 py-1.5 bg-secondary text-on-secondary rounded-md font-label-sm text-label-sm hover:bg-secondary-container transition-colors">Save</button>
+                                                <button type="button" class="flex-1 py-1.5 bg-surface-container-high text-on-surface-variant rounded-md font-label-sm text-label-sm hover:bg-surface-variant transition-colors" onclick="toggleEdit('card-business')">Cancel</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Premium Economy -->
+                            <div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-[0_4px_20px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col price-card" id="card-premiumecon">
+                                <div class="p-4 bg-primary-container text-on-primary-container flex justify-between items-center">
+                                    <span class="font-label-sm text-label-sm uppercase tracking-wide">Premium Econ</span>
+                                    <span class="material-symbols-outlined text-on-primary-container/80" style="font-size: 20px;">airline_seat_recline_extra</span>
+                                </div>
+                                <div class="p-6 flex-1 flex flex-col justify-between">
+                                    <div class="mb-6">
+                                        <p class="font-label-sm text-label-sm text-on-surface-variant mb-2">Current Base Fare</p>
+                                        <div class="display-value flex items-center justify-between group">
+                                            <span class="font-headline-md text-headline-md text-on-surface text-3xl" th:text="'$' + ${flight.premiumEconomyFare}">$850</span>
+                                            <button type="button" class="w-8 h-8 rounded-full flex items-center justify-center text-outline hover:text-secondary hover:bg-surface-container transition-all" onclick="toggleEdit('card-premiumecon')">
+                                                <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
+                                            </button>
+                                        </div>
+                                        <div class="edit-form flex-col gap-3">
+                                            <div class="relative">
+                                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant font-body-md">$</span>
+                                                <input th:field="*{premiumEconomyFare}" class="w-full pl-7 pr-3 py-2 bg-surface border border-outline-variant rounded-lg focus:border-secondary focus:ring-1 focus:ring-secondary outline-none font-body-md text-on-surface" type="number" step="0.01">
+                                            </div>
+                                            <div class="flex gap-2">
+                                                <button type="submit" class="flex-1 py-1.5 bg-secondary text-on-secondary rounded-md font-label-sm text-label-sm hover:bg-secondary-container transition-colors">Save</button>
+                                                <button type="button" class="flex-1 py-1.5 bg-surface-container-high text-on-surface-variant rounded-md font-label-sm text-label-sm hover:bg-surface-variant transition-colors" onclick="toggleEdit('card-premiumecon')">Cancel</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Economy Class -->
+                            <div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-[0_4px_20px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col price-card" id="card-econ">
+                                <div class="p-4 bg-surface-variant text-on-surface-variant flex justify-between items-center">
+                                    <span class="font-label-sm text-label-sm uppercase tracking-wide">Economy</span>
+                                    <span class="material-symbols-outlined text-on-surface-variant/80" style="font-size: 20px;">airline_seat_recline_normal</span>
+                                </div>
+                                <div class="p-6 flex-1 flex flex-col justify-between">
+                                    <div class="mb-6">
+                                        <p class="font-label-sm text-label-sm text-on-surface-variant mb-2">Current Base Fare</p>
+                                        <div class="display-value flex items-center justify-between group">
+                                            <span class="font-headline-md text-headline-md text-on-surface text-3xl" th:text="'$' + ${flight.economyFare}">$420</span>
+                                            <button type="button" class="w-8 h-8 rounded-full flex items-center justify-center text-outline hover:text-secondary hover:bg-surface-container transition-all" onclick="toggleEdit('card-econ')">
+                                                <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
+                                            </button>
+                                        </div>
+                                        <div class="edit-form flex-col gap-3">
+                                            <div class="relative">
+                                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant font-body-md">$</span>
+                                                <input th:field="*{economyFare}" class="w-full pl-7 pr-3 py-2 bg-surface border border-outline-variant rounded-lg focus:border-secondary focus:ring-1 focus:ring-secondary outline-none font-body-md text-on-surface" type="number" step="0.01">
+                                            </div>
+                                            <div class="flex gap-2">
+                                                <button type="submit" class="flex-1 py-1.5 bg-secondary text-on-secondary rounded-md font-label-sm text-label-sm hover:bg-secondary-container transition-colors">Save</button>
+                                                <button type="button" class="flex-1 py-1.5 bg-surface-container-high text-on-surface-variant rounded-md font-label-sm text-label-sm hover:bg-surface-variant transition-colors" onclick="toggleEdit('card-econ')">Cancel</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Important hidden fields needed for the form to save correctly without wiping out other data -->
+                            <input type="hidden" th:field="*{flightNumber}" />
+                            <input type="hidden" th:field="*{originAirport.id}" />
+                            <input type="hidden" th:field="*{destinationAirport.id}" />
+                            <input type="hidden" th:field="*{airline.id}" />
+                            <input type="hidden" th:field="*{aircraft.id}" />
+                            <input type="hidden" th:field="*{departureDateTime}" />
+                            <input type="hidden" th:field="*{arrivalDateTime}" />
+                            <input type="hidden" th:field="*{durationMinutes}" />
+                            <input type="hidden" th:field="*{fare}" />
+                            <input type="hidden" th:field="*{totalSeats}" />
+                            <input type="hidden" th:field="*{availableSeats}" />
+                            <input type="hidden" th:field="*{gateNumber}" />
+                            <input type="hidden" th:field="*{terminal}" />
+                            <input type="hidden" th:field="*{boardingZone}" />
+                            <input type="hidden" th:field="*{flightStatus}" />
+                        </div>
+                    </form>
+                </section>
             </div>
-        </div>
+        </main>
+    </div>
 
-    </main>
-
+    <script>
+        function toggleEdit(cardId) {
+            const card = document.getElementById(cardId);
+            if (card) {
+                card.classList.toggle('edit-mode');
+            }
+        }
+    </script>
 </body>
 </html>
