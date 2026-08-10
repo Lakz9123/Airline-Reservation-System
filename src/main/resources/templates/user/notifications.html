@@ -252,8 +252,8 @@
                         <p class="font-body-md text-on-surface-variant mb-2" th:text="${n.message}">Your notification description goes here.</p>
                         
                         <p class="font-label-sm text-outline" style="font-size: 11px;">
-                            Flight: <strong class="text-on-surface-variant" th:text="${n.booking.flight.flightNumber}">FL-101</strong>
-                            &bull; Booking: <strong class="text-on-surface-variant" th:text="${'SKY-' + #strings.padLeft('' + n.booking.id, 5, '0')}">SKY-00001</strong>
+                            Flight: <strong class="text-on-surface-variant" th:text="${n.booking != null and n.booking.flight != null ? n.booking.flight.flightNumber : 'N/A'}">FL-101</strong>
+                            &bull; Booking: <strong class="text-on-surface-variant" th:text="${n.booking != null ? 'SKY-' + #numbers.formatInteger(n.booking.id, 5) : 'N/A'}">SKY-00001</strong>
                         </p>
                     </div>
                 </div>
