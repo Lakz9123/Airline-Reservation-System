@@ -467,15 +467,91 @@
 </nav>
 
 <!-- FOOTER -->
-<footer th:fragment="footer" class="footer-main mt-auto" style="background: rgba(15, 23, 42, 0.95); color: #94a3b8; padding: 3rem 0 2rem; border-top: 1px solid var(--border); position: relative; z-index: 10;">
-    <div class="container text-center text-md-start">
-        <div class="row">
-            <div class="col-md-6 mb-4 mb-md-0">
-                <h5 class="mb-3 text-white fw-bold"><i class="bi bi-airplane-fill me-2 text-info"></i>SkyFly Elite</h5>
-                <p class="small text-muted max-w-sm">Elevating your travel experience with premium services and seamless booking flows.</p>
+<footer th:fragment="footer" class="footer-main mt-auto" style="background-color: #0d1b2a; position: relative; overflow: hidden; padding: 4rem 0 2rem; color: #94a3b8; border-top: 1px solid rgba(255,255,255,0.1); z-index: 10;">
+    <!-- Watermark Airplane -->
+    <svg style="position: absolute; right: -5%; bottom: -10%; width: 50%; max-width: 600px; opacity: 0.08; fill: #ffffff; z-index: 0; pointer-events: none; transform: rotate(-15deg);" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+        <path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-11.6 6.5-18 4.7L266 142.1 113.6 294.6l101.4 34.9c7.6 2.6 13.5 8.5 16 16.2l31 93.1-66.2 66.2c-4.7 4.7-11.6 6.5-18 4.7L13 417c-6.8-2.6-11.5-8.8-12.7-16.1s2-14.7 8-19.1l97.3-70.3 152.5-152.5-50.8-167.7c-1.8-6.4 0-13.3 4.7-18l46.1-46.1c6.2-6.2 16.4-6.2 22.6 0l152.5 152.5 62.1 62.1c6.2 6.2 6.2 16.4 0 22.6z"/>
+    </svg>
+
+    <div class="container" style="position: relative; z-index: 1;">
+        <div class="row g-4 mb-5">
+            <!-- Brand Column -->
+            <div class="col-lg-3 col-md-6">
+                <a href="/" style="text-decoration: none; display: inline-block; margin-bottom: 1.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; font-family: 'Montserrat', sans-serif;">
+                        <div style="width: 38px; height: 38px; background-color: #0ea5e9; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 15px rgba(14, 165, 233, 0.25); flex-shrink: 0;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
+                              <path d="M6.428 1.151C6.708.591 7.213 0 8 0s1.292.592 1.572 1.151C9.861 1.73 10 2.431 10 3v3.691l5.17 2.585a1.5 1.5 0 0 1 .83 1.342V12a.5.5 0 0 1-.582.493l-5.507-.918-.375 2.253 1.318 1.318A.5.5 0 0 1 10.5 16h-5a.5.5 0 0 1-.354-.854l1.319-1.318-.376-2.253-5.507.918A.5.5 0 0 1 0 12v-1.382a1.5 1.5 0 0 1 .83-1.342L6 6.691V3c0-.568.14-1.271.428-1.849Z"/>
+                            </svg>
+                        </div>
+                        <div style="display: flex; align-items: center;">
+                            <span style="color: #ffffff; font-weight: 900; font-size: 24px; letter-spacing: -1px;">Sky</span><span style="color: #0ea5e9; font-weight: 900; font-size: 24px; letter-spacing: -1px;">Fly</span>
+                            <span style="background-color: #0284c7; color: white; padding: 3px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; letter-spacing: 1.5px; margin-left: 8px;">ELITE</span>
+                        </div>
+                    </div>
+                </a>
+                <p style="font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.5rem;">Elevating travel to an art form through precision engineering and unparalleled customer service. Your premium journey starts here.</p>
+                <div style="display: flex; gap: 0.75rem;">
+                    <a href="#" style="width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.05); color: #fff; display: flex; align-items: center; justify-content: center; text-decoration: none; transition: background 0.2s;"><i class="bi bi-twitter-x"></i></a>
+                    <a href="#" style="width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.05); color: #fff; display: flex; align-items: center; justify-content: center; text-decoration: none; transition: background 0.2s;"><i class="bi bi-instagram"></i></a>
+                    <a href="#" style="width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.05); color: #fff; display: flex; align-items: center; justify-content: center; text-decoration: none; transition: background 0.2s;"><i class="bi bi-linkedin"></i></a>
+                    <a href="#" style="width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.05); color: #fff; display: flex; align-items: center; justify-content: center; text-decoration: none; transition: background 0.2s;"><i class="bi bi-facebook"></i></a>
+                </div>
             </div>
-            <div class="col-md-6 text-md-end align-self-center">
-                <p class="mb-0 text-muted small">&copy; 2026 SkyFly Elite. All rights reserved.</p>
+            
+            <!-- Company -->
+            <div class="col-lg-2 col-md-6">
+                <h6 style="color: #fff; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; margin-bottom: 1.5rem;">Company</h6>
+                <ul class="list-unstyled" style="margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.75rem;">
+                    <li><a href="#" style="color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;" onmouseover="this.style.color='#0ea5e9'" onmouseout="this.style.color='#94a3b8'">About Us</a></li>
+                    <li><a href="#" style="color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;" onmouseover="this.style.color='#0ea5e9'" onmouseout="this.style.color='#94a3b8'">Careers</a></li>
+                    <li><a href="#" style="color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;" onmouseover="this.style.color='#0ea5e9'" onmouseout="this.style.color='#94a3b8'">Press Room</a></li>
+                    <li><a href="#" style="color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;" onmouseover="this.style.color='#0ea5e9'" onmouseout="this.style.color='#94a3b8'">Contact</a></li>
+                </ul>
+            </div>
+
+            <!-- Support -->
+            <div class="col-lg-2 col-md-6">
+                <h6 style="color: #fff; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; margin-bottom: 1.5rem;">Support</h6>
+                <ul class="list-unstyled" style="margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.75rem;">
+                    <li><a href="#" style="color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;" onmouseover="this.style.color='#0ea5e9'" onmouseout="this.style.color='#94a3b8'">Help Center</a></li>
+                    <li><a href="#" style="color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;" onmouseover="this.style.color='#0ea5e9'" onmouseout="this.style.color='#94a3b8'">FAQs</a></li>
+                    <li><a href="#" style="color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;" onmouseover="this.style.color='#0ea5e9'" onmouseout="this.style.color='#94a3b8'">Baggage Policy</a></li>
+                    <li><a href="#" style="color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;" onmouseover="this.style.color='#0ea5e9'" onmouseout="this.style.color='#94a3b8'">Refund Policy</a></li>
+                    <li><a href="#" style="color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;" onmouseover="this.style.color='#0ea5e9'" onmouseout="this.style.color='#94a3b8'">Travel Insurance</a></li>
+                </ul>
+            </div>
+
+            <!-- Legal -->
+            <div class="col-lg-2 col-md-6">
+                <h6 style="color: #fff; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; margin-bottom: 1.5rem;">Legal</h6>
+                <ul class="list-unstyled" style="margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.75rem;">
+                    <li><a href="#" style="color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;" onmouseover="this.style.color='#0ea5e9'" onmouseout="this.style.color='#94a3b8'">Privacy Policy</a></li>
+                    <li><a href="#" style="color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;" onmouseover="this.style.color='#0ea5e9'" onmouseout="this.style.color='#94a3b8'">Terms of Service</a></li>
+                    <li><a href="#" style="color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;" onmouseover="this.style.color='#0ea5e9'" onmouseout="this.style.color='#94a3b8'">Cookie Settings</a></li>
+                    <li><a href="#" style="color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;" onmouseover="this.style.color='#0ea5e9'" onmouseout="this.style.color='#94a3b8'">Sitemap</a></li>
+                </ul>
+            </div>
+
+            <!-- Newsletter -->
+            <div class="col-lg-3 col-md-12">
+                <h6 style="color: #fff; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; margin-bottom: 1.5rem;">Newsletter</h6>
+                <p style="font-size: 0.9rem; line-height: 1.5; margin-bottom: 1rem;">Get exclusive fares and travel updates directly to your inbox.</p>
+                <div class="input-group" style="background: rgba(255,255,255,0.05); border-radius: 8px; padding: 4px; border: 1px solid rgba(255,255,255,0.1);">
+                    <input type="email" class="form-control shadow-none border-0 bg-transparent text-white" placeholder="your@email.com" style="font-size: 0.9rem; outline: none;">
+                    <button class="btn" style="background: #0ea5e9; color: #fff; border-radius: 6px; font-weight: 600; font-size: 0.85rem; padding: 0.5rem 1rem;">Subscribe</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom bar -->
+        <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem; display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 1rem;" class="flex-md-row">
+            <span style="font-size: 0.85rem;">&copy; 2026 SkyFly Elite. All rights reserved.</span>
+            <div style="display: flex; gap: 1rem; color: rgba(255,255,255,0.5);">
+                <i class="bi bi-cc-visa" style="font-size: 1.5rem;"></i>
+                <i class="bi bi-cc-mastercard" style="font-size: 1.5rem;"></i>
+                <i class="bi bi-cc-amex" style="font-size: 1.5rem;"></i>
+                <i class="bi bi-cc-paypal" style="font-size: 1.5rem;"></i>
             </div>
         </div>
     </div>
