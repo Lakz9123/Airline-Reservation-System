@@ -143,18 +143,16 @@
                                 <thead class="bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm uppercase">
                                     <tr>
                                         <th class="py-3 px-4">Route</th>
-                                        <th class="py-3 px-4">Flights</th>
-                                        <th class="py-3 px-4 text-right">Revenue</th>
+                                        <th class="py-3 px-4 text-right">Bookings</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-outline-variant/50">
                                     <tr th:each="route : ${topRoutes}" class="hover:bg-surface-variant/20">
-                                        <td class="py-3 px-4 text-on-surface font-medium" th:text="${route.origin} + ' → ' + ${route.destination}">JFK → LHR</td>
-                                        <td class="py-3 px-4 text-on-surface-variant" th:text="${route.flightCount}">124</td>
-                                        <td class="py-3 px-4 text-right text-secondary font-medium" th:text="'$' + ${#numbers.formatDecimal(route.revenue, 1, 'COMMA', 0, 'POINT')}">$45,000</td>
+                                        <td class="py-3 px-4 text-on-surface font-medium" th:text="${route[0]} + ' &rarr; ' + ${route[1]}">JFK &rarr; LHR</td>
+                                        <td class="py-3 px-4 text-right text-on-surface-variant" th:text="${route[2]}">124</td>
                                     </tr>
                                     <tr th:if="${#lists.isEmpty(topRoutes)}">
-                                        <td colspan="3" class="py-4 text-center text-on-surface-variant text-sm">No route data available</td>
+                                        <td colspan="2" class="py-4 text-center text-on-surface-variant text-sm">No route data available</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -172,11 +170,11 @@
                                 <div class="flex items-center gap-3">
                                     <div class="w-10 h-10 rounded bg-white border border-outline-variant flex items-center justify-center font-bold text-secondary text-lg" th:text="${iterStat.count}">1</div>
                                     <div>
-                                        <div class="font-medium text-on-surface" th:text="${airline.airlineName}">SkyFly Elite</div>
-                                        <div class="text-xs text-on-surface-variant" th:text="${airline.bookingsCount} + ' bookings'">450 bookings</div>
+                                        <div class="font-medium text-on-surface" th:text="${airline[0]}">SkyFly Elite</div>
+                                        <div class="text-xs text-on-surface-variant" th:text="${airline[1]} + ' bookings'">450 bookings</div>
                                     </div>
                                 </div>
-                                <div class="bg-primary-fixed text-on-primary-fixed px-2 py-1 rounded text-xs font-bold" th:text="'+' + ${airline.performance} + '%'">+14%</div>
+                                <span class="material-symbols-outlined text-outline-variant">chevron_right</span>
                             </div>
                             <div th:if="${#lists.isEmpty(topAirlines)}" class="py-4 text-center text-on-surface-variant text-sm">
                                 No airline data available
