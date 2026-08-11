@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/admin-layout :: admin_head('Notifications')}"></head>
+<body class="bg-background text-on-background flex h-screen overflow-hidden antialiased">
+    
+    <nav th:replace="~{admin/admin-layout :: admin_sidebar(activePage=${activePage})}"></nav>
+
+    <div class="flex-1 ml-64 flex flex-col min-w-0 bg-surface-bright">
+        <header th:replace="~{admin/admin-layout :: admin_topbar}"></header>
+
+        <main class="flex-1 overflow-y-auto p-gutter lg:p-margin-desktop">
+            <div class="max-w-[1000px] mx-auto space-y-6">
+                
+                <div class="flex items-center justify-between mb-8">
+                    <div>
+                        <h2 class="font-headline-md text-headline-md text-on-surface flex items-center gap-2">
+                            System Notifications
+                        </h2>
+                        <p class="font-body-md text-body-md text-on-surface-variant mt-1">Recent alerts and updates</p>
+                    </div>
+                    <button class="text-secondary hover:text-secondary-fixed-variant text-sm font-semibold hover:underline">
+                        Mark all as read
+                    </button>
+                </div>
+
+                <div class="bg-surface rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+                    <div class="divide-y divide-outline-variant/30">
+                        
+                        <div class="p-6 flex gap-4 hover:bg-surface-variant/10 transition-colors bg-secondary-container/5">
+                            <div class="w-10 h-10 rounded-full bg-error-container text-on-error-container flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined" style="font-size: 20px;">warning</span>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-body-md font-semibold text-on-surface">High Server Load Detected</h4>
+                                <p class="text-sm text-on-surface-variant mt-1">CPU usage exceeded 90% for the last 5 minutes. Consider scaling up instances.</p>
+                                <span class="text-xs text-outline font-medium mt-2 block">10 minutes ago</span>
+                            </div>
+                            <div class="w-2 h-2 rounded-full bg-secondary mt-2"></div>
+                        </div>
+
+                        <div class="p-6 flex gap-4 hover:bg-surface-variant/10 transition-colors">
+                            <div class="w-10 h-10 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined" style="font-size: 20px;">flight_takeoff</span>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-body-md font-semibold text-on-surface">New Flight Route Added</h4>
+                                <p class="text-sm text-on-surface-variant mt-1">Flight SF-104 (JFK to LHR) has been successfully activated for bookings.</p>
+                                <span class="text-xs text-outline font-medium mt-2 block">2 hours ago</span>
+                            </div>
+                        </div>
+
+                        <div class="p-6 flex gap-4 hover:bg-surface-variant/10 transition-colors">
+                            <div class="w-10 h-10 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined" style="font-size: 20px;">person_add</span>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-body-md font-semibold text-on-surface">New Admin User Registered</h4>
+                                <p class="text-sm text-on-surface-variant mt-1">John Doe (admin@skyflyelite.com) was added to the administrator group.</p>
+                                <span class="text-xs text-outline font-medium mt-2 block">1 day ago</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+</body>
+</html>

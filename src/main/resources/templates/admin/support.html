@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/admin-layout :: admin_head('Support')}"></head>
+<body class="bg-background text-on-background flex h-screen overflow-hidden antialiased">
+    
+    <nav th:replace="~{admin/admin-layout :: admin_sidebar(activePage=${activePage})}"></nav>
+
+    <div class="flex-1 ml-64 flex flex-col min-w-0 bg-surface-bright">
+        <header th:replace="~{admin/admin-layout :: admin_topbar}"></header>
+
+        <main class="flex-1 overflow-y-auto p-gutter lg:p-margin-desktop">
+            <div class="max-w-[1000px] mx-auto space-y-6">
+                
+                <div class="flex flex-col mb-8">
+                    <h2 class="font-headline-md text-headline-md text-on-surface flex items-center gap-2">
+                        Help & Support
+                    </h2>
+                    <p class="font-body-md text-body-md text-on-surface-variant mt-1">Get assistance with your admin console</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <div class="bg-surface rounded-xl border border-outline-variant shadow-sm p-8 flex flex-col items-center text-center">
+                        <div class="w-16 h-16 bg-secondary-container/20 rounded-full flex items-center justify-center mb-4">
+                            <span class="material-symbols-outlined text-secondary text-3xl">mail</span>
+                        </div>
+                        <h3 class="font-headline-md text-lg text-on-surface mb-2">Email Support</h3>
+                        <p class="font-body-md text-sm text-on-surface-variant mb-6">Our team typically replies within 24 hours.</p>
+                        <a href="mailto:admin-support@skyflyelite.com" class="bg-secondary text-on-secondary px-6 py-2 rounded-lg font-label-sm tracking-wide hover:bg-secondary-container transition-colors">
+                            admin-support@skyflyelite.com
+                        </a>
+                    </div>
+                    
+                    <div class="bg-surface rounded-xl border border-outline-variant shadow-sm p-8 flex flex-col items-center text-center">
+                        <div class="w-16 h-16 bg-secondary-container/20 rounded-full flex items-center justify-center mb-4">
+                            <span class="material-symbols-outlined text-secondary text-3xl">call</span>
+                        </div>
+                        <h3 class="font-headline-md text-lg text-on-surface mb-2">Phone Support</h3>
+                        <p class="font-body-md text-sm text-on-surface-variant mb-6">Available 24/7 for urgent escalations.</p>
+                        <a href="tel:+18005550199" class="bg-secondary text-on-secondary px-6 py-2 rounded-lg font-label-sm tracking-wide hover:bg-secondary-container transition-colors">
+                            +1 (800) 555-0199
+                        </a>
+                    </div>
+
+                </div>
+
+            </div>
+        </main>
+    </div>
+</body>
+</html>

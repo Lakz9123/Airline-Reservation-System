@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/admin-layout :: admin_head('Profile')}"></head>
+<body class="bg-background text-on-background flex h-screen overflow-hidden antialiased">
+    
+    <nav th:replace="~{admin/admin-layout :: admin_sidebar(activePage=${activePage})}"></nav>
+
+    <div class="flex-1 ml-64 flex flex-col min-w-0 bg-surface-bright">
+        <header th:replace="~{admin/admin-layout :: admin_topbar}"></header>
+
+        <main class="flex-1 overflow-y-auto p-gutter lg:p-margin-desktop">
+            <div class="max-w-[800px] mx-auto space-y-6">
+                
+                <div class="flex items-center gap-6 mb-8">
+                    <div class="w-24 h-24 rounded-full bg-secondary text-white font-display-lg text-4xl flex items-center justify-center shadow-lg" th:text="${adminUser != null ? #strings.substring(adminUser.name, 0, 1) : 'A'}">
+                        A
+                    </div>
+                    <div>
+                        <h2 class="font-headline-md text-headline-md text-on-surface" th:text="${adminUser != null ? adminUser.name : 'Administrator'}">
+                            Administrator
+                        </h2>
+                        <div class="flex items-center gap-2 mt-2">
+                            <span class="bg-secondary-container/20 text-secondary-fixed-variant px-3 py-1 rounded-full font-label-sm uppercase tracking-wide text-xs" th:text="${adminUser != null ? adminUser.role : 'ADMIN'}">ADMIN</span>
+                            <span class="text-sm text-on-surface-variant flex items-center gap-1">
+                                <span class="material-symbols-outlined" style="font-size: 16px;">mail</span>
+                                <span th:text="${adminUser != null ? adminUser.email : 'admin@skyflyelite.com'}">admin@skyflyelite.com</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-surface rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+                    <div class="p-6 border-b border-outline-variant/30 bg-surface-container-low">
+                        <h3 class="font-headline-md text-lg text-on-surface">Account Details</h3>
+                    </div>
+                    <div class="p-6 space-y-6">
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block font-label-sm text-on-surface-variant mb-2">Full Name</label>
+                                <input type="text" class="w-full bg-surface-container-lowest border border-outline-variant/50 rounded-lg px-4 py-3 text-on-surface focus:border-secondary focus:ring-1 focus:ring-secondary/50 outline-none" th:value="${adminUser != null ? adminUser.name : 'Administrator'}" readonly>
+                            </div>
+                            <div>
+                                <label class="block font-label-sm text-on-surface-variant mb-2">Email Address</label>
+                                <input type="email" class="w-full bg-surface-container-lowest border border-outline-variant/50 rounded-lg px-4 py-3 text-on-surface focus:border-secondary focus:ring-1 focus:ring-secondary/50 outline-none" th:value="${adminUser != null ? adminUser.email : 'admin@skyflyelite.com'}" readonly>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block font-label-sm text-on-surface-variant mb-2">Password</label>
+                            <div class="flex gap-4">
+                                <input type="password" class="flex-1 bg-surface-container-lowest border border-outline-variant/50 rounded-lg px-4 py-3 text-on-surface outline-none" value="********" readonly>
+                                <button class="bg-surface-container-high hover:bg-surface-variant text-on-surface-variant px-6 py-2 rounded-lg font-label-sm transition-colors border border-outline-variant/50">
+                                    Change Password
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+</body>
+</html>

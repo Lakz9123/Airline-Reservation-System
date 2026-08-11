@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import java.security.Principal;
 
 @Controller
 @RequestMapping("/admin")
@@ -241,5 +242,34 @@ public class AdminController {
             redirectAttributes.addFlashAttribute("error", "Error updating user: " + e.getMessage());
         }
         return "redirect:/admin/users";
+    }
+
+    // --- New System Endpoints (Support, Settings, Notifications, Profile) ---
+    
+    @GetMapping("/support")
+    public String adminSupport(Model model) {
+        model.addAttribute("activePage", "support");
+        return "admin/support";
+    }
+
+    @GetMapping("/settings")
+    public String adminSettings(Model model) {
+        model.addAttribute("activePage", "settings");
+        return "admin/settings";
+    }
+
+    @GetMapping("/notifications")
+    public String adminNotifications(Model model) {
+        model.addAttribute("activePage", "notifications");
+        return "admin/notifications";
+    }
+
+    @GetMapping("/profile")
+    public String adminProfile(Model model, Principal principal) {
+        model.addAttribute("activePage", "profile");
+        if (principal != null) {
+            model.addAttribute("adminUser", userService.findByEmail(principal.getName()).orElse(null));
+        }
+        return "admin/profile";
     }
 }
