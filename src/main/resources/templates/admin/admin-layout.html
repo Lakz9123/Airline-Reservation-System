@@ -116,127 +116,126 @@
         .edit-mode .display-value { display: none; }
     </style>
 </head>
-<body class="bg-background text-on-background font-body-md text-body-md antialiased min-h-screen flex">
+<body class="bg-background text-on-background flex h-screen overflow-hidden antialiased">
 
 <!-- Shared Sidebar Fragment -->
-<nav th:fragment="admin_sidebar(activePage)" class="fixed left-0 top-0 h-screen w-64 bg-primary-container dark:bg-primary-container border-r border-outline-variant shadow-sm flex flex-col z-50 overflow-y-auto">
+<nav th:fragment="admin_sidebar(activePage)" class="fixed left-0 top-0 h-screen w-64 bg-primary-container dark:bg-primary-container border-r border-outline-variant shadow-sm flex flex-col z-50">
     <!-- Header -->
-    <div class="p-6 pb-8 border-b border-outline-variant/30 flex items-center gap-3">
-        <div class="w-10 h-10 rounded-lg bg-surface-container-lowest flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
-             <span class="material-symbols-outlined text-secondary font-bold text-2xl">flight</span>
+    <div class="p-6 border-b border-outline-variant/30 flex items-center gap-4">
+        <div class="w-10 h-10 rounded-lg bg-surface flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-secondary font-bold text-2xl">flight</span>
         </div>
-        <div class="flex flex-col">
-            <span class="font-headline-md text-headline-md font-bold text-on-primary dark:text-primary-fixed leading-tight">SkyFly Elite</span>
-            <span class="font-label-sm text-label-sm text-on-primary-container">Admin Console</span>
+        <div>
+            <h1 class="font-headline-md text-headline-md font-bold text-on-primary">SkyFly Elite</h1>
+            <p class="font-label-sm text-label-sm text-on-primary-container">Admin Console</p>
         </div>
-    </div>
-    
-    <div class="p-4">
-        <a th:href="@{/admin/flights/new}" class="w-full bg-secondary text-on-secondary rounded-lg py-3 px-4 font-label-sm text-label-sm flex items-center justify-center gap-2 hover:bg-secondary-container transition-colors duration-200 shadow-sm scale-95 active:scale-90 inline-flex">
-            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 18px;">add</span>
-            New Flight
-        </a>
     </div>
 
-    <!-- Main Nav Tabs -->
-    <div class="flex-1 py-2 flex flex-col gap-1">
+    <!-- CTA -->
+    <div class="p-4">
+        <button class="w-full bg-secondary text-on-secondary font-label-sm text-label-sm py-3 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-secondary-container transition-colors duration-200 scale-95 active:scale-90 transition-transform">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add</span>
+            New Flight
+        </button>
+    </div>
+
+    <!-- Navigation Links -->
+    <div class="flex-1 overflow-y-auto py-2 flex flex-col gap-1 px-2 scrollbar-hide">
         <a th:href="@{/admin/dashboard}" 
-           th:class="${activePage == 'dashboard' ? 'flex items-center gap-3 px-6 py-3 text-secondary-fixed bg-secondary-container/10 border-r-4 border-secondary font-bold' : 'flex items-center gap-3 px-6 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200'}">
+           th:class="${activePage == 'dashboard' ? 'flex items-center gap-3 px-4 py-3 bg-secondary-container/10 border-r-4 border-secondary font-bold text-secondary-fixed rounded-lg' : 'flex items-center gap-3 px-4 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200 font-label-sm text-label-sm rounded-lg'}">
             <span class="material-symbols-outlined" th:style="${activePage == 'dashboard' ? 'font-variation-settings: ''FILL'' 1;' : 'font-variation-settings: ''FILL'' 0;'}">dashboard</span>
-            <span class="font-label-sm text-label-sm">Dashboard</span>
+            Dashboard
         </a>
         <a th:href="@{/admin/flights}" 
-           th:class="${activePage == 'flights' ? 'flex items-center gap-3 px-6 py-3 text-secondary-fixed bg-secondary-container/10 border-r-4 border-secondary font-bold' : 'flex items-center gap-3 px-6 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200'}">
-            <span class="material-symbols-outlined" th:style="${activePage == 'flights' ? 'font-variation-settings: ''FILL'' 1;' : 'font-variation-settings: ''FILL'' 0;'}">flight_takeoff</span>
-            <span class="font-label-sm text-label-sm">Flights</span>
+           th:class="${activePage == 'flights' ? 'flex items-center gap-3 px-4 py-3 bg-secondary-container/10 border-r-4 border-secondary font-bold text-secondary-fixed rounded-lg' : 'flex items-center gap-3 px-4 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200 font-label-sm text-label-sm rounded-lg'}">
+            <span class="material-symbols-outlined" th:style="${activePage == 'flights' ? 'font-variation-settings: ''FILL'' 1;' : 'font-variation-settings: ''FILL'' 0;'}">flight</span>
+            Flights
         </a>
         <a th:href="@{/admin/bookings}" 
-           th:class="${activePage == 'bookings' ? 'flex items-center gap-3 px-6 py-3 text-secondary-fixed bg-secondary-container/10 border-r-4 border-secondary font-bold' : 'flex items-center gap-3 px-6 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200'}">
-            <span class="material-symbols-outlined" th:style="${activePage == 'bookings' ? 'font-variation-settings: ''FILL'' 1;' : 'font-variation-settings: ''FILL'' 0;'}">confirmation_number</span>
-            <span class="font-label-sm text-label-sm">Bookings</span>
+           th:class="${activePage == 'bookings' ? 'flex items-center gap-3 px-4 py-3 bg-secondary-container/10 border-r-4 border-secondary font-bold text-secondary-fixed rounded-lg' : 'flex items-center gap-3 px-4 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200 font-label-sm text-label-sm rounded-lg'}">
+            <span class="material-symbols-outlined" th:style="${activePage == 'bookings' ? 'font-variation-settings: ''FILL'' 1;' : 'font-variation-settings: ''FILL'' 0;'}">airplane_ticket</span>
+            Bookings
         </a>
         <a th:href="@{/admin/users}" 
-           th:class="${activePage == 'users' ? 'flex items-center gap-3 px-6 py-3 text-secondary-fixed bg-secondary-container/10 border-r-4 border-secondary font-bold' : 'flex items-center gap-3 px-6 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200'}">
+           th:class="${activePage == 'users' ? 'flex items-center gap-3 px-4 py-3 bg-secondary-container/10 border-r-4 border-secondary font-bold text-secondary-fixed rounded-lg' : 'flex items-center gap-3 px-4 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200 font-label-sm text-label-sm rounded-lg'}">
             <span class="material-symbols-outlined" th:style="${activePage == 'users' ? 'font-variation-settings: ''FILL'' 1;' : 'font-variation-settings: ''FILL'' 0;'}">group</span>
-            <span class="font-label-sm text-label-sm">Users</span>
+            Users
         </a>
         <a th:href="@{/admin/airlines}" 
-           th:class="${activePage == 'airlines' ? 'flex items-center gap-3 px-6 py-3 text-secondary-fixed bg-secondary-container/10 border-r-4 border-secondary font-bold' : 'flex items-center gap-3 px-6 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200'}">
+           th:class="${activePage == 'airlines' ? 'flex items-center gap-3 px-4 py-3 bg-secondary-container/10 border-r-4 border-secondary font-bold text-secondary-fixed rounded-lg' : 'flex items-center gap-3 px-4 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200 font-label-sm text-label-sm rounded-lg'}">
             <span class="material-symbols-outlined" th:style="${activePage == 'airlines' ? 'font-variation-settings: ''FILL'' 1;' : 'font-variation-settings: ''FILL'' 0;'}">corporate_fare</span>
-            <span class="font-label-sm text-label-sm">Airlines</span>
+            Airlines
         </a>
         <a th:href="@{/admin/airports}" 
-           th:class="${activePage == 'airports' ? 'flex items-center gap-3 px-6 py-3 text-secondary-fixed bg-secondary-container/10 border-r-4 border-secondary font-bold' : 'flex items-center gap-3 px-6 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200'}">
+           th:class="${activePage == 'airports' ? 'flex items-center gap-3 px-4 py-3 bg-secondary-container/10 border-r-4 border-secondary font-bold text-secondary-fixed rounded-lg' : 'flex items-center gap-3 px-4 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200 font-label-sm text-label-sm rounded-lg'}">
             <span class="material-symbols-outlined" th:style="${activePage == 'airports' ? 'font-variation-settings: ''FILL'' 1;' : 'font-variation-settings: ''FILL'' 0;'}">connecting_airports</span>
-            <span class="font-label-sm text-label-sm">Airports</span>
+            Airports
         </a>
         <a th:href="@{/admin/aircraft}" 
-           th:class="${activePage == 'aircraft' ? 'flex items-center gap-3 px-6 py-3 text-secondary-fixed bg-secondary-container/10 border-r-4 border-secondary font-bold' : 'flex items-center gap-3 px-6 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200'}">
+           th:class="${activePage == 'aircraft' ? 'flex items-center gap-3 px-4 py-3 bg-secondary-container/10 border-r-4 border-secondary font-bold text-secondary-fixed rounded-lg' : 'flex items-center gap-3 px-4 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200 font-label-sm text-label-sm rounded-lg'}">
             <span class="material-symbols-outlined" th:style="${activePage == 'aircraft' ? 'font-variation-settings: ''FILL'' 1;' : 'font-variation-settings: ''FILL'' 0;'}">flight_class</span>
-            <span class="font-label-sm text-label-sm">Aircraft</span>
+            Aircraft
         </a>
         <a th:href="@{/admin/baggage}" 
-           th:class="${activePage == 'baggage' ? 'flex items-center gap-3 px-6 py-3 text-secondary-fixed bg-secondary-container/10 border-r-4 border-secondary font-bold' : 'flex items-center gap-3 px-6 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200'}">
+           th:class="${activePage == 'baggage' ? 'flex items-center gap-3 px-4 py-3 bg-secondary-container/10 border-r-4 border-secondary font-bold text-secondary-fixed rounded-lg' : 'flex items-center gap-3 px-4 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200 font-label-sm text-label-sm rounded-lg'}">
             <span class="material-symbols-outlined" th:style="${activePage == 'baggage' ? 'font-variation-settings: ''FILL'' 1;' : 'font-variation-settings: ''FILL'' 0;'}">luggage</span>
-            <span class="font-label-sm text-label-sm">Baggage</span>
+            Baggage
         </a>
         <a th:href="@{/admin/coupons}" 
-           th:class="${activePage == 'coupons' ? 'flex items-center gap-3 px-6 py-3 text-secondary-fixed bg-secondary-container/10 border-r-4 border-secondary font-bold' : 'flex items-center gap-3 px-6 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200'}">
+           th:class="${activePage == 'coupons' ? 'flex items-center gap-3 px-4 py-3 bg-secondary-container/10 border-r-4 border-secondary font-bold text-secondary-fixed rounded-lg' : 'flex items-center gap-3 px-4 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200 font-label-sm text-label-sm rounded-lg'}">
             <span class="material-symbols-outlined" th:style="${activePage == 'coupons' ? 'font-variation-settings: ''FILL'' 1;' : 'font-variation-settings: ''FILL'' 0;'}">sell</span>
-            <span class="font-label-sm text-label-sm">Coupons</span>
+            Coupons
         </a>
         <a th:href="@{/admin/wallets}" 
-           th:class="${activePage == 'wallets' ? 'flex items-center gap-3 px-6 py-3 text-secondary-fixed bg-secondary-container/10 border-r-4 border-secondary font-bold' : 'flex items-center gap-3 px-6 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200'}">
+           th:class="${activePage == 'wallets' ? 'flex items-center gap-3 px-4 py-3 bg-secondary-container/10 border-r-4 border-secondary font-bold text-secondary-fixed rounded-lg' : 'flex items-center gap-3 px-4 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200 font-label-sm text-label-sm rounded-lg'}">
             <span class="material-symbols-outlined" th:style="${activePage == 'wallets' ? 'font-variation-settings: ''FILL'' 1;' : 'font-variation-settings: ''FILL'' 0;'}">account_balance_wallet</span>
-            <span class="font-label-sm text-label-sm">Wallets</span>
+            Wallets
         </a>
         <a th:href="@{/admin/logs}" 
-           th:class="${activePage == 'logs' ? 'flex items-center gap-3 px-6 py-3 text-secondary-fixed bg-secondary-container/10 border-r-4 border-secondary font-bold' : 'flex items-center gap-3 px-6 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200'}">
+           th:class="${activePage == 'logs' ? 'flex items-center gap-3 px-4 py-3 bg-secondary-container/10 border-r-4 border-secondary font-bold text-secondary-fixed rounded-lg' : 'flex items-center gap-3 px-4 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200 font-label-sm text-label-sm rounded-lg'}">
             <span class="material-symbols-outlined" th:style="${activePage == 'logs' ? 'font-variation-settings: ''FILL'' 1;' : 'font-variation-settings: ''FILL'' 0;'}">history</span>
-            <span class="font-label-sm text-label-sm">System Logs</span>
+            System Logs
         </a>
     </div>
 
     <!-- Footer Tabs -->
-    <div class="mt-auto border-t border-outline-variant/30 py-4">
-        <a href="#" class="flex items-center gap-3 px-6 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200">
+    <div class="mt-auto border-t border-outline-variant/30 py-4 flex flex-col gap-1 px-2">
+        <a href="#" class="flex items-center gap-3 px-4 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200 font-label-sm text-label-sm rounded-lg">
             <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">help</span>
-            <span class="font-label-sm text-label-sm">Support</span>
+            Support
         </a>
-        <a href="#" class="flex items-center gap-3 px-6 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200">
+        <a href="#" class="flex items-center gap-3 px-4 py-3 text-on-primary-container/70 hover:text-on-primary-container hover:bg-surface-variant/10 transition-colors duration-200 font-label-sm text-label-sm rounded-lg">
             <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings</span>
-            <span class="font-label-sm text-label-sm">Settings</span>
+            Settings
         </a>
     </div>
 </nav>
 
 <!-- Shared Top App Bar Fragment -->
-<header th:fragment="admin_topbar" class="docked full-width top-0 sticky z-40 bg-surface dark:bg-surface-container shadow-sm border-b border-outline-variant flex justify-between items-center w-full px-gutter h-16">
-    <!-- Search Bar -->
-    <div class="flex-1 flex items-center max-w-md">
-        <div class="relative w-full">
-            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
-            <input class="w-full bg-surface-container-low border border-outline-variant rounded-full py-2 pl-10 pr-4 font-body-md text-body-md text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all" placeholder="Search flights, users..." type="text">
+<header th:fragment="admin_topbar" class="flex justify-between items-center w-full px-gutter h-16 bg-surface border-b border-outline-variant shadow-sm z-40 sticky top-0">
+    <!-- Search -->
+    <div class="flex-1 max-w-md">
+        <div class="relative flex items-center w-full h-10 rounded-lg bg-surface-container-low border border-outline-variant/50 focus-within:border-secondary focus-within:ring-1 focus-within:ring-secondary/50 transition-all">
+            <span class="material-symbols-outlined text-outline absolute left-3 pointer-events-none">search</span>
+            <input class="w-full h-full pl-10 pr-4 bg-transparent border-none text-body-md font-body-md text-on-surface placeholder-outline focus:ring-0 rounded-lg" placeholder="Search..." type="text">
         </div>
     </div>
 
     <!-- Trailing Actions -->
     <div class="flex items-center gap-4">
-        <button class="text-on-surface-variant hover:text-secondary transition-colors opacity-80 hover:opacity-100 flex items-center justify-center relative">
-            <span class="material-symbols-outlined">notifications</span>
-            <span class="absolute top-0 right-0 w-2 h-2 bg-error rounded-full"></span>
+        <button class="relative w-10 h-10 rounded-full hover:bg-surface-variant/50 flex items-center justify-center transition-colors">
+            <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+            <span class="absolute top-2.5 right-2.5 w-2 h-2 bg-error rounded-full border border-surface"></span>
         </button>
-        <button class="text-on-surface-variant hover:text-secondary transition-colors opacity-80 hover:opacity-100 flex items-center justify-center">
-            <span class="material-symbols-outlined">help_outline</span>
+        <button class="w-10 h-10 rounded-full hover:bg-surface-variant/50 flex items-center justify-center transition-colors">
+            <span class="material-symbols-outlined text-on-surface-variant">help</span>
         </button>
-        
-        <div class="w-px h-6 bg-outline-variant mx-2"></div>
-        
-        <div class="flex items-center gap-3">
+        <div class="h-6 w-px bg-outline-variant/50 mx-1"></div>
+        <div class="flex items-center gap-3 cursor-pointer group">
             <div class="w-8 h-8 rounded-full overflow-hidden bg-surface-container-high border border-outline-variant shadow-sm flex items-center justify-center">
                 <span class="material-symbols-outlined text-on-surface-variant" style="font-size: 20px;">person</span>
             </div>
-            <form th:action="@{/logout}" method="post" class="inline">
+            <form th:action="@{/logout}" method="post" class="inline m-0">
                 <button type="submit" class="font-label-sm text-label-sm text-primary dark:text-primary-fixed-dim hover:text-secondary transition-colors opacity-80 hover:opacity-100 font-bold">
                     Logout
                 </button>
