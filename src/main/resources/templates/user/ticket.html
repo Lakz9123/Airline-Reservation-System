@@ -182,11 +182,11 @@
                 <div class="space-y-4 font-body-md text-base text-primary-container">
                     <div class="flex justify-between border-b border-surface-variant border-dashed pb-2">
                         <span>Airfare (85%)</span>
-                        <span th:text="${'&#8377;' + #numbers.formatDecimal(booking.totalFare * 0.85, 1, 2)}">$4,250.00</span>
+                        <span th:text="${'&#8377;' + #numbers.formatDecimal(booking.totalFare * 0.85, 1, 2)}">₹4,250.00</span>
                     </div>
                     <div class="flex justify-between border-b border-surface-variant border-dashed pb-2">
                         <span>Taxes &amp; Fees (15%)</span>
-                        <span th:text="${'&#8377;' + #numbers.formatDecimal(booking.totalFare * 0.15, 1, 2)}">$385.50</span>
+                        <span th:text="${'&#8377;' + #numbers.formatDecimal(booking.totalFare * 0.15, 1, 2)}">₹385.50</span>
                     </div>
                     <div class="flex justify-between border-b border-surface-variant border-dashed pb-2">
                         <span>Extra Baggage</span>
@@ -196,7 +196,7 @@
                     </div>
                     <div class="flex justify-between pt-2 font-headline-md text-2xl text-primary-container">
                         <span>Total Paid</span>
-                        <span th:text="${'&#8377;' + #numbers.formatDecimal(booking.totalFare, 1, 2)}">$4,635.50</span>
+                        <span th:text="${'&#8377;' + #numbers.formatDecimal(booking.totalFare, 1, 2)}">₹4,635.50</span>
                     </div>
                     <p class="font-label-sm text-[13px] text-on-surface-variant mt-4" th:text="${booking.status == 'CONFIRMED' ? 'Payment Completed' : 'Payment Failed/Cancelled'}">Payment Completed</p>
                 </div>

@@ -98,7 +98,7 @@
                         </div>
                         <div class="z-10">
                             <h3 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Revenue</h3>
-                            <div class="font-display-lg text-4xl text-on-surface" th:text="'$' + ${#numbers.formatDecimal(totalRevenue, 1, 'COMMA', 2, 'POINT')}">$0.00</div>
+                            <div class="font-display-lg text-4xl text-on-surface" th:text="'₹' + ${#numbers.formatDecimal(totalRevenue, 1, 'COMMA', 2, 'POINT')}">₹0.00</div>
                         </div>
                     </div>
 
@@ -236,7 +236,7 @@
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Revenue ($)',
+                        label: 'Revenue (₹)',
                         data: revValues,
                         borderColor: '#005cab',
                         backgroundColor: 'rgba(0, 92, 171, 0.1)',

@@ -71,7 +71,7 @@
                                     </td>
                                     <td class="py-4 px-6">
                                         <span th:if="${coupon.discountType.name() == 'PERCENTAGE'}" class="text-on-surface font-bold text-lg" th:text="${#numbers.formatDecimal(coupon.discountValue, 0, 0)} + '%'">20%</span>
-                                        <span th:if="${coupon.discountType.name() == 'FIXED_AMOUNT'}" class="text-on-surface font-bold text-lg" th:text="'$' + ${#numbers.formatDecimal(coupon.discountValue, 1, 'COMMA', 2, 'POINT')}">$50.00</span>
+                                        <span th:if="${coupon.discountType.name() == 'FIXED_AMOUNT'}" class="text-on-surface font-bold text-lg" th:text="'₹' + ${#numbers.formatDecimal(coupon.discountValue, 1, 'COMMA', 2, 'POINT')}">₹50.00</span>
                                         <div class="text-xs text-on-surface-variant mt-0.5" th:if="${coupon.minBookingAmount != null}">Min: $<span th:text="${#numbers.formatDecimal(coupon.minBookingAmount, 1, 0)}">200</span></div>
                                     </td>
                                     <td class="py-4 px-6">

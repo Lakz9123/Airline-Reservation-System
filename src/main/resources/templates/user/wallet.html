@@ -250,7 +250,7 @@
                             <td class="py-4 px-6 text-right font-medium whitespace-nowrap"
                                 th:classappend="${tx.type.name() == 'CREDIT'} ? 'text-[#2e7d32]' : 'text-error'"
                                 th:text="${tx.type.name() == 'CREDIT' ? '+' : '-'} + '₹' + ${#numbers.formatDecimal(tx.amount, 1, 2)}">
-                                -$1,250.00
+                                -₹1,250.00
                             </td>
                         </tr>
                     </tbody>
