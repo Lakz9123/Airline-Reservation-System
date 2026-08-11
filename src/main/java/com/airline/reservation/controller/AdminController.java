@@ -40,14 +40,30 @@ public class AdminController {
     }
 
     // 1. Dashboard
-    @GetMapping({"", "/"})
-    public String adminRoot() {
-        return "redirect:/admin/flights";
-    }
-
-    @GetMapping("/dashboard")
+    @GetMapping({"", "/", "/dashboard"})
     public String dashboard(Model model) throws Exception {
-        return "redirect:/admin/flights";
+        model.addAttribute("totalFlights", flightService.getCount());
+        model.addAttribute("totalUsers", userService.getAllUsers().size());
+        model.addAttribute("totalBookings", bookingService.getBookingCount());
+        model.addAttribute("totalRevenue", bookingService.getTotalRevenue());
+        
+        // Analytics
+        java.time.LocalDateTime oneYearAgo = java.time.LocalDateTime.now().minusMonths(12);
+        
+        // Format for Chart.js
+        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+        model.addAttribute("monthlyRevenueJson", mapper.writeValueAsString(bookingService.getMonthlyRevenueSince(oneYearAgo)));
+        model.addAttribute("monthlyBookingsJson", mapper.writeValueAsString(bookingService.getMonthlyBookingsSince(oneYearAgo)));
+        
+        model.addAttribute("topRoutes", bookingService.getTopRoutes());
+        model.addAttribute("occupancyPercentage", flightService.getOverallOccupancyPercentage());
+        model.addAttribute("cancellationPercentage", bookingService.getCancellationPercentage());
+        model.addAttribute("flightUtilization", flightService.getFlightUtilization());
+        model.addAttribute("topCustomers", bookingService.getTopCustomersBySpend());
+        model.addAttribute("topAirlines", bookingService.getTopAirlinesByBookings());
+        model.addAttribute("recentLogs", systemLogService.getRecentLogs());
+        
+        return "admin/dashboard";
     }
     
     @GetMapping("/logs")

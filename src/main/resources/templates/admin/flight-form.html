@@ -1,98 +1,119 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{layout :: html_head(${flight.id == null ? 'Add Flight' : 'Edit Flight'})}"></head>
-<body>
-<div th:replace="~{layout :: navbar}"></div>
+<html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/admin-layout :: admin_head('Flight Management')}"></head>
+<body class="bg-background text-on-background font-body-md text-body-md antialiased min-h-screen flex">
+    
+    <nav th:replace="~{admin/admin-layout :: admin_sidebar(activePage='flights')}"></nav>
 
-<main class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-primary text-white py-3">
-                    <h4 class="mb-0 fw-bold">
-                        <i class="bi" th:classappend="${flight.id == null ? 'bi-plus-circle' : 'bi-pencil-square'}"></i>
-                        <span th:text="${flight.id == null ? 'Add New Flight' : 'Edit Flight'}">Flight Form</span>
-                    </h4>
+    <div class="flex-1 flex flex-col min-w-0 bg-surface">
+        <header th:replace="~{admin/admin-layout :: admin_topbar}"></header>
+
+        <main class="flex-1 overflow-y-auto p-gutter lg:p-margin-desktop">
+            <div class="max-w-[800px] mx-auto">
+                
+                <div class="mb-8 flex items-center justify-between">
+                    <div>
+                        <a th:href="@{/admin/flights}" class="text-secondary hover:underline text-sm font-medium mb-2 inline-flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[16px]">arrow_back</span> Back to Flights
+                        </a>
+                        <h2 class="font-headline-md text-headline-md text-on-surface" th:text="${flight.id == null ? '✈ Add New Flight' : '✈ Edit Flight ' + flight.flightNumber}">Add New Flight</h2>
+                    </div>
                 </div>
-                <div class="card-body p-4">
-                    <form th:action="@{/admin/flights}" th:object="${flight}" method="post">
-                        <!-- Hidden ID for updates -->
+
+                <div class="bg-surface rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+                    <form th:action="@{/admin/flights}" th:object="${flight}" method="post" class="p-6 md:p-8 space-y-6">
                         <input type="hidden" th:field="*{id}">
                         
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label for="flightNumber" class="form-label fw-semibold">Flight Number</label>
-                                <input type="text" th:field="*{flightNumber}" class="form-control" id="flightNumber" required placeholder="e.g. AA-101">
-                            </div>
-                            <div class="col-md-6">
-                                <label for="airline" class="form-label fw-semibold">Airline</label>
-                                <select th:field="*{airline.id}" class="form-select" id="airline" required>
-                                    <option value="" disabled selected>Select Airline</option>
-                                    <option th:each="al : ${airlines}" th:value="${al.id}" th:text="${al.airlineName} + ' (' + ${al.country} + ')'"></option>
-                                </select>
-                            </div>
+                        <!-- Route & Identification -->
+                        <div class="space-y-4">
+                            <h3 class="font-headline-md text-lg text-on-surface border-b border-outline-variant pb-2">Flight Details</h3>
                             
-                            <div class="col-md-6">
-                                <label for="originAirport" class="form-label fw-semibold">Origin Airport</label>
-                                <select th:field="*{originAirport.id}" class="form-select" id="originAirport" required>
-                                    <option value="" disabled selected>Select Origin</option>
-                                    <option th:each="ap : ${airports}" th:value="${ap.id}" th:text="${ap.airportCode} + ' - ' + ${ap.airportName} + ', ' + ${ap.city}"></option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="destinationAirport" class="form-label fw-semibold">Destination Airport</label>
-                                <select th:field="*{destinationAirport.id}" class="form-select" id="destinationAirport" required>
-                                    <option value="" disabled selected>Select Destination</option>
-                                    <option th:each="ap : ${airports}" th:value="${ap.id}" th:text="${ap.airportCode} + ' - ' + ${ap.airportName} + ', ' + ${ap.city}"></option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label for="departureDateTime" class="form-label fw-semibold">Departure Date & Time</label>
-                                <input type="datetime-local" th:field="*{departureDateTime}" class="form-control" id="departureDateTime" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="arrivalDateTime" class="form-label fw-semibold">Arrival Date & Time</label>
-                                <input type="datetime-local" th:field="*{arrivalDateTime}" class="form-control" id="arrivalDateTime" required>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="flightNumber" class="block font-label-sm text-label-sm text-on-surface mb-2">Flight Number</label>
+                                    <input type="text" th:field="*{flightNumber}" id="flightNumber" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" required placeholder="e.g. AA-101">
+                                </div>
+                                <div>
+                                    <label for="airline" class="block font-label-sm text-label-sm text-on-surface mb-2">Airline Operator</label>
+                                    <select th:field="*{airline.id}" id="airline" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" required>
+                                        <option value="" disabled selected>Select Airline</option>
+                                        <option th:each="al : ${airlines}" th:value="${al.id}" th:text="${al.airlineName} + ' (' + ${al.country} + ')'"></option>
+                                    </select>
+                                </div>
                             </div>
 
-                            <div class="col-md-4">
-                                <label for="fare" class="form-label fw-semibold">Fare (₹)</label>
-                                <input type="number" step="0.01" th:field="*{fare}" class="form-control" id="fare" required placeholder="0.00" min="0">
-                            </div>
-                            <div class="col-md-4">
-                                <label for="aircraft" class="form-label">Aircraft</label>
-                                <select class="form-select" id="aircraft" th:field="*{aircraft}" required>
-                                    <option value="" disabled>Select aircraft...</option>
-                                    <option th:each="ac : ${aircrafts}" th:value="${ac.id}" th:text="${ac.aircraftName + ' (' + ac.aircraftNumber + ') - Cap: ' + ac.capacity}"></option>
-                                </select>
-                            </div>
-                            <div class="col-md-4" th:if="${flight.id != null}">
-                                <label for="availableSeats" class="form-label fw-semibold">Available Seats (Read-only)</label>
-                                <input type="number" th:field="*{availableSeats}" class="form-control" id="availableSeats" readonly>
-                            </div>
-                            <div class="col-md-4" th:if="${flight.id != null}">
-                                <label for="flightStatus" class="form-label fw-semibold">Flight Status</label>
-                                <select th:field="*{flightStatus}" class="form-select" id="flightStatus">
-                                    <option th:each="status : ${T(com.airline.reservation.entity.FlightStatus).values()}"
-                                            th:value="${status}"
-                                            th:text="${status.label}"></option>
-                                </select>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="originAirport" class="block font-label-sm text-label-sm text-on-surface mb-2">Origin</label>
+                                    <select th:field="*{originAirport.id}" id="originAirport" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" required>
+                                        <option value="" disabled selected>Select Origin</option>
+                                        <option th:each="ap : ${airports}" th:value="${ap.id}" th:text="${ap.airportCode} + ' - ' + ${ap.city}"></option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="destinationAirport" class="block font-label-sm text-label-sm text-on-surface mb-2">Destination</label>
+                                    <select th:field="*{destinationAirport.id}" id="destinationAirport" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" required>
+                                        <option value="" disabled selected>Select Destination</option>
+                                        <option th:each="ap : ${airports}" th:value="${ap.id}" th:text="${ap.airportCode} + ' - ' + ${ap.city}"></option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="d-flex justify-content-between mt-4">
-                            <a th:href="@{/admin/flights}" class="btn btn-outline-secondary"><i class="bi bi-x-circle"></i> Cancel</a>
-                            <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> Save Flight</button>
+                        <!-- Timing & Capacity -->
+                        <div class="space-y-4 pt-4">
+                            <h3 class="font-headline-md text-lg text-on-surface border-b border-outline-variant pb-2">Schedule & Equipment</h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="departureDateTime" class="block font-label-sm text-label-sm text-on-surface mb-2">Departure Time</label>
+                                    <input type="datetime-local" th:field="*{departureDateTime}" id="departureDateTime" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" required>
+                                </div>
+                                <div>
+                                    <label for="arrivalDateTime" class="block font-label-sm text-label-sm text-on-surface mb-2">Arrival Time</label>
+                                    <input type="datetime-local" th:field="*{arrivalDateTime}" id="arrivalDateTime" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" required>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div>
+                                    <label for="aircraft" class="block font-label-sm text-label-sm text-on-surface mb-2">Assigned Aircraft</label>
+                                    <select th:field="*{aircraft}" id="aircraft" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" required>
+                                        <option value="" disabled selected>Select aircraft...</option>
+                                        <option th:each="ac : ${aircrafts}" th:value="${ac.id}" th:text="${ac.aircraftName} + ' (Cap: ' + ${ac.capacity} + ')'"></option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="fare" class="block font-label-sm text-label-sm text-on-surface mb-2">Base Fare ($)</label>
+                                    <input type="number" step="0.01" min="0" th:field="*{fare}" id="fare" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" required placeholder="0.00">
+                                </div>
+                                
+                                <div th:if="${flight.id != null}">
+                                    <label for="flightStatus" class="block font-label-sm text-label-sm text-on-surface mb-2">Status</label>
+                                    <select th:field="*{flightStatus}" id="flightStatus" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary">
+                                        <option th:each="status : ${T(com.airline.reservation.entity.FlightStatus).values()}"
+                                                th:value="${status}"
+                                                th:text="${status}"></option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
+                        
+                        <!-- Actions -->
+                        <div class="pt-6 border-t border-outline-variant flex items-center justify-end gap-3">
+                            <a th:href="@{/admin/flights}" class="px-6 py-2.5 rounded-lg border border-outline-variant text-on-surface hover:bg-surface-variant/50 transition-colors font-label-sm text-label-sm">
+                                Cancel
+                            </a>
+                            <button type="submit" class="px-6 py-2.5 rounded-lg bg-secondary text-on-secondary hover:bg-secondary-container hover:text-on-secondary-container transition-colors shadow-sm font-label-sm text-label-sm">
+                                Save Flight
+                            </button>
+                        </div>
+                        
                     </form>
                 </div>
-            </div>
-        </div>
-    </div>
-</main>
 
-<div th:replace="~{layout :: footer}"></div>
-<div th:replace="~{layout :: html_scripts}"></div>
+            </div>
+        </main>
+    </div>
 </body>
 </html>

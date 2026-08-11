@@ -1,80 +1,91 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{layout :: html_head(${aircraft.id == null ? 'Add Aircraft' : 'Edit Aircraft'})}"></head>
-<body>
-<div th:replace="~{layout :: navbar}"></div>
+<html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/admin-layout :: admin_head('Aircraft Management')}"></head>
+<body class="bg-background text-on-background font-body-md text-body-md antialiased min-h-screen flex">
+    
+    <nav th:replace="~{admin/admin-layout :: admin_sidebar(activePage='aircraft')}"></nav>
 
-<main class="container">
-    <div class="mb-4">
-        <span class="eyebrow-label">Fleet Management</span>
-        <h1 class="section-title mb-0" th:text="${aircraft.id == null ? 'Add New Aircraft' : 'Edit Aircraft'}">Aircraft Form</h1>
-    </div>
+    <div class="flex-1 flex flex-col min-w-0 bg-surface">
+        <header th:replace="~{admin/admin-layout :: admin_topbar}"></header>
 
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card border-0">
-                <div class="card-body p-4 p-md-5">
-                    <div th:if="${error}" class="alert alert-danger border-0 rounded-4 mb-4" th:text="${error}"></div>
+        <main class="flex-1 overflow-y-auto p-gutter lg:p-margin-desktop">
+            <div class="max-w-[700px] mx-auto">
+                
+                <div class="mb-8 flex items-center justify-between">
+                    <div>
+                        <a th:href="@{/admin/aircraft}" class="text-secondary hover:underline text-sm font-medium mb-2 inline-flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[16px]">arrow_back</span> Back to Fleet
+                        </a>
+                        <h2 class="font-headline-md text-headline-md text-on-surface" th:text="${aircraft.id == null ? '✈ Add New Aircraft' : '✈ Edit Aircraft'}">Add New Aircraft</h2>
+                    </div>
+                </div>
 
-                    <form th:action="@{/admin/aircraft}" method="post" th:object="${aircraft}">
-                        <input type="hidden" th:field="*{id}" />
+                <div class="bg-surface rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+                    <form th:action="@{/admin/aircraft}" th:object="${aircraft}" method="post" class="p-6 md:p-8 space-y-6">
+                        <input type="hidden" th:field="*{id}">
+                        
+                        <div class="space-y-4">
+                            <h3 class="font-headline-md text-lg text-on-surface border-b border-outline-variant pb-2">Equipment Details</h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="aircraftName" class="block font-label-sm text-label-sm text-on-surface mb-2">Aircraft Name</label>
+                                    <input type="text" th:field="*{aircraftName}" id="aircraftName" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" required placeholder="e.g. Boeing 737">
+                                </div>
+                                <div>
+                                    <label for="model" class="block font-label-sm text-label-sm text-on-surface mb-2">Model Variant</label>
+                                    <input type="text" th:field="*{model}" id="model" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" required placeholder="e.g. B737-800">
+                                </div>
+                            </div>
 
-                        <div class="row g-3 mb-3">
-                            <div class="col-md-6">
-                                <label for="aircraftName" class="form-label fw-bold text-uppercase small text-muted">Aircraft Name</label>
-                                <input type="text" class="form-control" id="aircraftName" th:field="*{aircraftName}" placeholder="e.g. Skyline Explorer" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="aircraftNumber" class="form-label fw-bold text-uppercase small text-muted">Registration Number</label>
-                                <input type="text" class="form-control" id="aircraftNumber" th:field="*{aircraftNumber}" placeholder="e.g. VT-ABC" required>
-                            </div>
-                        </div>
-
-                        <div class="row g-3 mb-3">
-                            <div class="col-md-6">
-                                <label for="model" class="form-label fw-bold text-uppercase small text-muted">Model</label>
-                                <input type="text" class="form-control" id="model" th:field="*{model}" placeholder="e.g. Boeing 737" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="status" class="form-label fw-bold text-uppercase small text-muted">Status</label>
-                                <select class="form-select" id="status" th:field="*{status}" required>
-                                    <option value="" disabled>Select status...</option>
-                                    <option th:each="st : ${statuses}" th:value="${st}" th:text="${st}"></option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-4">
-                                <label for="capacity" class="form-label fw-bold text-uppercase small text-muted">Total Capacity</label>
-                                <input type="number" class="form-control" id="capacity" th:field="*{capacity}" min="1" required>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="businessSeats" class="form-label fw-bold text-uppercase small text-muted">Business Seats</label>
-                                <input type="number" class="form-control" id="businessSeats" th:field="*{businessSeats}" min="0" required>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="economySeats" class="form-label fw-bold text-uppercase small text-muted">Economy Seats</label>
-                                <input type="number" class="form-control" id="economySeats" th:field="*{economySeats}" min="0" required>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="aircraftNumber" class="block font-label-sm text-label-sm text-on-surface mb-2">Registration Number</label>
+                                    <input type="text" th:field="*{aircraftNumber}" id="aircraftNumber" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface uppercase font-mono focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" required placeholder="e.g. N12345">
+                                </div>
+                                <div>
+                                    <label for="status" class="block font-label-sm text-label-sm text-on-surface mb-2">Operational Status</label>
+                                    <select th:field="*{status}" id="status" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" required>
+                                        <option value="" disabled selected>Select status...</option>
+                                        <option th:each="st : ${statuses}" th:value="${st}" th:text="${st}"></option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="d-flex justify-content-between gap-3">
-                            <a th:href="@{/admin/aircraft}" class="btn-outline-theme py-3 px-4 flex-grow-1 text-center">
-                                <i class="bi bi-arrow-left me-1"></i> Cancel
+                        <div class="space-y-4 pt-4">
+                            <h3 class="font-headline-md text-lg text-on-surface border-b border-outline-variant pb-2">Cabin Configuration</h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div>
+                                    <label for="capacity" class="block font-label-sm text-label-sm text-on-surface mb-2">Total Capacity</label>
+                                    <input type="number" th:field="*{capacity}" id="capacity" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" required min="1" placeholder="e.g. 180">
+                                </div>
+                                <div>
+                                    <label for="businessSeats" class="block font-label-sm text-label-sm text-on-surface mb-2">Business Seats</label>
+                                    <input type="number" th:field="*{businessSeats}" id="businessSeats" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" required min="0" placeholder="e.g. 20">
+                                </div>
+                                <div>
+                                    <label for="economySeats" class="block font-label-sm text-label-sm text-on-surface mb-2">Economy Seats</label>
+                                    <input type="number" th:field="*{economySeats}" id="economySeats" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" required min="0" placeholder="e.g. 160">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="pt-6 border-t border-outline-variant flex items-center justify-end gap-3">
+                            <a th:href="@{/admin/aircraft}" class="px-6 py-2.5 rounded-lg border border-outline-variant text-on-surface hover:bg-surface-variant/50 transition-colors font-label-sm text-label-sm">
+                                Cancel
                             </a>
-                            <button type="submit" class="btn-primary-theme py-3 px-4 flex-grow-1">
-                                <i class="bi bi-save me-1"></i> Save Aircraft
+                            <button type="submit" class="px-6 py-2.5 rounded-lg bg-secondary text-on-secondary hover:bg-secondary-container hover:text-on-secondary-container transition-colors shadow-sm font-label-sm text-label-sm">
+                                Save Aircraft
                             </button>
                         </div>
+                        
                     </form>
                 </div>
-            </div>
-        </div>
-    </div>
-</main>
 
-<div th:replace="~{layout :: footer}"></div>
-<div th:replace="~{layout :: html_scripts}"></div>
+            </div>
+        </main>
+    </div>
 </body>
 </html>

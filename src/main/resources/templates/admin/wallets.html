@@ -1,62 +1,111 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{layout :: html_head('Manage Wallets')}"></head>
-<body>
-<div th:replace="~{layout :: navbar}"></div>
+<html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/admin-layout :: admin_head('Wallet Management')}"></head>
+<body class="bg-background text-on-background font-body-md text-body-md antialiased min-h-screen flex">
+    
+    <nav th:replace="~{admin/admin-layout :: admin_sidebar(activePage='wallets')}"></nav>
 
-<div class="container-fluid mt-4">
-    <div class="row">
-        <div class="col-md-2">
-            <!-- Optional sidebar can go here, or we just rely on navbar -->
-        </div>
-        <div class="col-md-10 offset-md-1">
-            <h2 class="mb-4">User Wallets Overview</h2>
-            
-            <div class="card shadow">
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>User ID</th>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Tier</th>
-                                    <th>Total Miles</th>
-                                    <th>Wallet Balance</th>
-                                    <th>Reward Points</th>
-                                    <th>Last Updated</th>
-                                    <th>Actions</th>
+    <div class="flex-1 flex flex-col min-w-0 bg-surface">
+        <header th:replace="~{admin/admin-layout :: admin_topbar}"></header>
+
+        <main class="flex-1 overflow-y-auto p-gutter lg:p-margin-desktop">
+            <div class="max-w-container-max mx-auto space-y-6">
+                
+                <div th:if="${success}" class="bg-green-50 text-green-700 border border-green-200 rounded-lg p-4 mb-4 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined">check_circle</span>
+                        <span th:text="${success}">Success</span>
+                    </div>
+                </div>
+                
+                <div th:if="${error}" class="bg-red-50 text-red-700 border border-red-200 rounded-lg p-4 mb-4 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined">error</span>
+                        <span th:text="${error}">Error</span>
+                    </div>
+                </div>
+
+                <!-- Page Header -->
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                    <div>
+                        <h2 class="font-headline-md text-headline-md text-on-surface">Customer Wallets</h2>
+                        <p class="font-body-md text-body-md text-on-surface-variant mt-1">Manage user balances, miles, and loyalty tiers.</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="relative">
+                            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+                            <input class="w-64 bg-surface-container-low border border-outline-variant rounded-lg py-2 pl-9 pr-4 font-label-sm text-label-sm text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" placeholder="Search by name, email..." type="text">
+                        </div>
+                        <button class="flex items-center gap-2 px-4 py-2 border border-outline-variant rounded-lg text-on-surface font-label-sm text-label-sm hover:bg-surface-variant/50 transition-colors">
+                            <span class="material-symbols-outlined text-[18px]">filter_list</span>
+                            Filter
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Table Card -->
+                <div class="bg-surface rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse min-w-[1000px]">
+                            <thead>
+                                <tr class="bg-surface-container-low border-b border-outline-variant">
+                                    <th class="py-4 px-6 font-label-sm text-label-sm text-on-surface-variant font-semibold">User</th>
+                                    <th class="py-4 px-6 font-label-sm text-label-sm text-on-surface-variant font-semibold">Loyalty Tier</th>
+                                    <th class="py-4 px-6 font-label-sm text-label-sm text-on-surface-variant font-semibold">Total Miles</th>
+                                    <th class="py-4 px-6 font-label-sm text-label-sm text-on-surface-variant font-semibold">Reward Points</th>
+                                    <th class="py-4 px-6 font-label-sm text-label-sm text-on-surface-variant font-semibold text-right">Balance</th>
+                                    <th class="py-4 px-6 font-label-sm text-label-sm text-on-surface-variant font-semibold text-right">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr th:each="wallet : ${wallets}">
-                                    <td th:text="${wallet.user.id}"></td>
-                                    <td th:text="${wallet.user.name}"></td>
-                                    <td th:text="${wallet.user.email}"></td>
-                                    <td>
-                                        <span class="badge bg-secondary" th:if="${wallet.tier.name() == 'SILVER'}">SILVER</span>
-                                        <span class="badge bg-warning text-dark" th:if="${wallet.tier.name() == 'GOLD'}">GOLD</span>
-                                        <span class="badge bg-dark" th:if="${wallet.tier.name() == 'PLATINUM'}">PLATINUM</span>
+                            <tbody class="divide-y divide-outline-variant/50 font-body-md text-body-md text-on-surface">
+                                <tr th:each="wallet : ${wallets}" class="hover:bg-surface-variant/10 transition-colors group">
+                                    <td class="py-4 px-6">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-9 h-9 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-sm shrink-0" th:text="${#strings.substring(wallet.user.name, 0, 1)}">J</div>
+                                            <div>
+                                                <div class="font-medium text-on-surface" th:text="${wallet.user.name}">John Doe</div>
+                                                <div class="text-xs text-on-surface-variant" th:text="${wallet.user.email}">john@example.com</div>
+                                            </div>
+                                        </div>
                                     </td>
-                                    <td th:text="${#numbers.formatInteger(wallet.totalMiles, 1, 'COMMA')}"></td>
-                                    <td class="fw-bold text-success">₹<span th:text="${#numbers.formatDecimal(wallet.balance, 1, 2)}"></span></td>
-                                    <td class="text-warning fw-bold"><i class="bi bi-star-fill"></i> <span th:text="${wallet.rewardPoints}"></span></td>
-                                    <td th:text="${#temporals.format(wallet.updatedAt, 'dd MMM yyyy HH:mm')}"></td>
-                                    <td>
-                                        <a th:href="@{/admin/wallets/{userId}(userId=${wallet.user.id})}" class="btn btn-sm btn-outline-primary">View Transactions</a>
+                                    <td class="py-4 px-6">
+                                        <span th:if="${wallet.tier.name() == 'SILVER'}" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-700 border border-gray-200">Silver</span>
+                                        <span th:if="${wallet.tier.name() == 'GOLD'}" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800 border border-yellow-200">Gold</span>
+                                        <span th:if="${wallet.tier.name() == 'PLATINUM'}" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-800 text-slate-100 border border-slate-900">Platinum</span>
+                                        <span th:if="${wallet.tier.name() == 'BLUE' || wallet.tier.name() == 'BASIC'}" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200" th:text="${wallet.tier}">Blue</span>
                                     </td>
+                                    <td class="py-4 px-6">
+                                        <div class="flex items-center gap-1.5 font-medium text-on-surface">
+                                            <span class="material-symbols-outlined text-[16px] text-primary">flight_takeoff</span>
+                                            <span th:text="${#numbers.formatInteger(wallet.totalMiles, 1, 'COMMA')}">12,500</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-6">
+                                        <div class="flex items-center gap-1.5 font-medium text-on-surface">
+                                            <span class="material-symbols-outlined text-[16px] text-amber-500">stars</span>
+                                            <span th:text="${#numbers.formatInteger(wallet.rewardPoints, 1, 'COMMA')}">4,200</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-6 text-right">
+                                        <div class="font-bold text-secondary text-lg" th:text="'$' + ${#numbers.formatDecimal(wallet.balance, 1, 'COMMA', 2, 'POINT')}">$450.00</div>
+                                    </td>
+                                    <td class="py-4 px-6 text-right">
+                                        <a th:href="@{/admin/wallets/{userId}(userId=${wallet.user.id})}" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm hover:bg-secondary hover:text-on-secondary transition-colors" title="View Transactions">
+                                            <span class="material-symbols-outlined text-[16px]">receipt_long</span>
+                                            Transactions
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(wallets)}">
+                                    <td colspan="6" class="py-8 text-center text-on-surface-variant">No wallets found.</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
 
-<div th:replace="~{layout :: footer}"></div>
-<div th:replace="~{layout :: html_scripts}"></div>
+            </div>
+        </main>
+    </div>
 </body>
 </html>

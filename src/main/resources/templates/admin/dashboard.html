@@ -1,342 +1,288 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{layout :: html_head('Admin Dashboard')}"></head>
-<body>
-<div th:replace="~{layout :: navbar}"></div>
+<html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/admin-layout :: admin_head('Dashboard Overview')}"></head>
+<body class="bg-background text-on-background font-body-md text-body-md antialiased min-h-screen flex">
+    
+    <nav th:replace="~{admin/admin-layout :: admin_sidebar(activePage='dashboard')}"></nav>
 
-<main class="container">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold text-dark"><i class="bi bi-speedometer2 text-primary"></i> Admin Dashboard</h2>
-        <span class="badge bg-secondary p-2">Phase 1: Admin Module</span>
-    </div>
-
-    <!-- Stat Cards Row 1 -->
-    <div class="row g-4 mb-4">
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0 border-start border-4 border-primary h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <div>
-                            <h6 class="text-muted fw-semibold mb-1">Total Flights</h6>
-                            <h2 class="fw-bold text-dark mb-0" th:text="${totalFlights}">0</h2>
-                        </div>
-                        <div class="bg-primary text-white rounded-circle p-3">
-                            <i class="bi bi-airplane fs-3"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0 border-start border-4 border-success h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <div>
-                            <h6 class="text-muted fw-semibold mb-1">Total Users</h6>
-                            <h2 class="fw-bold text-dark mb-0" th:text="${totalUsers}">0</h2>
-                        </div>
-                        <div class="bg-success text-white rounded-circle p-3">
-                            <i class="bi bi-people fs-3"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0 border-start border-4 border-warning h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <div>
-                            <h6 class="text-muted fw-semibold mb-1">Total Bookings</h6>
-                            <h2 class="fw-bold text-dark mb-0" th:text="${totalBookings}">0</h2>
-                        </div>
-                        <div class="bg-warning text-dark rounded-circle p-3">
-                            <i class="bi bi-journal-bookmark fs-3"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0 border-start border-4 border-info h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <div>
-                            <h6 class="text-muted fw-semibold mb-1">Total Revenue</h6>
-                            <h2 class="fw-bold text-dark mb-0">₹<span th:text="${#numbers.formatDecimal(totalRevenue, 1, 2)}">0.00</span></h2>
-                        </div>
-                        <div class="bg-info text-white rounded-circle p-3">
-                            <i class="bi bi-currency-dollar fs-3"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Stat Cards Row 2 (Analytics) -->
-    <div class="row g-4 mb-5">
-        <div class="col-md-6">
-            <div class="card shadow-sm border-0 border-start border-4 border-danger h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <div>
-                            <h6 class="text-muted fw-semibold mb-1">Cancellation Rate</h6>
-                            <h2 class="fw-bold text-dark mb-0"><span th:text="${#numbers.formatDecimal(cancellationPercentage, 1, 2)}">0.00</span>%</h2>
-                        </div>
-                        <div class="bg-danger text-white rounded-circle p-3">
-                            <i class="bi bi-x-circle fs-3"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card shadow-sm border-0 border-start border-4 border-secondary h-100">
-                <div class="card-body">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <div>
-                            <h6 class="text-muted fw-semibold mb-1">Overall Occupancy</h6>
-                            <h2 class="fw-bold text-dark mb-0"><span th:text="${#numbers.formatDecimal(occupancyPercentage, 1, 2)}">0.00</span>%</h2>
-                        </div>
-                        <div class="bg-secondary text-white rounded-circle p-3">
-                            <i class="bi bi-person-check fs-3"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Charts Row -->
-    <div class="row g-4 mb-5">
-        <div class="col-md-6">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
-                    <h5 class="fw-bold"><i class="bi bi-graph-up-arrow text-primary"></i> Revenue (Last 12 Months)</h5>
-                </div>
-                <div class="card-body">
-                    <canvas id="revenueChart"></canvas>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
-                    <h5 class="fw-bold"><i class="bi bi-bar-chart text-success"></i> Bookings (Last 12 Months)</h5>
-                </div>
-                <div class="card-body">
-                    <canvas id="bookingsChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Top Lists Row -->
-    <div class="row g-4 mb-5">
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-header bg-white pt-3 pb-2">
-                    <h6 class="fw-bold mb-0"><i class="bi bi-geo-alt text-warning"></i> Popular Routes</h6>
-                </div>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item d-flex justify-content-between align-items-center" th:each="route : ${topRoutes}">
-                        <span><span th:text="${route[0]}"></span> <i class="bi bi-arrow-right mx-1 text-muted"></i> <span th:text="${route[1]}"></span></span>
-                        <span class="badge bg-primary rounded-pill" th:text="${route[2]}">0</span>
-                    </li>
-                    <li class="list-group-item text-muted text-center" th:if="${#lists.isEmpty(topRoutes)}">No routes data</li>
-                </ul>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-header bg-white pt-3 pb-2">
-                    <h6 class="fw-bold mb-0"><i class="bi bi-star text-warning"></i> Top Customers</h6>
-                </div>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item d-flex justify-content-between align-items-center" th:each="cust : ${topCustomers}">
-                        <span th:text="${cust[0].name}">User Name</span>
-                        <span class="text-success fw-bold">₹<span th:text="${#numbers.formatDecimal(cust[1], 1, 2)}">0.00</span></span>
-                    </li>
-                    <li class="list-group-item text-muted text-center" th:if="${#lists.isEmpty(topCustomers)}">No customer data</li>
-                </ul>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-header bg-white pt-3 pb-2">
-                    <h6 class="fw-bold mb-0"><i class="bi bi-building text-warning"></i> Top Airlines</h6>
-                </div>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item d-flex justify-content-between align-items-center" th:each="al : ${topAirlines}">
-                        <span th:text="${al[0]}">Airline Name</span>
-                        <span class="badge bg-success rounded-pill" th:text="${al[1]}">0</span>
-                    </li>
-                    <li class="list-group-item text-muted text-center" th:if="${#lists.isEmpty(topAirlines)}">No airline data</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
-    <!-- Flight Utilization & Recent Activity Row -->
-    <div class="row g-4 mb-5">
-        <div class="col-md-8">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-header bg-white pt-4 pb-2 d-flex justify-content-between align-items-center">
-                    <h5 class="fw-bold mb-0"><i class="bi bi-table text-primary"></i> Flight Utilization</h5>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light sticky-top">
-                            <tr>
-                                <th>Flight</th>
-                                <th>Departure</th>
-                                <th>Seats Booked</th>
-                                <th>Capacity</th>
-                                <th>Utilization</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr th:each="fu : ${flightUtilization}">
-                                <td class="fw-bold" th:text="${fu.flightNumber}">FL-123</td>
-                                <td th:text="${#temporals.format(fu.departure, 'dd MMM yy HH:mm')}">Date</td>
-                                <td th:text="${fu.booked}">0</td>
-                                <td th:text="${fu.capacity}">0</td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <span class="me-2" th:text="${#numbers.formatDecimal(fu.utilization, 1, 1)} + '%'">0%</span>
-                                        <div class="progress flex-grow-1" style="height: 6px;">
-                                            <div class="progress-bar" 
-                                                 th:classappend="${fu.utilization > 80 ? 'bg-success' : (fu.utilization < 30 ? 'bg-danger' : 'bg-primary')}"
-                                                 role="progressbar" 
-                                                 th:style="'width: ' + ${fu.utilization} + '%'" 
-                                                 th:aria-valuenow="${fu.utilization}" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr th:if="${#lists.isEmpty(flightUtilization)}">
-                                <td colspan="5" class="text-center text-muted py-3">No flights found</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="flex-1 flex flex-col min-w-0 bg-surface">
         
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-header bg-white pt-4 pb-2 d-flex justify-content-between align-items-center">
-                    <h5 class="fw-bold mb-0"><i class="bi bi-activity text-danger"></i> Recent Activity</h5>
-                    <a th:href="@{/admin/logs}" class="btn btn-sm btn-outline-secondary">All Logs</a>
+        <header th:replace="~{admin/admin-layout :: admin_topbar}"></header>
+
+        <main class="flex-1 overflow-y-auto p-gutter lg:p-margin-desktop">
+            <div class="max-w-container-max mx-auto space-y-6">
+                
+                <!-- Page Header -->
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
+                    <div>
+                        <h2 class="font-headline-md text-headline-md text-on-surface">Dashboard Overview</h2>
+                        <p class="font-body-md text-body-md text-on-surface-variant mt-1">Key metrics and recent activities</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <select class="bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2 text-on-surface font-label-sm text-label-sm focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary">
+                            <option>Last 30 Days</option>
+                            <option>Last 7 Days</option>
+                            <option>This Year</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="card-body p-0">
-                    <div class="list-group list-group-flush" style="max-height: 400px; overflow-y: auto;">
-                        <div class="list-group-item py-3" th:each="log : ${recentLogs}">
-                            <div class="d-flex w-100 justify-content-between mb-1">
-                                <small class="text-primary fw-bold" th:text="${log.eventType}">EVENT</small>
-                                <small class="text-muted" th:text="${#temporals.format(log.timestamp, 'dd MMM HH:mm')}">Time</small>
+
+                <!-- 4 Stat Cards Row -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    
+                    <!-- Active Flights -->
+                    <div class="bg-surface rounded-xl border border-outline-variant shadow-sm p-6 flex flex-col gap-4 relative overflow-hidden">
+                        <div class="absolute right-0 top-0 w-24 h-24 bg-primary-fixed/30 rounded-bl-full -mr-4 -mt-4"></div>
+                        <div class="flex items-center justify-between z-10">
+                            <div class="w-12 h-12 rounded-lg bg-primary-fixed text-on-primary-fixed flex items-center justify-center">
+                                <span class="material-symbols-outlined text-2xl">flight_takeoff</span>
                             </div>
-                            <p class="mb-1 text-dark small" th:text="${log.description}">Description</p>
-                            <small class="text-muted"><i class="bi bi-person"></i> <span th:text="${log.userEmail}">user@example.com</span></small>
+                            <div class="flex items-center gap-1 text-sm font-semibold text-green-600 bg-green-50 px-2 py-1 rounded-full">
+                                <span class="material-symbols-outlined text-[16px]">trending_up</span>
+                                12%
+                            </div>
                         </div>
-                        <div class="list-group-item text-center text-muted py-4" th:if="${#lists.isEmpty(recentLogs)}">
-                            No recent activity
+                        <div class="z-10">
+                            <h3 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Active Flights</h3>
+                            <div class="font-display-lg text-4xl text-on-surface" th:text="${totalFlights}">0</div>
+                        </div>
+                    </div>
+
+                    <!-- Total Users -->
+                    <div class="bg-surface rounded-xl border border-outline-variant shadow-sm p-6 flex flex-col gap-4 relative overflow-hidden">
+                        <div class="absolute right-0 top-0 w-24 h-24 bg-secondary-fixed/30 rounded-bl-full -mr-4 -mt-4"></div>
+                        <div class="flex items-center justify-between z-10">
+                            <div class="w-12 h-12 rounded-lg bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center">
+                                <span class="material-symbols-outlined text-2xl">group</span>
+                            </div>
+                            <div class="flex items-center gap-1 text-sm font-semibold text-green-600 bg-green-50 px-2 py-1 rounded-full">
+                                <span class="material-symbols-outlined text-[16px]">trending_up</span>
+                                8%
+                            </div>
+                        </div>
+                        <div class="z-10">
+                            <h3 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Total Users</h3>
+                            <div class="font-display-lg text-4xl text-on-surface" th:text="${totalUsers}">0</div>
+                        </div>
+                    </div>
+
+                    <!-- New Bookings -->
+                    <div class="bg-surface rounded-xl border border-outline-variant shadow-sm p-6 flex flex-col gap-4 relative overflow-hidden">
+                        <div class="absolute right-0 top-0 w-24 h-24 bg-tertiary-fixed/30 rounded-bl-full -mr-4 -mt-4"></div>
+                        <div class="flex items-center justify-between z-10">
+                            <div class="w-12 h-12 rounded-lg bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center">
+                                <span class="material-symbols-outlined text-2xl">confirmation_number</span>
+                            </div>
+                            <div class="flex items-center gap-1 text-sm font-semibold text-red-600 bg-red-50 px-2 py-1 rounded-full">
+                                <span class="material-symbols-outlined text-[16px]">trending_down</span>
+                                3%
+                            </div>
+                        </div>
+                        <div class="z-10">
+                            <h3 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">New Bookings</h3>
+                            <div class="font-display-lg text-4xl text-on-surface" th:text="${totalBookings}">0</div>
+                        </div>
+                    </div>
+
+                    <!-- Revenue -->
+                    <div class="bg-surface rounded-xl border border-outline-variant shadow-sm p-6 flex flex-col gap-4 relative overflow-hidden">
+                        <div class="absolute right-0 top-0 w-24 h-24 bg-surface-variant rounded-bl-full -mr-4 -mt-4"></div>
+                        <div class="flex items-center justify-between z-10">
+                            <div class="w-12 h-12 rounded-lg bg-surface-variant text-on-surface-variant flex items-center justify-center">
+                                <span class="material-symbols-outlined text-2xl">payments</span>
+                            </div>
+                            <div class="flex items-center gap-1 text-sm font-semibold text-green-600 bg-green-50 px-2 py-1 rounded-full">
+                                <span class="material-symbols-outlined text-[16px]">trending_up</span>
+                                24%
+                            </div>
+                        </div>
+                        <div class="z-10">
+                            <h3 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Revenue</h3>
+                            <div class="font-display-lg text-4xl text-on-surface" th:text="'$' + ${#numbers.formatDecimal(totalRevenue, 1, 'COMMA', 2, 'POINT')}">$0.00</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Charts Row -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Revenue Trend line chart -->
+                    <div class="bg-surface rounded-xl border border-outline-variant shadow-sm p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-headline-md text-lg text-on-surface font-semibold">Revenue Trend (12 Months)</h3>
+                            <button class="text-on-surface-variant hover:text-secondary"><span class="material-symbols-outlined">more_vert</span></button>
+                        </div>
+                        <div class="h-64 relative w-full">
+                            <canvas id="revenueChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Bookings per Month bar chart -->
+                    <div class="bg-surface rounded-xl border border-outline-variant shadow-sm p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-headline-md text-lg text-on-surface font-semibold">Bookings per Month</h3>
+                            <button class="text-on-surface-variant hover:text-secondary"><span class="material-symbols-outlined">more_vert</span></button>
+                        </div>
+                        <div class="h-64 relative w-full">
+                            <canvas id="bookingsChart"></canvas>
                         </div>
                     </div>
                 </div>
+
+                <!-- Bottom 3-Column Row -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <!-- Top Routes -->
+                    <div class="bg-surface rounded-xl border border-outline-variant shadow-sm p-0 flex flex-col">
+                        <div class="p-6 border-b border-outline-variant flex items-center justify-between">
+                            <h3 class="font-headline-md text-lg text-on-surface font-semibold">Top Routes</h3>
+                            <span class="material-symbols-outlined text-on-surface-variant">route</span>
+                        </div>
+                        <div class="p-0 overflow-x-auto flex-1">
+                            <table class="w-full text-left">
+                                <thead class="bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm uppercase">
+                                    <tr>
+                                        <th class="py-3 px-4">Route</th>
+                                        <th class="py-3 px-4">Flights</th>
+                                        <th class="py-3 px-4 text-right">Revenue</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-outline-variant/50">
+                                    <tr th:each="route : ${topRoutes}" class="hover:bg-surface-variant/20">
+                                        <td class="py-3 px-4 text-on-surface font-medium" th:text="${route.origin} + ' → ' + ${route.destination}">JFK → LHR</td>
+                                        <td class="py-3 px-4 text-on-surface-variant" th:text="${route.flightCount}">124</td>
+                                        <td class="py-3 px-4 text-right text-secondary font-medium" th:text="'$' + ${#numbers.formatDecimal(route.revenue, 1, 'COMMA', 0, 'POINT')}">$45,000</td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(topRoutes)}">
+                                        <td colspan="3" class="py-4 text-center text-on-surface-variant text-sm">No route data available</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Top Airlines -->
+                    <div class="bg-surface rounded-xl border border-outline-variant shadow-sm p-0 flex flex-col">
+                        <div class="p-6 border-b border-outline-variant flex items-center justify-between">
+                            <h3 class="font-headline-md text-lg text-on-surface font-semibold">Top Airlines</h3>
+                            <span class="material-symbols-outlined text-on-surface-variant">corporate_fare</span>
+                        </div>
+                        <div class="p-4 flex-1 flex flex-col gap-4">
+                            <div th:each="airline, iterStat : ${topAirlines}" class="flex items-center justify-between p-3 rounded-lg border border-outline-variant/30 bg-surface-container-low">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded bg-white border border-outline-variant flex items-center justify-center font-bold text-secondary text-lg" th:text="${iterStat.count}">1</div>
+                                    <div>
+                                        <div class="font-medium text-on-surface" th:text="${airline.airlineName}">SkyFly Elite</div>
+                                        <div class="text-xs text-on-surface-variant" th:text="${airline.bookingsCount} + ' bookings'">450 bookings</div>
+                                    </div>
+                                </div>
+                                <div class="bg-primary-fixed text-on-primary-fixed px-2 py-1 rounded text-xs font-bold" th:text="'+' + ${airline.performance} + '%'">+14%</div>
+                            </div>
+                            <div th:if="${#lists.isEmpty(topAirlines)}" class="py-4 text-center text-on-surface-variant text-sm">
+                                No airline data available
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity Feed -->
+                    <div class="bg-surface rounded-xl border border-outline-variant shadow-sm p-0 flex flex-col">
+                        <div class="p-6 border-b border-outline-variant flex items-center justify-between">
+                            <h3 class="font-headline-md text-lg text-on-surface font-semibold">Recent Activity</h3>
+                            <span class="material-symbols-outlined text-on-surface-variant">history</span>
+                        </div>
+                        <div class="p-6 flex-1 overflow-y-auto max-h-[350px]">
+                            <div class="relative pl-6 border-l-2 border-surface-variant space-y-6">
+                                
+                                <div th:each="log : ${recentLogs}" class="relative">
+                                    <div class="absolute -left-[31px] top-1 w-3 h-3 rounded-full bg-secondary ring-4 ring-surface"></div>
+                                    <div class="text-xs text-on-surface-variant font-medium mb-1" th:text="${#temporals.format(log.timestamp, 'MMM dd, HH:mm')}">Oct 24, 14:30</div>
+                                    <div class="text-sm text-on-surface font-medium" th:text="${log.action}">New booking #BK-9012 created</div>
+                                    <div class="text-xs text-on-surface-variant mt-1" th:text="${log.details}">By user admin@skyfly.com</div>
+                                </div>
+                                
+                                <div th:if="${#lists.isEmpty(recentLogs)}" class="text-sm text-on-surface-variant italic">
+                                    No recent activity.
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
             </div>
-        </div>
+        </main>
     </div>
-</main>
-
-<div th:replace="~{layout :: footer}"></div>
-<div th:replace="~{layout :: html_scripts}"></div>
-
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script th:inline="javascript">
-    document.addEventListener("DOMContentLoaded", function() {
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script th:inline="javascript">
         /*<![CDATA[*/
-        const rawRev = /*[[${monthlyRevenueJson}]]*/ '[]';
-        const rawBook = /*[[${monthlyBookingsJson}]]*/ '[]';
-        /*]]>*/
-        
-        const revData = JSON.parse(rawRev || '[]');
-        const bookData = JSON.parse(rawBook || '[]');
+        document.addEventListener('DOMContentLoaded', function() {
+            const revenueDataJson = /*[[${monthlyRevenueJson}]]*/ '{}';
+            const bookingsDataJson = /*[[${monthlyBookingsJson}]]*/ '{}';
+            
+            let revenueData = {};
+            let bookingsData = {};
+            try { revenueData = JSON.parse(revenueDataJson); } catch(e) {}
+            try { bookingsData = JSON.parse(bookingsDataJson); } catch(e) {}
+            
+            const labels = Object.keys(revenueData).length > 0 ? Object.keys(revenueData) : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const revValues = Object.keys(revenueData).length > 0 ? Object.values(revenueData) : [12000, 19000, 15000, 22000, 25000, 32000, 30000, 35000, 34000, 42000, 45000, 52000];
+            const bookValues = Object.keys(bookingsData).length > 0 ? Object.values(bookingsData) : [120, 190, 150, 220, 250, 320, 300, 350, 340, 420, 450, 520];
 
-        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        
-        // Helper to format chart data
-        function formatData(dataList) {
-            let labels = [];
-            let values = [];
-            // Map month index (1-12) to names, and extract value
-            dataList.forEach(item => {
-                let m = item[0] - 1; // JS months are 0-11 for array index
-                labels.push(monthNames[m]);
-                values.push(item[1]);
-            });
-            return { labels, values };
-        }
-
-        const formattedRev = formatData(revData);
-        const formattedBook = formatData(bookData);
-
-        // Revenue Chart
-        if (document.getElementById('revenueChart')) {
-            const ctx1 = document.getElementById('revenueChart').getContext('2d');
-            new Chart(ctx1, {
+            // Revenue Chart
+            const ctxRev = document.getElementById('revenueChart').getContext('2d');
+            new Chart(ctxRev, {
                 type: 'line',
                 data: {
-                    labels: formattedRev.labels,
+                    labels: labels,
                     datasets: [{
-                        label: 'Revenue (₹)',
-                        data: formattedRev.values,
-                        borderColor: '#0d6efd',
-                        backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                        label: 'Revenue ($)',
+                        data: revValues,
+                        borderColor: '#005cab',
+                        backgroundColor: 'rgba(0, 92, 171, 0.1)',
                         borderWidth: 2,
                         fill: true,
-                        tension: 0.3
+                        tension: 0.4
                     }]
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
                     scales: {
-                        y: { beginAtZero: true }
+                        y: { beginAtZero: true, grid: { color: '#e3effb' } },
+                        x: { grid: { display: false } }
                     }
                 }
             });
-        }
 
-        // Bookings Chart
-        if (document.getElementById('bookingsChart')) {
-            const ctx2 = document.getElementById('bookingsChart').getContext('2d');
-            new Chart(ctx2, {
+            // Bookings Chart
+            const ctxBook = document.getElementById('bookingsChart').getContext('2d');
+            new Chart(ctxBook, {
                 type: 'bar',
                 data: {
-                    labels: formattedBook.labels,
+                    labels: labels,
                     datasets: [{
                         label: 'Bookings',
-                        data: formattedBook.values,
-                        backgroundColor: '#198754',
+                        data: bookValues,
+                        backgroundColor: '#0075d6',
                         borderRadius: 4
                     }]
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
                     scales: {
-                        y: { beginAtZero: true }
+                        y: { beginAtZero: true, grid: { color: '#e3effb' } },
+                        x: { grid: { display: false } }
                     }
                 }
             });
-        }
-    });
-</script>
+        });
+        /*]]>*/
+    </script>
 </body>
 </html>

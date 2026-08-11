@@ -1,87 +1,118 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{layout :: html_head('Manage Aircraft')}"></head>
-<body>
-<div th:replace="~{layout :: navbar}"></div>
+<html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/admin-layout :: admin_head('Aircraft Fleet')}"></head>
+<body class="bg-background text-on-background font-body-md text-body-md antialiased min-h-screen flex">
+    
+    <nav th:replace="~{admin/admin-layout :: admin_sidebar(activePage='aircraft')}"></nav>
 
-<main class="container">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <span class="eyebrow-label">Fleet Management</span>
-            <h1 class="section-title mb-0">Aircraft Management</h1>
-        </div>
-        <a th:href="@{/admin/aircraft/new}" class="btn-primary-theme">
-            <i class="bi bi-plus-circle"></i> Add Aircraft
-        </a>
-    </div>
+    <div class="flex-1 flex flex-col min-w-0 bg-surface">
+        <header th:replace="~{admin/admin-layout :: admin_topbar}"></header>
 
-    <!-- Alerts -->
-    <div th:if="${success}" class="alert alert-success alert-dismissible fade show border-0 rounded-4 mb-4" role="alert">
-        <i class="bi bi-check-circle-fill me-2"></i><span th:text="${success}"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show border-0 rounded-4 mb-4" role="alert">
-        <i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${error}"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
+        <main class="flex-1 overflow-y-auto p-gutter lg:p-margin-desktop">
+            <div class="max-w-container-max mx-auto space-y-6">
+                
+                <div th:if="${success}" class="bg-green-50 text-green-700 border border-green-200 rounded-lg p-4 mb-4 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined">check_circle</span>
+                        <span th:text="${success}">Success</span>
+                    </div>
+                </div>
+                
+                <div th:if="${error}" class="bg-red-50 text-red-700 border border-red-200 rounded-lg p-4 mb-4 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined">error</span>
+                        <span th:text="${error}">Error</span>
+                    </div>
+                </div>
 
-    <div class="card border-0">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
-                    <tr class="text-uppercase small font-monospace text-muted">
-                        <th class="ps-4 py-3">Name</th>
-                        <th class="py-3">Reg. Number</th>
-                        <th class="py-3">Model</th>
-                        <th class="py-3">Capacity</th>
-                        <th class="py-3">Status</th>
-                        <th class="pe-4 py-3 text-end">Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="ac : ${aircrafts}">
-                        <td class="ps-4 py-3 fw-semibold" th:text="${ac.aircraftName}">Name</td>
-                        <td class="py-3"><code class="text-muted font-monospace" th:text="${ac.aircraftNumber}">VT-ABC</code></td>
-                        <td class="py-3" th:text="${ac.model}">Model</td>
-                        <td class="py-3">
-                            <strong th:text="${ac.capacity}"></strong> total
-                            <small class="text-muted d-block">
-                                <span th:text="${ac.businessSeats}"></span> Bus. / <span th:text="${ac.economySeats}"></span> Eco.
-                            </small>
-                        </td>
-                        <td class="py-3">
-                            <span class="badge rounded-pill px-3 py-2"
-                                  th:classappend="${ac.status.name() == 'ACTIVE' ? 'bg-success-subtle text-success border border-success-subtle' : (ac.status.name() == 'MAINTENANCE' ? 'bg-warning-subtle text-warning border border-warning-subtle' : 'bg-secondary-subtle text-secondary border')}"
-                                  th:text="${ac.status}">ACTIVE</span>
-                        </td>
-                        <td class="pe-4 py-3 text-end">
-                            <div class="btn-group btn-group-sm">
-                                <a th:href="@{/admin/aircraft/edit/{id}(id=${ac.id})}" class="btn btn-outline-primary rounded-3 me-1" title="Edit">
-                                    <i class="bi bi-pencil"></i> Edit
-                                </a>
-                                <form th:action="@{/admin/aircraft/delete/{id}(id=${ac.id})}" method="post" class="d-inline" onsubmit="return confirm('Delete this aircraft?');">
-                                    <button type="submit" class="btn btn-outline-danger rounded-3" title="Delete">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr th:if="${#lists.isEmpty(aircrafts)}">
-                        <td colspan="6" class="text-center py-5 text-muted">
-                            <i class="bi bi-airplane display-4 d-block mb-3 text-muted opacity-50"></i>
-                            No aircraft registered yet.
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+                <!-- Page Header -->
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                    <div>
+                        <h2 class="font-headline-md text-headline-md text-on-surface">Fleet Management</h2>
+                        <p class="font-body-md text-body-md text-on-surface-variant mt-1">Manage aircraft equipment and cabin configurations.</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button class="flex items-center gap-2 px-4 py-2 border border-outline-variant rounded-lg text-on-surface font-label-sm text-label-sm hover:bg-surface-variant/50 transition-colors">
+                            <span class="material-symbols-outlined text-[18px]">filter_list</span>
+                            Filter
+                        </button>
+                        <a th:href="@{/admin/aircraft/new}" class="flex items-center gap-2 px-4 py-2 bg-secondary text-on-secondary rounded-lg font-label-sm text-label-sm hover:bg-secondary-container transition-colors shadow-sm">
+                            <span class="material-symbols-outlined text-[18px]">add_circle</span>
+                            Add Aircraft
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Table Card -->
+                <div class="bg-surface rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse min-w-[900px]">
+                            <thead>
+                                <tr class="bg-surface-container-low border-b border-outline-variant">
+                                    <th class="py-4 px-6 font-label-sm text-label-sm text-on-surface-variant font-semibold">Aircraft Details</th>
+                                    <th class="py-4 px-6 font-label-sm text-label-sm text-on-surface-variant font-semibold">Registration No.</th>
+                                    <th class="py-4 px-6 font-label-sm text-label-sm text-on-surface-variant font-semibold">Total Capacity</th>
+                                    <th class="py-4 px-6 font-label-sm text-label-sm text-on-surface-variant font-semibold">Configuration</th>
+                                    <th class="py-4 px-6 font-label-sm text-label-sm text-on-surface-variant font-semibold text-center">Status</th>
+                                    <th class="py-4 px-6 font-label-sm text-label-sm text-on-surface-variant font-semibold text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-outline-variant/50 font-body-md text-body-md text-on-surface">
+                                <tr th:each="ac : ${aircrafts}" class="hover:bg-surface-variant/10 transition-colors group">
+                                    <td class="py-4 px-6">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 rounded bg-primary-container text-on-primary-container flex items-center justify-center shrink-0">
+                                                <span class="material-symbols-outlined text-[20px]">flight_class</span>
+                                            </div>
+                                            <div>
+                                                <div class="font-medium text-on-surface" th:text="${ac.aircraftName}">Boeing 737</div>
+                                                <div class="text-xs text-on-surface-variant uppercase tracking-wider" th:text="${ac.model}">B737-800</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-6">
+                                        <span class="inline-block bg-surface-container-high px-2 py-1 rounded text-sm font-semibold tracking-wider font-mono text-on-surface" th:text="${ac.aircraftNumber}">N12345</span>
+                                    </td>
+                                    <td class="py-4 px-6">
+                                        <div class="flex items-center gap-2 text-on-surface font-medium">
+                                            <span class="material-symbols-outlined text-[16px] text-on-surface-variant">airline_seat_recline_normal</span>
+                                            <span th:text="${ac.capacity}">180</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-6 text-on-surface-variant text-sm">
+                                        <div class="flex flex-col gap-1">
+                                            <span th:text="${ac.businessSeats} + ' Business'">20 Business</span>
+                                            <span th:text="${ac.economySeats} + ' Economy'">160 Economy</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-6 text-center">
+                                        <span th:if="${ac.status.name() == 'ACTIVE'}" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-50 text-green-700 border border-green-200">Active</span>
+                                        <span th:if="${ac.status.name() == 'MAINTENANCE'}" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">Maintenance</span>
+                                        <span th:if="${ac.status.name() == 'RETIRED'}" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-surface-variant text-on-surface-variant border border-outline-variant">Retired</span>
+                                    </td>
+                                    <td class="py-4 px-6 text-right">
+                                        <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <a th:href="@{/admin/aircraft/edit/{id}(id=${ac.id})}" class="p-1.5 rounded-md text-on-surface-variant hover:text-secondary hover:bg-surface-container transition-colors" title="Edit">
+                                                <span class="material-symbols-outlined text-[18px]">edit</span>
+                                            </a>
+                                            <form th:action="@{/admin/aircraft/delete/{id}(id=${ac.id})}" method="post" class="inline" onsubmit="return confirm('Are you sure you want to delete this aircraft? Existing flights referencing it will block deletion.')">
+                                                <button type="submit" class="p-1.5 rounded-md text-on-surface-variant hover:text-error hover:bg-error-container/20 transition-colors" title="Delete">
+                                                    <span class="material-symbols-outlined text-[18px]">delete</span>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(aircrafts)}">
+                                    <td colspan="6" class="py-8 text-center text-on-surface-variant">No aircraft recorded yet.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
             </div>
-        </div>
+        </main>
     </div>
-</main>
-
-<div th:replace="~{layout :: footer}"></div>
-<div th:replace="~{layout :: html_scripts}"></div>
 </body>
 </html>

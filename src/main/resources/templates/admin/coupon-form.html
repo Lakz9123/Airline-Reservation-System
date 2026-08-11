@@ -1,92 +1,118 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{layout :: html_head('Manage Coupon')}"></head>
-<body>
-<div th:replace="~{layout :: navbar}"></div>
+<html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/admin-layout :: admin_head('Coupon Management')}"></head>
+<body class="bg-background text-on-background font-body-md text-body-md antialiased min-h-screen flex">
+    
+    <nav th:replace="~{admin/admin-layout :: admin_sidebar(activePage='coupons')}"></nav>
 
-<main class="container">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold" th:text="${coupon.id == null ? 'Add New Coupon' : 'Edit Coupon'}">Coupon</h2>
-        <a th:href="@{/admin/coupons}" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left"></i> Back to List
-        </a>
+    <div class="flex-1 flex flex-col min-w-0 bg-surface">
+        <header th:replace="~{admin/admin-layout :: admin_topbar}"></header>
+
+        <main class="flex-1 overflow-y-auto p-gutter lg:p-margin-desktop">
+            <div class="max-w-[800px] mx-auto">
+                
+                <div class="mb-8 flex items-center justify-between">
+                    <div>
+                        <a th:href="@{/admin/coupons}" class="text-secondary hover:underline text-sm font-medium mb-2 inline-flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[16px]">arrow_back</span> Back to Coupons
+                        </a>
+                        <h2 class="font-headline-md text-headline-md text-on-surface" th:text="${coupon.id == null ? '🎫 Create New Coupon' : '🎫 Edit Coupon ' + coupon.code}">Create New Coupon</h2>
+                    </div>
+                </div>
+
+                <div class="bg-surface rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+                    <form th:action="@{/admin/coupons}" th:object="${coupon}" method="post" class="p-6 md:p-8 space-y-6">
+                        <input type="hidden" th:field="*{id}">
+                        
+                        <!-- Core Details -->
+                        <div class="space-y-4">
+                            <h3 class="font-headline-md text-lg text-on-surface border-b border-outline-variant pb-2">Coupon Details</h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="code" class="block font-label-sm text-label-sm text-on-surface mb-2">Coupon Code</label>
+                                    <input type="text" th:field="*{code}" id="code" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface uppercase font-mono tracking-wider focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" required placeholder="e.g. SUMMER26">
+                                </div>
+                                <div class="flex items-center mt-8">
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" th:field="*{active}" class="w-5 h-5 text-secondary border-outline-variant rounded focus:ring-secondary">
+                                        <span class="font-label-sm text-label-sm text-on-surface">Coupon is Active</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="discountType" class="block font-label-sm text-label-sm text-on-surface mb-2">Discount Type</label>
+                                    <select th:field="*{discountType}" id="discountType" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" required>
+                                        <option th:each="type : ${T(com.airline.reservation.entity.DiscountType).values()}" th:value="${type}" th:text="${type.name()}"></option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="discountValue" class="block font-label-sm text-label-sm text-on-surface mb-2">Discount Value</label>
+                                    <input type="number" step="0.01" th:field="*{discountValue}" id="discountValue" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" required min="0" placeholder="e.g. 20 or 50.00">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Restrictions -->
+                        <div class="space-y-4 pt-4">
+                            <h3 class="font-headline-md text-lg text-on-surface border-b border-outline-variant pb-2">Restrictions & Limits</h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="minBookingAmount" class="block font-label-sm text-label-sm text-on-surface mb-2">Min Booking Amount ($)</label>
+                                    <input type="number" step="0.01" th:field="*{minBookingAmount}" id="minBookingAmount" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" min="0" placeholder="e.g. 100.00">
+                                </div>
+                                <div>
+                                    <label for="maxDiscountAmount" class="block font-label-sm text-label-sm text-on-surface mb-2">Max Discount Amount ($)</label>
+                                    <input type="number" step="0.01" th:field="*{maxDiscountAmount}" id="maxDiscountAmount" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" min="0" placeholder="e.g. 50.00 (for percentages)">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="usageLimit" class="block font-label-sm text-label-sm text-on-surface mb-2">Total Usage Limit</label>
+                                    <input type="number" th:field="*{usageLimit}" id="usageLimit" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" min="1" placeholder="Leave empty for unlimited">
+                                </div>
+                                <div>
+                                    <label for="usageLimitPerUser" class="block font-label-sm text-label-sm text-on-surface mb-2">Usage Limit Per User</label>
+                                    <input type="number" th:field="*{usageLimitPerUser}" id="usageLimitPerUser" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" min="1" placeholder="Leave empty for unlimited">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Validity -->
+                        <div class="space-y-4 pt-4">
+                            <h3 class="font-headline-md text-lg text-on-surface border-b border-outline-variant pb-2">Validity Period</h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="validFrom" class="block font-label-sm text-label-sm text-on-surface mb-2">Valid From</label>
+                                    <input type="date" th:field="*{validFrom}" id="validFrom" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" required>
+                                </div>
+                                <div>
+                                    <label for="expiryDate" class="block font-label-sm text-label-sm text-on-surface mb-2">Valid Until</label>
+                                    <input type="date" th:field="*{expiryDate}" id="expiryDate" class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2.5 text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary">
+                                    <p class="text-xs text-on-surface-variant mt-1">Leave empty for no expiration date</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="pt-6 border-t border-outline-variant flex items-center justify-end gap-3">
+                            <a th:href="@{/admin/coupons}" class="px-6 py-2.5 rounded-lg border border-outline-variant text-on-surface hover:bg-surface-variant/50 transition-colors font-label-sm text-label-sm">
+                                Cancel
+                            </a>
+                            <button type="submit" class="px-6 py-2.5 rounded-lg bg-secondary text-on-secondary hover:bg-secondary-container hover:text-on-secondary-container transition-colors shadow-sm font-label-sm text-label-sm">
+                                Save Coupon
+                            </button>
+                        </div>
+                        
+                    </form>
+                </div>
+
+            </div>
+        </main>
     </div>
-
-    <div class="card shadow-sm border-0 mx-auto" style="max-width: 640px;">
-        <div class="card-body p-4">
-            <form th:action="@{/admin/coupons/save}" th:object="${coupon}" method="post">
-                <input type="hidden" th:field="*{id}" />
-
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Coupon Code <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control text-uppercase" th:field="*{code}" required placeholder="e.g. SUMMER50">
-                    <small class="form-text text-muted">Codes are automatically converted to uppercase.</small>
-                </div>
-
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">Discount Type <span class="text-danger">*</span></label>
-                        <select class="form-select" th:field="*{discountType}" required>
-                            <option value="PERCENTAGE">Percentage (%)</option>
-                            <option value="FLAT">Flat Amount (₹)</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">Discount Value <span class="text-danger">*</span></label>
-                        <input type="number" class="form-control" th:field="*{discountValue}" required min="0" step="0.01" placeholder="e.g. 10 or 500">
-                    </div>
-                </div>
-
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">Max Discount (₹)</label>
-                        <input type="number" class="form-control" th:field="*{maxDiscountAmount}" min="0" step="0.01" placeholder="Leave empty for none">
-                        <small class="form-text text-muted">Applicable for Percentage type.</small>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">Min Booking Amount (₹)</label>
-                        <input type="number" class="form-control" th:field="*{minBookingAmount}" min="0" step="0.01" placeholder="Leave empty for none">
-                    </div>
-                </div>
-
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">Total Usage Limit</label>
-                        <input type="number" class="form-control" th:field="*{usageLimit}" min="1" placeholder="Leave empty for unlimited">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">Usage Limit Per User</label>
-                        <input type="number" class="form-control" th:field="*{usageLimitPerUser}" min="1" placeholder="Leave empty for unlimited">
-                    </div>
-                </div>
-
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">Valid From <span class="text-danger">*</span></label>
-                        <input type="date" class="form-control" th:field="*{validFrom}" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">Valid Until <span class="text-danger">*</span></label>
-                        <input type="date" class="form-control" th:field="*{expiryDate}" required>
-                    </div>
-                </div>
-
-                <div class="mb-4 form-check form-switch">
-                    <input class="form-check-input" type="checkbox" role="switch" th:field="*{active}" id="isActiveSwitch">
-                    <label class="form-check-label fw-bold" for="isActiveSwitch">Coupon is Active</label>
-                </div>
-
-                <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-primary btn-lg">
-                        <i class="bi bi-save"></i> Save Coupon
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</main>
-
-<div th:replace="~{layout :: footer}"></div>
-<div th:replace="~{layout :: html_scripts}"></div>
 </body>
 </html>

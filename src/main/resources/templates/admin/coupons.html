@@ -1,99 +1,120 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{layout :: html_head('Manage Coupons')}"></head>
-<body>
-<div th:replace="~{layout :: navbar}"></div>
+<html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/admin-layout :: admin_head('Promotions & Coupons')}"></head>
+<body class="bg-background text-on-background font-body-md text-body-md antialiased min-h-screen flex">
+    
+    <nav th:replace="~{admin/admin-layout :: admin_sidebar(activePage='coupons')}"></nav>
 
-<main class="container">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold"><i class="bi bi-ticket-perforated-fill text-primary"></i> Coupon Management</h2>
-        <a th:href="@{/admin/coupons/new}" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Add Coupon
-        </a>
-    </div>
+    <div class="flex-1 flex flex-col min-w-0 bg-surface">
+        <header th:replace="~{admin/admin-layout :: admin_topbar}"></header>
 
-    <!-- Alerts -->
-    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
-        <span th:text="${success}"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-        <span th:text="${error}"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
+        <main class="flex-1 overflow-y-auto p-gutter lg:p-margin-desktop">
+            <div class="max-w-container-max mx-auto space-y-6">
+                
+                <div th:if="${success}" class="bg-green-50 text-green-700 border border-green-200 rounded-lg p-4 mb-4 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined">check_circle</span>
+                        <span th:text="${success}">Success</span>
+                    </div>
+                </div>
+                
+                <div th:if="${error}" class="bg-red-50 text-red-700 border border-red-200 rounded-lg p-4 mb-4 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined">error</span>
+                        <span th:text="${error}">Error</span>
+                    </div>
+                </div>
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-dark">
-                    <tr>
-                        <th>Code</th>
-                        <th>Type</th>
-                        <th>Value</th>
-                        <th>Validity (From → Until)</th>
-                        <th>Limits &amp; Usage</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="c : ${coupons}">
-                        <td><strong th:text="${c.code}" class="text-primary"></strong></td>
-                        <td>
-                            <span class="badge bg-secondary" th:text="${c.discountType}"></span>
-                        </td>
-                        <td>
-                            <span th:if="${c.discountType.name() == 'PERCENTAGE'}" th:text="${c.discountValue + '%'}"></span>
-                            <span th:if="${c.discountType.name() == 'FLAT'}" th:text="${'₹' + c.discountValue}"></span>
-                            <small class="text-muted d-block" th:if="${c.maxDiscountAmount != null}">Max ₹<span th:text="${c.maxDiscountAmount}"></span></small>
-                            <small class="text-muted d-block" th:if="${c.minBookingAmount != null}">Min ₹<span th:text="${c.minBookingAmount}"></span></small>
-                        </td>
-                        <td>
-                            <span th:text="${c.validFrom}"></span> →
-                            <span th:text="${c.expiryDate}"></span>
-                        </td>
-                        <td th:with="count=${@couponService.getUsageCount(c)}">
-                            <small class="d-block">Total Limit: <strong th:text="${c.usageLimit != null ? c.usageLimit : '∞'}"></strong></small>
-                            <small class="d-block text-primary">Used: <strong th:text="${count}"></strong></small>
-                            <small class="d-block text-success">Remaining: <strong th:text="${c.usageLimit != null ? (c.usageLimit - count) : '∞'}"></strong></small>
-                            <small class="d-block">Per User: <strong th:text="${c.usageLimitPerUser != null ? c.usageLimitPerUser : '∞'}"></strong></small>
-                        </td>
-                        <td>
-                            <form th:action="@{/admin/coupons/toggle/{id}(id=${c.id})}" method="post" class="m-0 p-0">
-                                <button type="submit" class="btn btn-sm text-white"
-                                        th:classappend="${c.active ? 'btn-success' : 'btn-danger'}"
-                                        th:text="${c.active ? 'Active' : 'Inactive'}"></button>
-                            </form>
-                        </td>
-                        <td>
-                            <div class="btn-group btn-group-sm">
-                                <a th:href="@{/admin/coupons/edit/{id}(id=${c.id})}" class="btn btn-outline-primary" title="Edit">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                <form th:action="@{/admin/coupons/delete/{id}(id=${c.id})}" method="post" class="d-inline"
-                                      onsubmit="return confirm('Delete this coupon?');">
-                                    <button type="submit" class="btn btn-outline-danger" title="Delete">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr th:if="${#lists.isEmpty(coupons)}">
-                        <td colspan="7" class="text-center py-5 text-muted">
-                            <i class="bi bi-ticket-perforated display-5 d-block mb-2"></i>
-                            No coupons found. <a th:href="@{/admin/coupons/new}">Add the first one!</a>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+                <!-- Page Header -->
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                    <div>
+                        <h2 class="font-headline-md text-headline-md text-on-surface">Promotions & Coupons</h2>
+                        <p class="font-body-md text-body-md text-on-surface-variant mt-1">Create and manage discount codes for marketing campaigns.</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button class="flex items-center gap-2 px-4 py-2 border border-outline-variant rounded-lg text-on-surface font-label-sm text-label-sm hover:bg-surface-variant/50 transition-colors">
+                            <span class="material-symbols-outlined text-[18px]">filter_list</span>
+                            Filter
+                        </button>
+                        <a th:href="@{/admin/coupons/new}" class="flex items-center gap-2 px-4 py-2 bg-secondary text-on-secondary rounded-lg font-label-sm text-label-sm hover:bg-secondary-container transition-colors shadow-sm">
+                            <span class="material-symbols-outlined text-[18px]">add_circle</span>
+                            Create Coupon
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Table Card -->
+                <div class="bg-surface rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse min-w-[1000px]">
+                            <thead>
+                                <tr class="bg-surface-container-low border-b border-outline-variant">
+                                    <th class="py-4 px-6 font-label-sm text-label-sm text-on-surface-variant font-semibold">Code</th>
+                                    <th class="py-4 px-6 font-label-sm text-label-sm text-on-surface-variant font-semibold">Type</th>
+                                    <th class="py-4 px-6 font-label-sm text-label-sm text-on-surface-variant font-semibold">Value</th>
+                                    <th class="py-4 px-6 font-label-sm text-label-sm text-on-surface-variant font-semibold">Validity (Dates)</th>
+                                    <th class="py-4 px-6 font-label-sm text-label-sm text-on-surface-variant font-semibold">Usage Limit</th>
+                                    <th class="py-4 px-6 font-label-sm text-label-sm text-on-surface-variant font-semibold text-center">Status</th>
+                                    <th class="py-4 px-6 font-label-sm text-label-sm text-on-surface-variant font-semibold text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-outline-variant/50 font-body-md text-body-md text-on-surface">
+                                <tr th:each="coupon : ${coupons}" class="hover:bg-surface-variant/10 transition-colors group">
+                                    <td class="py-4 px-6">
+                                        <div class="inline-flex items-center gap-2 bg-secondary/10 text-secondary border border-secondary/20 px-3 py-1 rounded font-mono font-bold tracking-wider">
+                                            <span class="material-symbols-outlined text-[16px]">local_activity</span>
+                                            <span th:text="${coupon.code}">SUMMER26</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-6">
+                                        <span class="text-on-surface font-medium capitalize" th:text="${coupon.discountType.name().toLowerCase().replace('_', ' ')}">Percentage</span>
+                                    </td>
+                                    <td class="py-4 px-6">
+                                        <span th:if="${coupon.discountType.name() == 'PERCENTAGE'}" class="text-on-surface font-bold text-lg" th:text="${#numbers.formatDecimal(coupon.discountValue, 0, 0)} + '%'">20%</span>
+                                        <span th:if="${coupon.discountType.name() == 'FIXED_AMOUNT'}" class="text-on-surface font-bold text-lg" th:text="'$' + ${#numbers.formatDecimal(coupon.discountValue, 1, 'COMMA', 2, 'POINT')}">$50.00</span>
+                                        <div class="text-xs text-on-surface-variant mt-0.5" th:if="${coupon.minBookingAmount != null}">Min: $<span th:text="${#numbers.formatDecimal(coupon.minBookingAmount, 1, 0)}">200</span></div>
+                                    </td>
+                                    <td class="py-4 px-6">
+                                        <div class="flex items-center gap-1.5 text-on-surface-variant text-sm">
+                                            <span class="material-symbols-outlined text-[16px]">calendar_today</span>
+                                            <span th:text="${#temporals.format(coupon.validFrom, 'MMM dd, yyyy')}">Jun 01, 2026</span>
+                                            <span> - </span>
+                                            <span th:if="${coupon.expiryDate != null}" th:text="${#temporals.format(coupon.expiryDate, 'MMM dd, yyyy')}">Aug 31, 2026</span>
+                                            <span th:if="${coupon.expiryDate == null}">No Expiry</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-6">
+                                        <div class="text-on-surface font-medium" th:text="${coupon.usageLimit != null ? coupon.usageLimit + ' total' : 'Unlimited'}">1000 total</div>
+                                        <div class="text-xs text-on-surface-variant mt-0.5" th:text="${coupon.usageLimitPerUser != null ? coupon.usageLimitPerUser + ' per user' : 'No limit/user'}">1 per user</div>
+                                    </td>
+                                    <td class="py-4 px-6 text-center">
+                                        <!-- Note: Real status logic requires checking dates. Simplified here. -->
+                                        <span th:if="${coupon.active}" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-50 text-green-700 border border-green-200">Active</span>
+                                        <span th:if="${!coupon.active}" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-50 text-red-700 border border-red-200">Expired</span>
+                                    </td>
+                                    <td class="py-4 px-6 text-right">
+                                        <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <a th:href="@{/admin/coupons/edit/{id}(id=${coupon.id})}" class="p-1.5 rounded-md text-on-surface-variant hover:text-secondary hover:bg-surface-container transition-colors" title="Edit">
+                                                <span class="material-symbols-outlined text-[18px]">edit</span>
+                                            </a>
+                                            <form th:action="@{/admin/coupons/delete/{id}(id=${coupon.id})}" method="post" class="inline" onsubmit="return confirm('Are you sure you want to delete this coupon?')">
+                                                <button type="submit" class="p-1.5 rounded-md text-on-surface-variant hover:text-error hover:bg-error-container/20 transition-colors" title="Delete">
+                                                    <span class="material-symbols-outlined text-[18px]">delete</span>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(coupons)}">
+                                    <td colspan="7" class="py-8 text-center text-on-surface-variant">No coupons created yet.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
             </div>
-        </div>
+        </main>
     </div>
-</main>
-
-<div th:replace="~{layout :: footer}"></div>
-<div th:replace="~{layout :: html_scripts}"></div>
 </body>
 </html>
