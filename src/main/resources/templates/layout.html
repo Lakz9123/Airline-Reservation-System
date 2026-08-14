@@ -371,8 +371,17 @@
 
 <!-- USER NAVBAR (Matches landing page exactly) -->
 <nav th:fragment="user_navbar" class="navbar navbar-expand-lg navbar-main fixed-top" style="background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 0.65rem 0; z-index: 1000;">
+    <style>
+        @media (min-width: 992px) {
+            .navbar-main .dropdown:hover .dropdown-menu {
+                display: block;
+                margin-top: 0;
+            }
+        }
+    </style>
     <div class="container">
-        <a class="navbar-brand" th:href="@{/user/dashboard}" style="font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.45rem; color: var(--text) !important; letter-spacing: -1.2px; text-decoration: none; display: flex; align-items: center; gap: .6rem;">
+        <!-- Logo -->
+        <a class="navbar-brand" th:href="@{/}" style="font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.45rem; color: var(--text) !important; letter-spacing: -1.2px; text-decoration: none; display: flex; align-items: center; gap: .6rem;">
             <div class="brand-icon">
                 <i class="bi bi-airplane-fill"></i>
             </div>
@@ -382,37 +391,94 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="userNav">
-            <ul class="navbar-nav me-auto align-items-center gap-1 mt-3 mt-lg-0">
-                <li class="nav-item"><a class="nav-link nav-link-item" th:href="@{/user/dashboard}">Dashboard</a></li>
-                <li class="nav-item"><a class="nav-link nav-link-item" th:href="@{/user/search}">Search Flights</a></li>
-                <li class="nav-item"><a class="nav-link nav-link-item" th:href="@{/user/bookings}">My Bookings</a></li>
-                <li class="nav-item"><a class="nav-link nav-link-item" th:href="@{/user/wallet}">My Wallet</a></li>
-                <li class="nav-item"><a class="nav-link nav-link-item" th:href="@{/user/loyalty}">Loyalty</a></li>
+            
+            <!-- BEFORE LOGIN Main Links -->
+            <ul class="navbar-nav me-auto align-items-center gap-1 mt-3 mt-lg-0" sec:authorize="!isAuthenticated()">
+                <li class="nav-item"><a class="nav-link nav-link-item" th:href="@{/#search}">Book a Flight</a></li>
+                <li class="nav-item"><a class="nav-link nav-link-item" th:href="@{/#flight-status}">Flight Status</a></li>
+                <li class="nav-item"><a class="nav-link nav-link-item" th:href="@{/#offers}">Offers</a></li>
             </ul>
+
+            <!-- AFTER LOGIN Main Links -->
+            <ul class="navbar-nav me-auto align-items-center gap-1 mt-3 mt-lg-0" sec:authorize="isAuthenticated()">
+                <li class="nav-item"><a class="nav-link nav-link-item" th:href="@{/user/search}">Book a Flight</a></li>
+                <li class="nav-item"><a class="nav-link nav-link-item" th:href="@{/#offers}">Offers</a></li>
+                <!-- My Trips Dropdown -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="myTripsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        My Trips
+                    </a>
+                    <ul class="dropdown-menu border-0 shadow-sm rounded-4 mt-2" aria-labelledby="myTripsDropdown" style="background: var(--surface); backdrop-filter: blur(20px);">
+                        <li><a class="dropdown-item py-2" th:href="@{/user/bookings}"><i class="bi bi-clock-history text-muted me-2"></i>Booking History</a></li>
+                        <li><a class="dropdown-item py-2" th:href="@{/user/bookings}"><i class="bi bi-check-circle text-muted me-2"></i>Check-in</a></li>
+                        
+                        <!-- Conditionally render Boarding Pass if user has a CHECKED_IN booking -->
+                        <th:block th:with="userOpt=${@userRepository.findByEmail(#authentication.name)}">
+                            <th:block th:if="${userOpt.isPresent()}" th:with="userBookings=${@bookingRepository.findByUserOrderByBookingDateDesc(userOpt.get())}">
+                                <th:block th:with="hasCheckedIn=${#lists.size(userBookings.?[checkInStatus == 'CHECKED_IN']) > 0}">
+                                    <li th:if="${hasCheckedIn}"><a class="dropdown-item py-2" th:href="@{/user/bookings}"><i class="bi bi-pass text-primary me-2"></i>Boarding Pass</a></li>
+                                </th:block>
+                            </th:block>
+                        </th:block>
+                        
+                        <li><hr class="dropdown-divider opacity-10"></li>
+                        <li><a class="dropdown-item py-2" th:href="@{/user/bookings}"><i class="bi bi-arrow-counterclockwise text-muted me-2"></i>Refund/Cancellation</a></li>
+                    </ul>
+                </li>
+            </ul>
+
             <ul class="navbar-nav ms-auto align-items-center gap-3 mt-3 mt-lg-0">
-                <!-- Notification Bell -->
-                <li class="nav-item">
-                    <a class="btn btn-outline-theme btn-sm position-relative rounded-pill px-2.5 py-1.5" th:href="@{/user/notifications}">
-                        <i class="bi bi-bell-fill" style="color: var(--sky-dark);"></i>
-                        <span th:if="${(unreadNotificationCount != null) and (unreadNotificationCount > 0)}"
-                              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                              style="font-size: .65rem; padding: 0.25em 0.5em;"
-                              th:text="${unreadNotificationCount}">0</span>
-                    </a>
-                </li>
-                <li class="nav-item" sec:authorize="isAuthenticated()">
-                    <a th:href="@{/user/profile}" class="nav-link d-flex align-items-center gap-2 px-2 py-1 rounded text-decoration-none" style="color: var(--text);">
-                        <i class="bi bi-person-circle text-primary" style="font-size: 1.2rem;"></i>
-                        <span sec:authentication="name" class="fw-semibold small"></span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <form th:action="@{/logout}" method="post" class="m-0">
-                        <button type="submit" class="btn-outline-theme py-2 px-3 small">
-                            Logout <i class="bi bi-box-arrow-right ms-1"></i>
-                        </button>
-                    </form>
-                </li>
+                <!-- BEFORE LOGIN Right Side -->
+                <th:block sec:authorize="!isAuthenticated()">
+                    <li class="nav-item">
+                        <a th:href="@{/login}" class="btn btn-outline-theme rounded-pill px-4 py-2 small fw-semibold">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a th:href="@{/register}" class="btn btn-primary rounded-pill px-4 py-2 small fw-semibold" style="background-color: var(--sky); border-color: var(--sky);">Sign Up</a>
+                    </li>
+                </th:block>
+
+                <!-- AFTER LOGIN Right Side -->
+                <th:block sec:authorize="isAuthenticated()">
+                    <!-- Notification Bell -->
+                    <li class="nav-item">
+                        <a class="btn btn-outline-theme btn-sm position-relative rounded-pill px-2.5 py-1.5" th:href="@{/user/notifications}">
+                            <i class="bi bi-bell-fill" style="color: var(--sky-dark);"></i>
+                            <span th:if="${(unreadNotificationCount != null) and (unreadNotificationCount > 0)}"
+                                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                  style="font-size: .65rem; padding: 0.25em 0.5em;"
+                                  th:text="${unreadNotificationCount}">0</span>
+                        </a>
+                    </li>
+                    
+                    <!-- Avatar/Account Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 px-2 py-1 rounded text-decoration-none" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: var(--text);">
+                            <i class="bi bi-person-circle text-primary" style="font-size: 1.2rem;"></i>
+                            <span sec:authentication="name" class="fw-semibold small d-none d-lg-inline"></span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm rounded-4 mt-2" aria-labelledby="accountDropdown" style="background: var(--surface); backdrop-filter: blur(20px);">
+                            <li class="px-3 py-2 border-bottom border-light mb-1">
+                                <span class="d-block small text-muted">Signed in as</span>
+                                <span class="fw-bold" sec:authentication="name">User</span>
+                            </li>
+                            <li><a class="dropdown-item py-2" th:href="@{/user/profile}"><i class="bi bi-person text-muted me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item py-2" th:href="@{/user/wallet}"><i class="bi bi-wallet2 text-muted me-2"></i>Wallet</a></li>
+                            <li><a class="dropdown-item py-2" th:href="@{/user/loyalty}"><i class="bi bi-star text-muted me-2"></i>Loyalty</a></li>
+                            <li><a class="dropdown-item py-2" th:href="@{/user/support}"><i class="bi bi-question-circle text-muted me-2"></i>Help Center</a></li>
+                            <li><hr class="dropdown-divider opacity-10"></li>
+                            <li>
+                                <form th:action="@{/logout}" method="post" class="m-0">
+                                    <button type="submit" class="dropdown-item py-2 text-danger">
+                                        <i class="bi bi-box-arrow-right me-2"></i>Logout
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                </th:block>
+                
+                <!-- Dark Mode Toggle -->
                 <li class="nav-item">
                     <button class="btn btn-outline-theme py-2 px-2.5 darkModeToggle"><i class="bi bi-moon"></i></button>
                 </li>
