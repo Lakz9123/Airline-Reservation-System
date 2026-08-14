@@ -903,6 +903,126 @@
     </div>
 </section>
 
+<!-- ─── FLIGHT STATUS ─────────────────────────────────────── -->
+<section class="py-5" id="flight-status" style="background: linear-gradient(135deg, var(--bg) 0%, rgba(14, 165, 233, 0.03) 100%);">
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center mb-4">
+                <span class="section-label mb-2">Real-Time Updates</span>
+                <h2 class="section-title">Check Flight Status</h2>
+                <p class="text-muted">Stay informed with the latest departure and arrival times for all SkyFly Elite flights.</p>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="p-4 rounded-4 shadow-sm" style="background: var(--surface); backdrop-filter: blur(20px); border: 1px solid var(--border);">
+                    <form th:action="@{/login}" method="get" class="row g-3">
+                        <div class="col-md-5">
+                            <label class="form-label small fw-bold text-muted">Flight Number</label>
+                            <input type="text" class="form-control" placeholder="e.g. SF 101" required>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label small fw-bold text-muted">Departure Date</label>
+                            <input type="date" class="form-control" required>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="button" class="btn btn-theme w-100" onclick="window.location.href='/login'">Check</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ─── OFFERS & DEALS ────────────────────────────────────── -->
+<section class="py-6 py-md-5 my-3" id="offers">
+    <div class="container">
+        <div class="d-flex flex-wrap align-items-end justify-content-between mb-4 gap-3">
+            <div>
+                <p class="section-label mb-1">Exclusive Deals</p>
+                <h2 class="section-title mb-0">Special Offers</h2>
+            </div>
+            <a th:href="@{/login}" class="btn text-primary fw-bold text-decoration-none">View All Deals <i class="bi bi-arrow-right ms-1"></i></a>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card border-0 rounded-4 shadow-sm h-100 overflow-hidden" style="background: var(--surface);">
+                    <div class="p-4 d-flex flex-column h-100">
+                        <div class="mb-3"><span class="badge bg-primary-subtle text-primary py-2 px-3 rounded-pill">Limited Time</span></div>
+                        <h4 class="fw-bold mb-2">15% Off Business Class</h4>
+                        <p class="text-muted mb-4 text-sm">Experience luxury for less on all domestic flights booked this weekend.</p>
+                        <div class="mt-auto">
+                            <a th:href="@{/login}" class="btn nav-btn-outline w-100 rounded-pill">Claim Offer</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 rounded-4 shadow-sm h-100 overflow-hidden" style="background: var(--surface);">
+                    <div class="p-4 d-flex flex-column h-100">
+                        <div class="mb-3"><span class="badge bg-info-subtle text-info py-2 px-3 rounded-pill">Students</span></div>
+                        <h4 class="fw-bold mb-2">Student Discount</h4>
+                        <p class="text-muted mb-4 text-sm">Verify your student ID and get up to 10% off plus extra baggage allowance.</p>
+                        <div class="mt-auto">
+                            <a th:href="@{/login}" class="btn nav-btn-outline w-100 rounded-pill">Learn More</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 rounded-4 shadow-sm h-100 overflow-hidden" style="background: var(--surface);">
+                    <div class="p-4 d-flex flex-column h-100">
+                        <div class="mb-3"><span class="badge bg-success-subtle text-success py-2 px-3 rounded-pill">Weekend</span></div>
+                        <h4 class="fw-bold mb-2">Weekend Getaways</h4>
+                        <p class="text-muted mb-4 text-sm">Special round-trip fares for weekend trips to Goa, Kerala, and Rajasthan.</p>
+                        <div class="mt-auto">
+                            <a th:href="@{/login}" class="btn nav-btn-outline w-100 rounded-pill">Book Now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ─── OUR FLEET ─────────────────────────────────────────── -->
+<section class="py-5" id="fleet">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="section-label mb-2">Experience Excellence</span>
+            <h2 class="section-title">Our Modern Fleet</h2>
+            <p class="text-muted mx-auto" style="max-width: 600px;">Travel in comfort on some of the youngest and most fuel-efficient aircraft in the skies.</p>
+        </div>
+        <div class="row g-4 align-items-center">
+            <div class="col-lg-6">
+                <div class="p-4 p-md-5 rounded-4 shadow-sm" style="background: var(--surface); border: 1px solid var(--border);">
+                    <h3 class="fw-bold text-dark mb-3">Boeing 787 Dreamliner</h3>
+                    <p class="text-muted mb-4">Our flagship wide-body aircraft designed for ultra-long-haul comfort. Enjoy larger windows, lower cabin altitude, and superior humidity for a refreshing arrival.</p>
+                    <ul class="list-unstyled mb-0 text-muted">
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> 256 Total Seats</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> 30 Lie-Flat Business Class Seats</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> High-Speed Wi-Fi Available</li>
+                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i> Advanced HEPA Filtration</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="p-4 p-md-5 rounded-4 shadow-sm" style="background: var(--surface); border: 1px solid var(--border);">
+                    <h3 class="fw-bold text-dark mb-3">Airbus A320neo</h3>
+                    <p class="text-muted mb-4">The backbone of our domestic operations. The A320neo offers uncompromised comfort with significantly reduced fuel burn and noise footprint.</p>
+                    <ul class="list-unstyled mb-0 text-muted">
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> 180 Economy Seats</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> Extra Legroom Options</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> Mood Lighting</li>
+                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i> Whisper-quiet Cabin</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- ─── STATS STRIP ───────────────────────────────────────── -->
 <div class="stats-strip">
     <div class="container">
@@ -934,6 +1054,130 @@
         </div>
     </div>
 </div>
+
+<!-- ─── ABOUT US ──────────────────────────────────────────── -->
+<section class="py-6 py-md-5 my-3" id="about">
+    <div class="container">
+        <div class="row g-5 align-items-center">
+            <div class="col-lg-6">
+                <div class="position-relative">
+                    <img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=800&q=80" alt="About SkyFly" class="img-fluid rounded-4 shadow-lg">
+                    <div class="position-absolute top-100 start-0 translate-middle-y ms-4 p-4 rounded-4 shadow-lg" style="background: var(--surface); backdrop-filter: blur(20px); border: 1px solid var(--border);">
+                        <h4 class="fw-bold text-primary mb-0">15+</h4>
+                        <span class="text-muted small fw-semibold">Years of Excellence</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <span class="section-label mb-2">Our Story</span>
+                <h2 class="section-title mb-4">Elevating Your Journey Since 2011</h2>
+                <p class="text-muted mb-4" style="line-height: 1.8;">At SkyFly Elite, we believe that the journey should be as magnificent as the destination. Born from a passion for aviation and a commitment to unmatched hospitality, we have redefined premium air travel.</p>
+                <p class="text-muted mb-4" style="line-height: 1.8;">Our mission is simple: to provide a seamless, safe, and luxurious flying experience. With industry-leading on-time performance and a world-class crew, you're always in good hands.</p>
+                <a th:href="@{/login}" class="btn btn-theme rounded-pill px-4">Discover More</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ─── CAREERS ───────────────────────────────────────────── -->
+<section class="py-5" id="careers" style="background: linear-gradient(135deg, rgba(2, 132, 199, 0.05) 0%, rgba(14, 165, 233, 0.05) 100%);">
+    <div class="container text-center">
+        <span class="section-label mb-2">Join the Elite</span>
+        <h2 class="section-title mb-4">Launch Your Career With Us</h2>
+        <p class="text-muted mx-auto mb-5" style="max-width: 600px;">We are always looking for passionate individuals to join our growing family. Whether in the cockpit, the cabin, or on the ground, your future takes flight here.</p>
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-4">
+                <div class="p-4 bg-white rounded-4 shadow-sm h-100 border-0">
+                    <div class="mb-3"><i class="bi bi-airplane-engines text-primary" style="font-size: 2rem;"></i></div>
+                    <h5 class="fw-bold mb-3">Pilots & Flight Operations</h5>
+                    <a th:href="@{/login}" class="text-decoration-none text-primary fw-bold small">View Openings <i class="bi bi-arrow-right"></i></a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4 bg-white rounded-4 shadow-sm h-100 border-0">
+                    <div class="mb-3"><i class="bi bi-person-hearts text-primary" style="font-size: 2rem;"></i></div>
+                    <h5 class="fw-bold mb-3">Cabin Crew & Hospitality</h5>
+                    <a th:href="@{/login}" class="text-decoration-none text-primary fw-bold small">View Openings <i class="bi bi-arrow-right"></i></a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4 bg-white rounded-4 shadow-sm h-100 border-0">
+                    <div class="mb-3"><i class="bi bi-headset text-primary" style="font-size: 2rem;"></i></div>
+                    <h5 class="fw-bold mb-3">Corporate & Ground Staff</h5>
+                    <a th:href="@{/login}" class="text-decoration-none text-primary fw-bold small">View Openings <i class="bi bi-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ─── CONTACT ───────────────────────────────────────────── -->
+<section class="py-6 py-md-5 my-3" id="contact">
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-lg-5">
+                <span class="section-label mb-2">Get In Touch</span>
+                <h2 class="section-title mb-4">We're Here to Help</h2>
+                <p class="text-muted mb-5">Have a question about your booking, baggage, or our services? Our dedicated support team is available 24/7 to assist you.</p>
+                
+                <div class="d-flex align-items-center mb-4">
+                    <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                        <i class="bi bi-geo-alt-fill fs-5"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-1">Headquarters</h6>
+                        <p class="text-muted mb-0 small">SkyFly Tower, Aero City, New Delhi 110037</p>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center mb-4">
+                    <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                        <i class="bi bi-telephone-fill fs-5"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-1">24/7 Support</h6>
+                        <p class="text-muted mb-0 small">+91 1800 123 4567</p>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                        <i class="bi bi-envelope-fill fs-5"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-1">Email Us</h6>
+                        <p class="text-muted mb-0 small">support@skyflyelite.com</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <div class="p-4 p-md-5 rounded-4 shadow-sm h-100" style="background: var(--surface); border: 1px solid var(--border);">
+                    <form th:action="@{/login}" method="get">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label text-muted small fw-bold">Full Name</label>
+                                <input type="text" class="form-control" placeholder="John Doe">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-muted small fw-bold">Email Address</label>
+                                <input type="email" class="form-control" placeholder="john@example.com">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label text-muted small fw-bold">Subject</label>
+                                <input type="text" class="form-control" placeholder="How can we help?">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label text-muted small fw-bold">Message</label>
+                                <textarea class="form-control" rows="4" placeholder="Your message here..."></textarea>
+                            </div>
+                            <div class="col-12 mt-4">
+                                <button type="button" class="btn btn-theme w-100 py-2" onclick="window.location.href='/login'">Send Message</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
 <!-- ─── CTA SECTION ───────────────────────────────────────── -->
 <section class="cta-section" id="cta">
