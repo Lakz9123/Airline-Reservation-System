@@ -885,6 +885,28 @@
                 e.preventDefault();
             });
         });
+        
+        // Handle "Book a Flight" link on landing page to focus search form
+        const bookFlightLinks = document.querySelectorAll('a.nav-link-item[href="/#home"]');
+        bookFlightLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                if (window.location.pathname === '/' || window.location.pathname === '') {
+                    e.preventDefault();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    
+                    // Focus the first input of the search form after scrolling
+                    setTimeout(() => {
+                        const originSelect = document.querySelector('select[name="originId"]');
+                        if (originSelect) {
+                            originSelect.focus();
+                            // Optional: add a temporary highlight effect
+                            originSelect.style.boxShadow = '0 0 0 0.25rem rgba(14, 165, 233, 0.5)';
+                            setTimeout(() => originSelect.style.boxShadow = '', 1500);
+                        }
+                    }, 500);
+                }
+            });
+        });
     });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
