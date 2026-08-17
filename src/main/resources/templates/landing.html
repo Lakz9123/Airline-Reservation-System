@@ -156,12 +156,13 @@
             color: #fff;
         }
 
+        /* ─── Hero ──────────────────────────────────────── */
         .hero {
             position: relative;
             min-height: 98vh;
             display: flex;
             align-items: center;
-            background: url('/images/hero-bg.png') center center / cover no-repeat;
+            background: url('/images/hero-skyfly-elite.png') center center / cover no-repeat;
             padding-top: 100px;
         }
         .hero-overlay {
@@ -825,16 +826,65 @@
         <div class="routes-scroll-wrap" id="routesContainer">
             <div class="routes-track" id="routesTrack">
 
+                <!-- Mumbai -->
+                <div class="route-card">
+                    <img src="/images/route-mumbai.png" alt="Mumbai" class="route-img">
+                    <div class="route-overlay"></div>
+                    <div class="route-body">
+                        <span class="price-badge">From ₹3,499</span>
+                        <p class="route-city">Mumbai</p>
+                        <div class="route-sub">Delhi → Mumbai</div>
+                    </div>
+                </div>
+
+                <!-- Delhi -->
+                <div class="route-card">
+                    <img src="/images/route-delhi.png" alt="Delhi" class="route-img">
+                    <div class="route-overlay"></div>
+                    <div class="route-body">
+                        <span class="price-badge">From ₹2,999</span>
+                        <p class="route-city">New Delhi</p>
+                        <div class="route-sub">Mumbai → Delhi</div>
+                    </div>
+                </div>
+
+                <!-- Bangalore -->
+                <div class="route-card">
+                    <img src="/images/route-bangalore.png" alt="Bangalore" class="route-img">
+                    <div class="route-overlay"></div>
+                    <div class="route-body">
+                        <span class="price-badge">From ₹3,199</span>
+                        <p class="route-city">Bangalore</p>
+                        <div class="route-sub">Chennai → Bangalore</div>
+                    </div>
+                </div>
+
+                <!-- Goa -->
+                <div class="route-card">
+                    <img src="/images/route-goa.png" alt="Goa" class="route-img">
+                    <div class="route-overlay"></div>
+                    <div class="route-body">
+                        <span class="price-badge">From ₹2,799</span>
+                        <p class="route-city">Goa</p>
+                        <div class="route-sub">Delhi → Goa</div>
+                    </div>
+                </div>
+
+                <!-- Kolkata -->
+                <div class="route-card">
+                    <img src="/images/route-kolkata.png" alt="Kolkata" class="route-img">
+                    <div class="route-overlay"></div>
+                    <div class="route-body">
+                        <span class="price-badge">From ₹3,899</span>
+                        <p class="route-city">Kolkata</p>
+                        <div class="route-sub">Hyderabad → Kolkata</div>
+                    </div>
+                </div>
+
                 <!-- Dynamic routes from backend -->
                 <th:block th:each="route, stat : ${topRoutes}">
-                    <div class="route-card" th:if="${stat.index lt 6}">
-                        <img th:src="${#strings.containsIgnoreCase(route[1], 'mumbai')} ? @{/images/route-mumbai.png} : 
-                                     (${#strings.containsIgnoreCase(route[1], 'delhi')} ? @{/images/route-delhi.png} : 
-                                     (${#strings.containsIgnoreCase(route[1], 'bangalore')} ? @{/images/route-bangalore.png} : 
-                                     (${#strings.containsIgnoreCase(route[1], 'goa')} ? @{/images/route-goa.png} : 
-                                     (${#strings.containsIgnoreCase(route[1], 'kolkata')} ? @{/images/route-kolkata.png} : 
-                                     'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=800&q=80'))))" 
-                             alt="Route" class="route-img">
+                    <div class="route-card" th:if="${stat.index lt 3}">
+                        <img th:src="@{'/images/route-bangalore.png'}" alt="Route" class="route-img">
                         <div class="route-overlay"></div>
                         <div class="route-body">
                             <span class="price-badge">Top Pick</span>
@@ -896,20 +946,42 @@
             <a th:href="@{/login}" class="btn text-primary fw-bold text-decoration-none">View All Deals <i class="bi bi-arrow-right ms-1"></i></a>
         </div>
         <div class="row g-4">
-            <th:block th:each="coupon, stat : ${@couponRepository.findAll()}">
-                <div class="col-md-4" th:if="${stat.index lt 3}">
-                    <div class="card border-0 rounded-4 shadow-sm h-100 overflow-hidden" style="background: var(--surface);">
-                        <div class="p-4 d-flex flex-column h-100">
-                            <div class="mb-3"><span class="badge bg-primary-subtle text-primary py-2 px-3 rounded-pill text-uppercase fw-bold" th:text="${coupon.code}">CODE</span></div>
-                            <h4 class="fw-bold mb-2" th:text="${coupon.discountValue + '% Off Flights'}">Discount</h4>
-                            <p class="text-muted mb-4 text-sm">Apply this exclusive code at checkout to receive <span th:text="${coupon.discountValue}"></span>% off your total fare.</p>
-                            <div class="mt-auto">
-                                <a th:href="@{/login}" class="btn btn-outline-primary w-100 rounded-pill fw-bold border-2">Claim Offer</a>
-                            </div>
+            <div class="col-md-4">
+                <div class="card border-0 rounded-4 shadow-sm h-100 overflow-hidden" style="background: var(--surface);">
+                    <div class="p-4 d-flex flex-column h-100">
+                        <div class="mb-3"><span class="badge bg-primary-subtle text-primary py-2 px-3 rounded-pill">Limited Time</span></div>
+                        <h4 class="fw-bold mb-2">15% Off Business Class</h4>
+                        <p class="text-muted mb-4 text-sm">Experience luxury for less on all domestic flights booked this weekend.</p>
+                        <div class="mt-auto">
+                            <a th:href="@{/login}" class="btn nav-btn-outline w-100 rounded-pill">Claim Offer</a>
                         </div>
                     </div>
                 </div>
-            </th:block>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 rounded-4 shadow-sm h-100 overflow-hidden" style="background: var(--surface);">
+                    <div class="p-4 d-flex flex-column h-100">
+                        <div class="mb-3"><span class="badge bg-info-subtle text-info py-2 px-3 rounded-pill">Students</span></div>
+                        <h4 class="fw-bold mb-2">Student Discount</h4>
+                        <p class="text-muted mb-4 text-sm">Verify your student ID and get up to 10% off plus extra baggage allowance.</p>
+                        <div class="mt-auto">
+                            <a th:href="@{/login}" class="btn nav-btn-outline w-100 rounded-pill">Learn More</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 rounded-4 shadow-sm h-100 overflow-hidden" style="background: var(--surface);">
+                    <div class="p-4 d-flex flex-column h-100">
+                        <div class="mb-3"><span class="badge bg-success-subtle text-success py-2 px-3 rounded-pill">Weekend</span></div>
+                        <h4 class="fw-bold mb-2">Weekend Getaways</h4>
+                        <p class="text-muted mb-4 text-sm">Special round-trip fares for weekend trips to Goa, Kerala, and Rajasthan.</p>
+                        <div class="mt-auto">
+                            <a th:href="@{/login}" class="btn nav-btn-outline w-100 rounded-pill">Book Now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </section>
@@ -923,20 +995,30 @@
             <p class="text-muted mx-auto" style="max-width: 600px;">Travel in comfort on some of the youngest and most fuel-efficient aircraft in the skies.</p>
         </div>
         <div class="row g-4 align-items-center">
-            <th:block th:each="aircraft, stat : ${@aircraftRepository.findAll()}">
-                <div class="col-lg-6" th:if="${stat.index lt 2}">
-                    <div class="p-4 p-md-5 rounded-4 shadow-sm h-100" style="background: var(--surface); border: 1px solid var(--border);">
-                        <h3 class="fw-bold text-dark mb-3" th:text="${aircraft.model}">Model</h3>
-                        <p class="text-muted mb-4" th:text="${'Experience premium comfort and efficiency aboard the ' + aircraft.model + '.'}">Description</p>
-                        <ul class="list-unstyled mb-0 text-muted">
-                            <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> <span th:text="${aircraft.capacity}"></span> Total Seats</li>
-                            <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> <span th:text="${aircraft.businessSeats}"></span> Premium Business Seats</li>
-                            <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> <span th:text="${aircraft.economySeats}"></span> Standard Economy Seats</li>
-                            <li><i class="bi bi-check-circle-fill text-primary me-2"></i> Advanced Cabin Filtration</li>
-                        </ul>
-                    </div>
+            <div class="col-lg-6">
+                <div class="p-4 p-md-5 rounded-4 shadow-sm" style="background: var(--surface); border: 1px solid var(--border);">
+                    <h3 class="fw-bold text-dark mb-3">Boeing 787 Dreamliner</h3>
+                    <p class="text-muted mb-4">Our flagship wide-body aircraft designed for ultra-long-haul comfort. Enjoy larger windows, lower cabin altitude, and superior humidity for a refreshing arrival.</p>
+                    <ul class="list-unstyled mb-0 text-muted">
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> 256 Total Seats</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> 30 Lie-Flat Business Class Seats</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> High-Speed Wi-Fi Available</li>
+                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i> Advanced HEPA Filtration</li>
+                    </ul>
                 </div>
-            </th:block>
+            </div>
+            <div class="col-lg-6">
+                <div class="p-4 p-md-5 rounded-4 shadow-sm" style="background: var(--surface); border: 1px solid var(--border);">
+                    <h3 class="fw-bold text-dark mb-3">Airbus A320neo</h3>
+                    <p class="text-muted mb-4">The backbone of our domestic operations. The A320neo offers uncompromised comfort with significantly reduced fuel burn and noise footprint.</p>
+                    <ul class="list-unstyled mb-0 text-muted">
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> 180 Economy Seats</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> Extra Legroom Options</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> Mood Lighting</li>
+                        <li><i class="bi bi-check-circle-fill text-primary me-2"></i> Whisper-quiet Cabin</li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 </section>
