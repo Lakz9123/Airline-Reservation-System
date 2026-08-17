@@ -902,8 +902,8 @@
                     <div class="card border-0 rounded-4 shadow-sm h-100 overflow-hidden" style="background: var(--surface);">
                         <div class="p-4 d-flex flex-column h-100">
                             <div class="mb-3"><span class="badge bg-primary-subtle text-primary py-2 px-3 rounded-pill text-uppercase fw-bold" th:text="${coupon.code}">CODE</span></div>
-                            <h4 class="fw-bold mb-2" th:text="${coupon.discountPercentage + '% Off Flights'}">Discount</h4>
-                            <p class="text-muted mb-4 text-sm">Apply this exclusive code at checkout to receive <span th:text="${coupon.discountPercentage}"></span>% off your total fare.</p>
+                            <h4 class="fw-bold mb-2" th:text="${coupon.discountValue + '% Off Flights'}">Discount</h4>
+                            <p class="text-muted mb-4 text-sm">Apply this exclusive code at checkout to receive <span th:text="${coupon.discountValue}"></span>% off your total fare.</p>
                             <div class="mt-auto">
                                 <a th:href="@{/login}" class="btn btn-outline-primary w-100 rounded-pill fw-bold border-2">Claim Offer</a>
                             </div>
