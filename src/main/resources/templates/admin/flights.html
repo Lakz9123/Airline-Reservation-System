@@ -12,7 +12,7 @@
         <!-- Shared Top App Bar Fragment -->
         <header th:replace="~{admin/admin-layout :: admin_topbar}"></header>
 
-        <main class="flex-1 overflow-y-auto p-gutter lg:p-margin-desktop">
+        <main class="flex-1 overflow-y-auto p-gutter lg:p-margin-desktop flex flex-col">
 <div class="max-w-container-max mx-auto space-y-unit*4">
 <!-- Page Header -->
 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
@@ -120,7 +120,7 @@
 </div>
 </div>
 </div>
-    <div class="-mx-4 -mb-4 md:-mx-6 md:-mb-6 lg:-mx-8 lg:-mb-8 mt-12">
+    <div class="-mx-gutter -mb-gutter lg:-mx-margin-desktop lg:-mb-margin-desktop mt-auto">
         <footer th:replace="~{layout :: footer}"></footer>
     </div>
 </main>
