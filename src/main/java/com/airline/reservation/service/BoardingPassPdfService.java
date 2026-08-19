@@ -243,12 +243,12 @@ public class BoardingPassPdfService {
         drawDetailBlock(canvas, bf, bfBold, col4, detailTop3, "BAGGAGE",
                 baggageStr);
 
-        // ── Barcode (Code128) ──
-        String barcodeText = String.format("SKY%05d", booking.getId());
-        byte[] barcodeBytes = barcodeService.generateBarcodeBytes(barcodeText, 300, 50);
+        // Add QR Code at bottom
+        String barcodeText = "SKY-" + booking.getId() + "-" + booking.getFlight().getFlightNumber() + "-" + booking.getSeatNumbers();
+        byte[] barcodeBytes = barcodeService.generateQRCodeBytes(barcodeText, 100, 100);
         if (barcodeBytes != null) {
             Image barcodeImage = Image.getInstance(barcodeBytes);
-            barcodeImage.setAbsolutePosition(cardX + 30, cardY + 20);
+            barcodeImage.setAbsolutePosition(cardX + cardW - 120, cardY + 20);
             canvas.addImage(barcodeImage);
         }
 

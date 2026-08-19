@@ -36,4 +36,29 @@ public class BarcodeService {
         if (bytes == null) return null;
         return "data:image/png;base64," + Base64.getEncoder().encodeToString(bytes);
     }
+
+    /**
+     * Generate a QR Code as PNG bytes.
+     */
+    public byte[] generateQRCodeBytes(String text, int width, int height) {
+        try {
+            com.google.zxing.qrcode.QRCodeWriter writer = new com.google.zxing.qrcode.QRCodeWriter();
+            BitMatrix bitMatrix = writer.encode(text, BarcodeFormat.QR_CODE, width, height);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            MatrixToImageWriter.writeToStream(bitMatrix, "PNG", baos);
+            return baos.toByteArray();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Generate a QR Code as a Base64-encoded data URI for embedding in HTML/PDF.
+     */
+    public String generateQRCodeBase64(String text, int width, int height) {
+        byte[] bytes = generateQRCodeBytes(text, width, height);
+        if (bytes == null) return null;
+        return "data:image/png;base64," + Base64.getEncoder().encodeToString(bytes);
+    }
 }
