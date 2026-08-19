@@ -247,4 +247,35 @@ public class Flight {
     public void setFlightStatus(FlightStatus flightStatus) {
         this.flightStatus = flightStatus;
     }
+
+    /** 
+     * Dynamic Pricing Engine 
+     * Calculates a real-time dynamic fare based on load factor and proximity to departure.
+     */
+    @Transient
+    public Double getDynamicFare() {
+        double base = this.fare != null ? this.fare : 0.0;
+        int total = getTotalSeats();
+        if (total == 0) return base;
+        
+        double loadFactor = (double) (total - (this.availableSeats != null ? this.availableSeats : total)) / total;
+        double multiplier = 1.0;
+        
+        // High load factor premium
+        if (loadFactor >= 0.8) {
+            multiplier += 0.20; // 20% premium if 80% or more full
+        } else if (loadFactor >= 0.5) {
+            multiplier += 0.10; // 10% premium if 50% or more full
+        }
+        
+        // Last-minute booking premium
+        if (this.departureDateTime != null) {
+            long hoursToDeparture = java.time.Duration.between(LocalDateTime.now(), this.departureDateTime).toHours();
+            if (hoursToDeparture > 0 && hoursToDeparture <= 72) {
+                multiplier += 0.15; // 15% premium if within 3 days
+            }
+        }
+        
+        return Math.round(base * multiplier * 100.0) / 100.0;
+    }
 }

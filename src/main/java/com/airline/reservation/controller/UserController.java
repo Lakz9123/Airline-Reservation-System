@@ -272,7 +272,7 @@ public class UserController {
         else if ("Business Class".equalsIgnoreCase(cabinClass)) multiplier = 2.5;
         else if ("First Class".equalsIgnoreCase(cabinClass)) multiplier = 4.0;
         
-        Double originalFare = flight.getFare() * multiplier * selectedSeats.size();
+        Double originalFare = flight.getDynamicFare() * multiplier * selectedSeats.size();
         Double taxes = originalFare * 0.18;
         Double convenienceFee = 200.0;
         Double totalFare = originalFare + taxes + convenienceFee;

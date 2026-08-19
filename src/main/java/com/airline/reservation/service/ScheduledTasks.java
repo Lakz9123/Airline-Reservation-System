@@ -23,17 +23,20 @@ public class ScheduledTasks {
     private final NotificationService notificationService;
     private final com.airline.reservation.repository.NotificationRepository notificationRepository;
     private final LoyaltyService loyaltyService;
+    private final com.airline.reservation.repository.FlightRepository flightRepository;
 
     public ScheduledTasks(BookingRepository bookingRepository,
                           EmailService emailService,
                           NotificationService notificationService,
                           com.airline.reservation.repository.NotificationRepository notificationRepository,
-                          LoyaltyService loyaltyService) {
+                          LoyaltyService loyaltyService,
+                          com.airline.reservation.repository.FlightRepository flightRepository) {
         this.bookingRepository = bookingRepository;
         this.emailService = emailService;
         this.notificationService = notificationService;
         this.notificationRepository = notificationRepository;
         this.loyaltyService = loyaltyService;
+        this.flightRepository = flightRepository;
     }
 
     /**
@@ -127,6 +130,50 @@ public class ScheduledTasks {
             logger.info("Completed daily loyalty tier downgrade check.");
         } catch (Exception e) {
             logger.error("Failed to process loyalty tier downgrades.", e);
+        }
+    }
+
+    /**
+     * Runs every minute to update the status of active flights automatically.
+     * Transitions: SCHEDULED -> BOARDING (45 mins prior) -> DEPARTED (at departure) -> LANDED (at arrival)
+     */
+    @Scheduled(fixedRate = 60000)
+    @Transactional
+    public void updateFlightStatuses() {
+        LocalDateTime now = LocalDateTime.now();
+        List<com.airline.reservation.entity.Flight> activeFlights = flightRepository.findByFlightStatusNot(com.airline.reservation.entity.FlightStatus.LANDED);
+        
+        for (com.airline.reservation.entity.Flight flight : activeFlights) {
+            if (flight.getFlightStatus() == com.airline.reservation.entity.FlightStatus.CANCELLED) {
+                continue;
+            }
+            
+            boolean updated = false;
+            
+            // Check if landed
+            if (now.isAfter(flight.getArrivalDateTime()) || now.isEqual(flight.getArrivalDateTime())) {
+                flight.setFlightStatus(com.airline.reservation.entity.FlightStatus.LANDED);
+                updated = true;
+            }
+            // Check if departed
+            else if (now.isAfter(flight.getDepartureDateTime()) || now.isEqual(flight.getDepartureDateTime())) {
+                if (flight.getFlightStatus() != com.airline.reservation.entity.FlightStatus.DEPARTED) {
+                    flight.setFlightStatus(com.airline.reservation.entity.FlightStatus.DEPARTED);
+                    updated = true;
+                }
+            }
+            // Check if boarding
+            else if (now.isAfter(flight.getDepartureDateTime().minusMinutes(45)) || now.isEqual(flight.getDepartureDateTime().minusMinutes(45))) {
+                if (flight.getFlightStatus() == com.airline.reservation.entity.FlightStatus.SCHEDULED) {
+                    flight.setFlightStatus(com.airline.reservation.entity.FlightStatus.BOARDING);
+                    updated = true;
+                }
+            }
+            
+            if (updated) {
+                flightRepository.save(flight);
+                logger.info("Automatically updated flight {} to status {}", flight.getFlightNumber(), flight.getFlightStatus());
+            }
         }
     }
 }

@@ -254,12 +254,12 @@
 <script th:inline="javascript">
     const allSeats    = /*[[${allSeats}]]*/ [];
     const bookedSeats = new Set(/*[[${bookedSeats}]]*/ []);
-    const farePerSeat = /*[[${flight.fare}]]*/ 0;
+    const farePerSeat = /*[[${flight.dynamicFare}]]*/ 0;
 
-    const economyFare        = /*[[${flight.economyFare ?: flight.fare}]]*/ 0;
-    const premiumEconomyFare = /*[[${flight.premiumEconomyFare ?: (flight.fare * 1.5)}]]*/ 0;
-    const businessFare       = /*[[${flight.businessFare ?: (flight.fare * 2.5)}]]*/ 0;
-    const firstClassFare     = /*[[${flight.firstClassFare ?: (flight.fare * 4.0)}]]*/ 0;
+    const economyFare        = /*[[${flight.economyFare ?: flight.dynamicFare}]]*/ 0;
+    const premiumEconomyFare = /*[[${flight.premiumEconomyFare ?: (flight.dynamicFare * 1.5)}]]*/ 0;
+    const businessFare       = /*[[${flight.businessFare ?: (flight.dynamicFare * 2.5)}]]*/ 0;
+    const firstClassFare     = /*[[${flight.firstClassFare ?: (flight.dynamicFare * 4.0)}]]*/ 0;
 
     const seatCounts = {
         firstClass:     /*[[${seatCounts.firstClass}]]*/ 0,

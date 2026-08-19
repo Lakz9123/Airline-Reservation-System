@@ -726,7 +726,7 @@
                             <div class="d-flex flex-column justify-content-between" style="min-width: 200px;">
                                 <div>
                                     <div class="class-label text-uppercase mb-1" th:text="${f.aircraft.model}">First Class</div>
-                                    <div class="price-large">₹<span th:text="${#numbers.formatDecimal(f.fare,1,'COMMA',0,'POINT')}">0</span></div>
+                                    <div class="price-large">₹<span th:text="${#numbers.formatDecimal(f.dynamicFare,1,'COMMA',0,'POINT')}">0</span></div>
                                     
                                     <!-- Seats warning/info -->
                                     <div th:if="${f.availableSeats <= 5}" class="seats-left">
