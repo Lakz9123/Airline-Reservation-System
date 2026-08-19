@@ -239,5 +239,19 @@
     </div>
 </header>
 
+<!-- Admin Footer Fragment -->
+<footer th:fragment="admin_footer" class="w-full bg-surface border-t border-outline-variant py-4 px-6 mt-auto">
+    <div class="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-on-surface-variant font-body-sm">
+        <div>
+            &copy; 2024 SkyFly Elite Admin Console. All rights reserved.
+        </div>
+        <div class="flex gap-6">
+            <a th:href="@{/admin/support}" class="hover:text-secondary transition-colors">Support</a>
+            <a th:href="@{/admin/settings}" class="hover:text-secondary transition-colors">Settings</a>
+            <a href="#" class="hover:text-secondary transition-colors">Privacy</a>
+        </div>
+    </div>
+</footer>
+
 </body>
 </html>
