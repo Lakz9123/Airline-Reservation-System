@@ -358,6 +358,45 @@
             </ul>
         </div>
     </div>
+    
+    <!-- Dark Mode Script (Admin) -->
+    <script>
+        if (localStorage.getItem("theme") === "dark") {
+            document.documentElement.classList.add("dark-mode");
+            if(document.body) document.body.classList.add("dark-mode");
+        }
+        document.addEventListener("DOMContentLoaded", () => {
+            const darkModeToggles = document.querySelectorAll(".darkModeToggle");
+            function updateDarkModeIcons() {
+                const isDark = document.body.classList.contains("dark-mode");
+                darkModeToggles.forEach(btn => {
+                    const icon = btn.querySelector("i");
+                    if (icon) {
+                        if (isDark) {
+                            icon.classList.remove("bi-moon");
+                            icon.classList.add("bi-sun");
+                            icon.style.color = "#FDE047";
+                        } else {
+                            icon.classList.remove("bi-sun");
+                            icon.classList.add("bi-moon");
+                            icon.style.color = "";
+                        }
+                    }
+                });
+            }
+            updateDarkModeIcons();
+            darkModeToggles.forEach(btn => {
+                btn.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    document.body.classList.toggle("dark-mode");
+                    document.documentElement.classList.toggle("dark-mode");
+                    const isDark = document.body.classList.contains("dark-mode");
+                    localStorage.setItem("theme", isDark ? "dark" : "light");
+                    updateDarkModeIcons();
+                });
+            });
+        });
+    </script>
 </nav>
 
 <!-- USER NAVBAR (Matches landing page exactly) -->
@@ -654,6 +693,44 @@
                     }
                 });
             }
+        });
+    </script>
+    <!-- Dark Mode Script (User) -->
+    <script>
+        if (localStorage.getItem("theme") === "dark") {
+            document.documentElement.classList.add("dark-mode");
+            if(document.body) document.body.classList.add("dark-mode");
+        }
+        document.addEventListener("DOMContentLoaded", () => {
+            const darkModeToggles = document.querySelectorAll(".darkModeToggle");
+            function updateDarkModeIcons() {
+                const isDark = document.body.classList.contains("dark-mode");
+                darkModeToggles.forEach(btn => {
+                    const icon = btn.querySelector("i");
+                    if (icon) {
+                        if (isDark) {
+                            icon.classList.remove("bi-moon");
+                            icon.classList.add("bi-sun");
+                            icon.style.color = "#FDE047";
+                        } else {
+                            icon.classList.remove("bi-sun");
+                            icon.classList.add("bi-moon");
+                            icon.style.color = "";
+                        }
+                    }
+                });
+            }
+            updateDarkModeIcons();
+            darkModeToggles.forEach(btn => {
+                btn.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    document.body.classList.toggle("dark-mode");
+                    document.documentElement.classList.toggle("dark-mode");
+                    const isDark = document.body.classList.contains("dark-mode");
+                    localStorage.setItem("theme", isDark ? "dark" : "light");
+                    updateDarkModeIcons();
+                });
+            });
         });
     </script>
 </nav>
