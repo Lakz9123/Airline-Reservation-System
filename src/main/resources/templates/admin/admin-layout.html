@@ -218,13 +218,13 @@
 
     <!-- Trailing Actions -->
     <div class="flex items-center gap-4">
-        <button class="relative w-10 h-10 rounded-full hover:bg-surface-variant/50 flex items-center justify-center transition-colors">
+        <a th:href="@{/admin/notifications}" class="relative w-10 h-10 rounded-full hover:bg-surface-variant/50 flex items-center justify-center transition-colors">
             <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
             <span class="absolute top-2.5 right-2.5 w-2 h-2 bg-error rounded-full border border-surface"></span>
-        </button>
-        <button class="w-10 h-10 rounded-full hover:bg-surface-variant/50 flex items-center justify-center transition-colors">
+        </a>
+        <a th:href="@{/admin/support}" class="w-10 h-10 rounded-full hover:bg-surface-variant/50 flex items-center justify-center transition-colors">
             <span class="material-symbols-outlined text-on-surface-variant">help</span>
-        </button>
+        </a>
         <div class="h-6 w-px bg-outline-variant/50 mx-1"></div>
         <div class="flex items-center gap-3 cursor-pointer group">
             <div class="w-8 h-8 rounded-full overflow-hidden bg-surface-container-high border border-outline-variant shadow-sm flex items-center justify-center">
